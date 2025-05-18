@@ -16,6 +16,7 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/landingpage.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/search.css') }}">
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,7 +43,7 @@
                 </nav>
                 
                 <div class="nav-icons">
-                    <a href="#" class="nav-icon"><i class="fas fa-search"></i></a>
+                    <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
                     <a href="#" class="nav-icon"><i class="fas fa-user"></i></a>
                     <a href="#" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
                 </div>
@@ -55,6 +56,72 @@
             </div>
         </header>
 
+        <!-- Search Overlay -->
+        <div class="search-overlay" ng-class="{'active': isSearchActive}"></div>
+
+        <!-- Search Panel (Hidden by default) -->
+        <div class="search-panel" ng-controller="SearchController" ng-class="{'active': isSearchActive}">
+            <!-- Categories Navigation -->
+            <nav class="navbar navbar-expand navbar-light bg-white navbar-categories">
+                <div class="container d-flex justify-content-center">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">HOLIDAY GIFTING</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">NEW ARRIVALS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">BEST SELLERS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">CLOTHING</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">TOPS & SWEATERS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">PANTS & JEANS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">OUTERWEAR</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">SHOES & BAGS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">SALE</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="container">
+                    <div class="d-flex align-items-center">
+                        <input type="text" class="search-input" placeholder="Search" ng-model="searchQuery" autofocus>
+                        <a href="javascript:void(0)" class="cancel-btn" ng-click="closeSearch()">Cancel</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Categories -->
+            <section class="popular-categories">
+                <div class="container">
+                    <h2>Popular Categories</h2>
+                    <div class="row">
+                        <div class="col-6 col-md-3" ng-repeat="category in popularCategories">
+                            <div class="category-card" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
+                                <img ng-src="@{{ category.image }}" alt="@{{ category.name }}" class="card-img-top">
+                                <h5 class="category-card-title">@{{ category.name }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
         <!-- Hero Section -->
         <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1490725263030-1f0521cec8ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
             <div class="container">
