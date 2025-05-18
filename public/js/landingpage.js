@@ -103,7 +103,7 @@ app.controller('SearchController', ['$scope', '$rootScope', '$document', functio
         },
         {
             name: "Women's Bottoms",
-            image: "https://images.unsplash.com/photo-1590159983013-d637b349f495?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+            image: "https://images.lee.com/is/image/Lee/112340541-HERO?$PDP24-XXLARGE$&fit=crop",
             isHovered: false
         },
         {
