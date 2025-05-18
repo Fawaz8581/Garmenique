@@ -32,11 +32,10 @@
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
                         <li><a href="#" class="nav-item">Home</a></li>
-                        <li><a href="#" class="nav-item">New Arrivals</a></li>
+                        <li><a href="#" class="nav-item">Catalog</a></li>
                         <li><a href="#" class="nav-item">Men</a></li>
                         <li><a href="#" class="nav-item">Women</a></li>
-                        <li><a href="#" class="nav-item">Sale</a></li>
-                        <li><a href="#" class="nav-item">Collections</a></li>
+                        <li><a href="#" class="nav-item">Blog</a></li>
                         <li><a href="#" class="nav-item">About</a></li>
                         <li><a href="#" class="nav-item">Contact</a></li>
                     </ul>
