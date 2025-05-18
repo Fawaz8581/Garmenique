@@ -10,7 +10,20 @@ app.controller('HeaderController', ['$scope', '$window', function($scope, $windo
     
     $scope.toggleNav = function() {
         $scope.isNavActive = !$scope.isNavActive;
+        
+        // Toggle active class on the button
+        angular.element(document.querySelector('.mobile-toggle')).toggleClass('active');
     };
+    
+    // Close menu when clicking outside
+    angular.element(document).on('click', function(event) {
+        if ($scope.isNavActive && !angular.element(event.target).closest('.main-nav, .mobile-toggle').length) {
+            $scope.$apply(function() {
+                $scope.isNavActive = false;
+                angular.element(document.querySelector('.mobile-toggle')).removeClass('active');
+            });
+        }
+    });
     
     // Sticky Header
     var headerHeight = 0;
@@ -33,7 +46,7 @@ app.controller('HeaderController', ['$scope', '$window', function($scope, $windo
 
 // Category Controller
 app.controller('CategoryController', ['$scope', function($scope) {
-    // Categories data with responsive image URLs
+    // Categories data with responsive image URLs using srcset for better image loading
     $scope.categories = [
         {
             name: 'Jackets',
@@ -117,4 +130,12 @@ app.controller('NewsletterController', ['$scope', function($scope) {
             $scope.email = '';
         }
     };
-}]); 
+}]);
+
+// Handle resize events for better responsiveness
+angular.element(window).on('resize', function() {
+    // Force a digest cycle to update the UI
+    var $body = angular.element(document.body);
+    var $rootScope = $body.scope().$root;
+    $rootScope.$apply();
+}); 
