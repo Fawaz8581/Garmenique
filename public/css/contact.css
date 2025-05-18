@@ -1,0 +1,188 @@
+/* Contact page styles for Garmenique */
+
+/* Contact Section */
+.contact-section {
+    padding: 80px 0;
+    background-color: #f8f8f8;
+}
+
+.contact-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.contact-header {
+    margin-bottom: 40px;
+}
+
+.section-subtitle {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #666;
+    font-weight: 500;
+}
+
+.contact-title {
+    font-size: 42px;
+    font-weight: 600;
+    margin: 15px 0;
+    line-height: 1.2;
+    color: #222;
+}
+
+.contact-description {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Contact Form Styles */
+.contact-form-container {
+    width: 100%;
+    background: #fff;
+    padding: 40px;
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.contact-form {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.form-group.full-width {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.3s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-actions {
+    text-align: center;
+}
+
+.btn-submit {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #333;
+}
+
+/* Additional Contact Info Section */
+.contact-info-section {
+    padding: 60px 0;
+    background-color: #fff;
+}
+
+.info-grid {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.info-item {
+    flex-basis: 30%;
+    text-align: center;
+    padding: 20px;
+}
+
+.info-item h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #222;
+}
+
+.info-item p {
+    color: #666;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 5px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .contact-title {
+        font-size: 32px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .contact-form-container {
+        padding: 30px 20px;
+    }
+
+    .info-grid {
+        flex-direction: column;
+    }
+
+    .info-item {
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-section {
+        padding: 50px 0;
+    }
+
+    .contact-title {
+        font-size: 28px;
+    }
+
+    .btn-submit {
+        width: 100%;
+    }
+} 

@@ -517,6 +517,59 @@ img {
     background-color: #555;
 }
 
+/* Email subscription form styles */
+.email-form {
+    display: flex;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.email-input {
+    flex-grow: 1;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-right: none;
+    background-color: #fff;
+}
+
+.submit-arrow {
+    width: 40px;
+    height: 40px;
+    background-color: #222;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-arrow:hover {
+    background-color: #000;
+}
+
+/* Social media links */
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-icon {
+    color: #333;
+    font-size: 16px;
+}
+
+.social-icon:hover {
+    color: #000;
+}
+
+.mt-3 {
+    margin-top: 15px;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     html {

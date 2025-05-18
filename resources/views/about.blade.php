@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="{{ asset('css/landingpage.css') }}">
         <link rel="stylesheet" href="{{ asset('css/about.search.css') }}">
         <link rel="stylesheet" href="{{ asset('css/about.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -38,7 +39,7 @@
                         <li><a href="#" class="nav-item">Women</a></li>
                         <li><a href="/blog" class="nav-item">Blog</a></li>
                         <li><a href="/about" class="nav-item active">About</a></li>
-                        <li><a href="#" class="nav-item">Contact</a></li>
+                        <li><a href="/contact" class="nav-item">Contact</a></li>
                     </ul>
                 </nav>
                 
@@ -223,7 +224,7 @@
                     <div class="footer-col">
                         <h4>Customer Care</h4>
                         <ul class="footer-links">
-                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="/contact">Contact Us</a></li>
                             <li><a href="#">Shipping & Returns</a></li>
                             <li><a href="#">Track Order</a></li>
                             <li><a href="#">FAQ</a></li>
@@ -232,24 +233,26 @@
 
                     <div class="footer-col">
                         <h4>Our Social Media</h4>
-                        <div class="social-links">
-                            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-pinterest"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-                        </div>
-                        <div class="newsletter">
-                            <h5>Stay in Touch</h5>
-                            <form>
-                                <input type="email" placeholder="Your email" required>
-                                <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                        <div class="social-email-section">
+                            <div class="social-icons">
+                                <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
+                                <a href="#" class="social-icon-circle"><i class="fab fa-youtube"></i></a>
+                            </div>
+                            <p class="email-title">Stay in Touch</p>
+                            <form class="email-form">
+                                <input type="email" placeholder="Email Address" class="email-input" required>
+                                <button type="submit" class="email-button">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>&copy; 2023 Garmenique. All Rights Reserved.</p>
+                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>

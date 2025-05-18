@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('css/landingpage.css') }}">
     <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css/blog.search.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -41,7 +42,7 @@
                     <li><a href="#" class="nav-item">Women</a></li>
                     <li><a href="/blog" class="nav-item active">Blog</a></li>
                     <li><a href="/about" class="nav-item">About</a></li>
-                    <li><a href="#" class="nav-item">Contact</a></li>
+                    <li><a href="/contact" class="nav-item">Contact</a></li>
                 </ul>
             </nav>
             
@@ -306,7 +307,7 @@
                 <div class="footer-col">
                     <h4>Company</h4>
                     <ul class="footer-links">
-                        <li><a href="#">Our Story</a></li>
+                        <li><a href="/about">Our Story</a></li>
                         <li><a href="#">Careers</a></li>
                         <li><a href="#">Terms of Use</a></li>
                         <li><a href="#">Privacy Policy</a></li>
@@ -316,7 +317,7 @@
                 <div class="footer-col">
                     <h4>Help</h4>
                     <ul class="footer-links">
-                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="/contact">Contact Us</a></li>
                         <li><a href="#">FAQ</a></li>
                         <li><a href="#">Shipping & Returns</a></li>
                         <li><a href="#">Order Tracking</a></li>
@@ -324,11 +325,23 @@
                 </div>
 
                 <div class="footer-col">
-                    <h4>Stay in Touch</h4>
-                    <form class="search-form" ng-controller="NewsletterController" ng-submit="subscribe()">
-                        <input type="email" ng-model="email" placeholder="Email Address" class="search-input">
-                        <button type="submit" class="search-button">→</button>
-                    </form>
+                    <h4>Our Social Media</h4>
+                    <div class="social-email-section">
+                        <div class="social-icons">
+                            <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
+                            <a href="#" class="social-icon-circle"><i class="fab fa-youtube"></i></a>
+                        </div>
+                        <p class="email-title">Stay in Touch</p>
+                        <form class="email-form">
+                            <input type="email" placeholder="Email Address" class="email-input" required>
+                            <button type="submit" class="email-button">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 

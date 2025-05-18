@@ -1,0 +1,137 @@
+/* Email subscription component styles */
+
+.social-email-section {
+    margin: 0;
+    max-width: 100%;
+}
+
+.social-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+.social-title:after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 2px;
+    background-color: #333;
+    bottom: -10px;
+    left: 0;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.social-icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #f1f1f1;
+    border-radius: 50%;
+    color: #333;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.social-icon-circle:hover {
+    background-color: #e0e0e0;
+}
+
+.email-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 20px 0 10px;
+}
+
+.email-form {
+    display: flex;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+
+.email-input {
+    flex-grow: 1;
+    height: 40px;
+    padding: 8px 12px;
+    border: none;
+    font-size: 14px;
+    background-color: white;
+    outline: none;
+}
+
+.email-button {
+    width: 40px;
+    height: 40px;
+    background-color: #222;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.email-subscription {
+    margin: 20px 0;
+    max-width: 360px;
+}
+
+.email-subscription-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.email-subscription-form {
+    display: flex;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+
+.email-subscription-input {
+    flex-grow: 1;
+    height: 40px;
+    padding: 8px 12px;
+    border: none;
+    font-size: 14px;
+    background-color: white;
+    outline: none;
+}
+
+.email-subscription-button {
+    width: 40px;
+    height: 40px;
+    background-color: #222;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.email-subscription-button:hover {
+    background-color: #000;
+}
+
+.social-links-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.social-icon-simple {
+    color: #333;
+    font-size: 16px;
+} 

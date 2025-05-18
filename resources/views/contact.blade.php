@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Garmenique - Premium Clothing Brand</title>
+        <title>Contact - Garmenique</title>
 
         <!-- Favicon -->
         <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
@@ -16,7 +16,8 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/landingpage.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/landing.page.search.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/about.search.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
         <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
         
         <!-- Font Awesome -->
@@ -27,18 +28,18 @@
         <header class="header" ng-controller="HeaderController">
             <div class="container nav-container">
                 <div class="logo-container">
-                    <a href="#" class="logo">GARMENIQUE</a>
+                    <a href="/" class="logo">GARMENIQUE</a>
                 </div>
                 
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
-                        <li><a href="/" class="nav-item active">Home</a></li>
+                        <li><a href="/" class="nav-item">Home</a></li>
                         <li><a href="#" class="nav-item">Catalog</a></li>
                         <li><a href="#" class="nav-item">Men</a></li>
                         <li><a href="#" class="nav-item">Women</a></li>
                         <li><a href="/blog" class="nav-item">Blog</a></li>
                         <li><a href="/about" class="nav-item">About</a></li>
-                        <li><a href="/contact" class="nav-item">Contact</a></li>
+                        <li><a href="/contact" class="nav-item active">Contact</a></li>
                     </ul>
                 </nav>
                 
@@ -55,7 +56,7 @@
                 </button>
             </div>
         </header>
-
+        
         <!-- Search Overlay -->
         <div class="search-overlay" ng-class="{'active': isSearchActive}"></div>
 
@@ -100,50 +101,77 @@
             </div>
         </div>
         
-        <!-- Hero Section -->
-        <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1490725263030-1f0521cec8ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
+        <!-- Contact Section -->
+        <section class="contact-section">
             <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">GARMENIQUE</h1>
-                    <p class="hero-description">Elegance in every stitch. Premium clothing crafted for those who appreciate quality and style.</p>
-                    <a href="#" class="btn">SHOP NOW</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Category Section -->
-        <section class="category-section" ng-controller="CategoryController">
-            <div class="container">
-                <h2 class="section-title">Shop by Category</h2>
-                <div class="category-grid">
-                    <div class="category-item" ng-repeat="category in categories" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
-                        <img ng-src="@{{ category.imageUrl }}" alt="@{{ category.name }}" class="category-img">
-                        <h3 class="category-name">@{{ category.name }}</h3>
+                <div class="contact-content">
+                    <div class="contact-header">
+                        <span class="section-subtitle">Contact Us</span>
+                        <h1 class="contact-title">Let's talk about<br>your question</h1>
+                        <p class="contact-description">Drop us a line through the form below and we'll get back to you</p>
+                    </div>
+                    
+                    <div class="contact-form-container">
+                        <form class="contact-form" ng-controller="ContactFormController" ng-submit="submitForm()">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="text" id="firstName" placeholder="First name*" ng-model="formData.firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="lastName" placeholder="Last name*" ng-model="formData.lastName" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="email" id="email" placeholder="Email address*" ng-model="formData.email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="jobRole" placeholder="Job role" ng-model="formData.jobRole">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="text" id="companyDomain" placeholder="Company domain" ng-model="formData.companyDomain">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <textarea id="message" placeholder="Tell us what you're hoping to achieve with Garmenique. We're here to help bring your fashion needs to life!" ng-model="formData.message" rows="5" required></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn-submit">Send Message</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- Featured Section -->
-        <section class="featured-section" ng-controller="FeaturedController">
+        
+        <!-- Additional Information Section -->
+        <section class="contact-info-section">
             <div class="container">
-                <div class="featured-grid">
-                    <div class="featured-item" ng-repeat="feature in featuredItems" ng-mouseenter="hover(feature)" ng-mouseleave="unhover(feature)" ng-class="{'hovered': feature.isHovered}">
-                        <img ng-src="@{{ feature.imageUrl }}" alt="@{{ feature.title }}" class="featured-img">
-                        <div class="featured-content">
-                            <h3 class="featured-title">@{{ feature.title }}</h3>
-                            <a href="@{{ feature.link }}" class="btn">SHOP NOW</a>
-                        </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h3>Visit Us</h3>
+                        <p>Jl. Bogor Raya No. 1</p>
+                        <p>Bogor, NY 16110</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <h3>Contact</h3>
+                        <p>info@garmenique.com</p>
+                        <p>+62 012345678</p>
+                    </div>
+                    
+                    <div class="info-item">
+                        <h3>Opening Hours</h3>
+                        <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
+                        <p>Sat: 10:00 AM - 5:00 PM</p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Mission Section -->
-        <section class="mission-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1553413077-190dd305871c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=70');">
-            <div class="container">
-                <h2 class="mission-title">We're on a Mission To Clean Up the Industry</h2>
-                <a href="#" class="btn">LEARN MORE</a>
             </div>
         </section>
 
@@ -177,7 +205,7 @@
                             <li><a href="/contact">Contact Us</a></li>
                             <li><a href="#">Shipping & Returns</a></li>
                             <li><a href="#">Track Order</a></li>
-                            <li><a href="#">FAQs</a></li>
+                            <li><a href="#">FAQ</a></li>
                         </ul>
                     </div>
 
@@ -201,7 +229,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="footer-bottom">
                     <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
                 </div>
@@ -209,6 +236,6 @@
         </footer>
 
         <!-- Scripts -->
-        <script src="{{ asset('js/landingpage.js') }}"></script>
+        <script src="{{ asset('js/contact.js') }}"></script>
     </body>
-</html>
+</html> 
