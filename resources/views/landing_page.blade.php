@@ -16,7 +16,7 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/landingpage.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/search.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/landing.page.search.css') }}">
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,7 +35,7 @@
                         <li><a href="#" class="nav-item">Catalog</a></li>
                         <li><a href="#" class="nav-item">Men</a></li>
                         <li><a href="#" class="nav-item">Women</a></li>
-                        <li><a href="#" class="nav-item">Blog</a></li>
+                        <li><a href="blog" class="nav-item">Blog</a></li>
                         <li><a href="#" class="nav-item">About</a></li>
                         <li><a href="#" class="nav-item">Contact</a></li>
                     </ul>
