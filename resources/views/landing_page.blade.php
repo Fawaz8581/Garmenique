@@ -57,7 +57,7 @@
 
         <!-- Hero Section -->
         <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1490725263030-1f0521cec8ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
-            <div class="container hero-container">
+            <div class="container">
                 <div class="hero-content">
                     <h1 class="hero-title">GARMENIQUE</h1>
                     <p class="hero-description">Elegance in every stitch. Premium clothing crafted for those who appreciate quality and style.</p>
@@ -67,33 +67,27 @@
         </section>
 
         <!-- Category Section -->
-        <section class="category-section">
+        <section class="category-section" ng-controller="CategoryController">
             <div class="container">
                 <h2 class="section-title">Shop by Category</h2>
-                <div class="category-grid" ng-controller="CategoryController">
-                    <div class="category-item" ng-repeat="category in categories" 
-                         ng-mouseenter="hover(category)" 
-                         ng-mouseleave="unhover(category)"
-                         ng-class="{'hovered': category.isHovered}">
-                        <img ng-src="@{{category.imageUrl}}" alt="@{{category.name}}" class="category-img">
-                        <h3 class="category-name">@{{category.name}}</h3>
+                <div class="category-grid">
+                    <div class="category-item" ng-repeat="category in categories" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
+                        <img ng-src="@{{ category.imageUrl }}" alt="@{{ category.name }}" class="category-img">
+                        <h3 class="category-name">@{{ category.name }}</h3>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Featured Section -->
-        <section class="featured-section">
+        <section class="featured-section" ng-controller="FeaturedController">
             <div class="container">
-                <div class="featured-grid" ng-controller="FeaturedController">
-                    <div class="featured-item" ng-repeat="item in featuredItems"
-                         ng-mouseenter="hover(item)"
-                         ng-mouseleave="unhover(item)"
-                         ng-class="{'hovered': item.isHovered}">
-                        <img ng-src="@{{item.imageUrl}}" alt="@{{item.title}}" class="featured-img">
+                <div class="featured-grid">
+                    <div class="featured-item" ng-repeat="feature in featuredItems" ng-mouseenter="hover(feature)" ng-mouseleave="unhover(feature)" ng-class="{'hovered': feature.isHovered}">
+                        <img ng-src="@{{ feature.imageUrl }}" alt="@{{ feature.title }}" class="featured-img">
                         <div class="featured-content">
-                            <h3 class="featured-title">@{{item.title}}</h3>
-                            <a href="@{{item.link}}" class="btn">SHOP NOW</a>
+                            <h3 class="featured-title">@{{ feature.title }}</h3>
+                            <a href="@{{ feature.link }}" class="btn">SHOP NOW</a>
                         </div>
                     </div>
                 </div>
@@ -109,7 +103,7 @@
         </section>
 
         <!-- Footer -->
-        <footer class="footer" ng-controller="NewsletterController">
+        <footer class="footer">
             <div class="container">
                 <div class="footer-grid">
                     <div class="footer-col">
@@ -129,7 +123,7 @@
                             <li><a href="#">Gift Cards</a></li>
                             <li><a href="#">Student Discount</a></li>
                             <li><a href="#">Refer a Friend</a></li>
-                        </ul>
+                    </ul>
                     </div>
 
                     <div class="footer-col">
@@ -139,12 +133,12 @@
                             <li><a href="#">Shipping & Returns</a></li>
                             <li><a href="#">Track Order</a></li>
                             <li><a href="#">FAQs</a></li>
-                        </ul>
+                    </ul>
                     </div>
 
                     <div class="footer-col">
                         <h4>Stay in Touch</h4>
-                        <form class="search-form" ng-submit="subscribe()">
+                        <form class="search-form" ng-controller="NewsletterController" ng-submit="subscribe()">
                             <input type="email" ng-model="email" placeholder="Email Address" class="search-input">
                             <button type="submit" class="search-button">→</button>
                         </form>
@@ -152,9 +146,9 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2023 Garmenique. All Rights Reserved. Terms & Privacy</p>
+                    <p>&copy; 2025 Garmenique. All Rights Reserved. Terms & Privacy</p>
                 </div>
-            </div>
+        </div>
         </footer>
 
         <!-- Scripts -->
