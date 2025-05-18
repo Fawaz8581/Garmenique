@@ -36,7 +36,7 @@
                         <li><a href="#" class="nav-item">Men</a></li>
                         <li><a href="#" class="nav-item">Women</a></li>
                         <li><a href="blog" class="nav-item">Blog</a></li>
-                        <li><a href="#" class="nav-item">About</a></li>
+                        <li><a href="/about" class="nav-item">About</a></li>
                         <li><a href="#" class="nav-item">Contact</a></li>
                     </ul>
                 </nav>
@@ -60,65 +60,43 @@
 
         <!-- Search Panel (Hidden by default) -->
         <div class="search-panel" ng-controller="SearchController" ng-class="{'active': isSearchActive}">
-            <!-- Categories Navigation -->
-            <nav class="navbar navbar-expand navbar-light bg-white navbar-categories">
-                <div class="container d-flex justify-content-center">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">HOLIDAY GIFTING</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">NEW ARRIVALS</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">BEST SELLERS</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">CLOTHING</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">TOPS & SWEATERS</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">PANTS & JEANS</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">OUTERWEAR</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">SHOES & BAGS</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">SALE</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- Search Bar -->
-            <div class="search-container">
-                <div class="container">
+            <div class="container">
+                <!-- Search Bar -->
+                <div class="search-container">
                     <div class="d-flex align-items-center">
                         <input type="text" class="search-input" placeholder="Search" ng-model="searchQuery" autofocus>
                         <a href="javascript:void(0)" class="cancel-btn" ng-click="closeSearch()">Cancel</a>
                     </div>
                 </div>
-            </div>
 
-            <!-- Popular Categories -->
-            <section class="popular-categories">
-                <div class="container">
-                    <h2>Popular Categories</h2>
-                    <div class="row">
-                        <div class="col-6 col-md-3" ng-repeat="category in popularCategories">
-                            <div class="category-card" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
-                                <img ng-src="@{{ category.image }}" alt="@{{ category.name }}" class="card-img-top">
-                                <h5 class="category-card-title">@{{ category.name }}</h5>
+                <div class="search-content">
+                    <!-- Categories Navigation as Bullets -->
+                    <div class="categories-list">
+                        <ul>
+                            <li><a href="#">BEST SELLERS</a></li>
+                            <li><a href="#">CLOTHING</a></li>
+                            <li><a href="#">TOPS & SWEATERS</a></li>
+                            <li><a href="#">PANTS & JEANS</a></li>
+                            <li><a href="#">OUTERWEAR</a></li>
+                            <li><a href="#">SHOES & BAGS</a></li>
+                            <li><a href="#">SALE</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Popular Categories -->
+                    <section class="popular-categories">
+                        <h2>Popular Categories</h2>
+                        <div class="row">
+                            <div class="col-6 col-md-3" ng-repeat="category in popularCategories">
+                                <div class="category-card" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
+                                    <img ng-src="@{{ category.image }}" alt="@{{ category.name }}" class="card-img-top">
+                                    <h5 class="category-card-title">@{{ category.name }}</h5>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
-            </section>
+            </div>
         </div>
         
         <!-- Hero Section -->
@@ -212,7 +190,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2025 Garmenique. All Rights Reserved. Terms & Privacy</p>
+                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
                 </div>
         </div>
         </footer>
