@@ -202,7 +202,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2023 Garmenique. All Rights Reserved.</p>
+                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>

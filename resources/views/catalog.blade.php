@@ -107,12 +107,6 @@
         <section class="page-title-banner" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
             <div class="container">
                 <h1>Our Catalog</h1>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Catalog</li>
-                    </ol>
-                </nav>
             </div>
         </section>
 
@@ -211,38 +205,39 @@
                                 <div class="col-md-6 col-6" ng-repeat="product in filteredProducts | limitTo: itemsPerPage : (currentPage - 1) * itemsPerPage">
                                     <div class="product-card" ng-mouseenter="hover(product)" ng-mouseleave="unhover(product)">
                                         <div class="product-img-container">
-                                            <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="primary-img">
-                                            <img ng-src="@{{ product.hoverImage }}" alt="@{{ product.name }}" class="hover-img" ng-if="product.isHovered">
-                                            
+                                            <a href="/catalog/product/@{{ product.id }}">
+                                                <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="primary-img">
+                                                <img ng-src="@{{ product.hoverImage }}" alt="@{{ product.name }}" class="hover-img">
+                                            </a>
                                             <div class="product-actions" ng-if="product.isHovered">
-                                                <button class="action-btn" ng-click="quickView(product)">
+                                                <button class="action-btn" ng-click="quickView(product)" title="Quick View">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <button class="action-btn" ng-click="addToWishlist(product)">
+                                                <button class="action-btn" ng-click="addToCart(product)" title="Add to Cart">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </button>
+                                                <button class="action-btn" ng-click="addToWishlist(product)" title="Add to Wishlist">
                                                     <i class="far fa-heart"></i>
                                                 </button>
-                                                <button class="action-btn" ng-click="addToCompare(product)">
+                                                <button class="action-btn" ng-click="addToCompare(product)" title="Compare">
                                                     <i class="fas fa-exchange-alt"></i>
                                                 </button>
                                             </div>
-                                            
-                                            <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
                                             <span class="product-tag new" ng-if="product.isNew">New</span>
+                                            <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
                                         </div>
                                         
                                         <div class="product-info">
-                                            <h3 class="product-name">@{{ product.name }}</h3>
+                                            <h3 class="product-name">
+                                                <a href="/catalog/product/@{{ product.id }}">@{{ product.name }}</a>
+                                            </h3>
                                             <div class="product-price">
-                                                <span class="price-current">$@{{ product.price | number:2 }}</span>
-                                                <span class="price-old" ng-if="product.oldPrice">$@{{ product.oldPrice | number:2 }}</span>
+                                                <span class="price-current" ng-class="{'has-discount': product.discount}">$@{{ product.price.toFixed(2) }}</span>
+                                                <span class="price-old" ng-if="product.oldPrice">$@{{ product.oldPrice.toFixed(2) }}</span>
                                             </div>
                                             
                                             <div class="product-colors">
-                                                <span class="color-dot" 
-                                                      ng-repeat="color in product.colors" 
-                                                      style="background-color: @{{ color.code }};"
-                                                      title="@{{ color.name }}">
-                                                </span>
+                                                <span class="color-dot" ng-repeat="color in product.colors | limitTo:4" style="background-color: @{{ color.code }}" title="@{{ color.name }}"></span>
                                             </div>
                                             
                                             <div class="product-rating" ng-if="product.rating">
@@ -263,37 +258,34 @@
                             <div class="products-list" ng-if="viewMode === 'list'">
                                 <div class="product-list-item" ng-repeat="product in filteredProducts">
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <div class="product-img-container">
-                                                <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="list-img">
-                                                <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
+                                                <a href="/catalog/product/@{{ product.id }}">
+                                                    <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="list-img">
+                                                </a>
                                                 <span class="product-tag new" ng-if="product.isNew">New</span>
+                                                <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-9">
+                                        <div class="col-md-8">
                                             <div class="list-product-info">
-                                                <h3 class="product-name">@{{ product.name }}</h3>
+                                                <h3 class="product-name">
+                                                    <a href="/catalog/product/@{{ product.id }}">@{{ product.name }}</a>
+                                                </h3>
                                                 
-                                                <div class="product-rating" ng-if="product.rating">
-                                                    <i class="fas fa-star" ng-repeat="n in [].constructor(product.rating) track by $index"></i>
-                                                    <i class="far fa-star" ng-repeat="n in [].constructor(5 - product.rating) track by $index"></i>
-                                                    <span class="rating-count">(@{{ product.reviewCount }})</span>
+                                                <div class="product-rating">
+                                                    <i class="fas fa-star" ng-repeat="i in getStars(product.rating) track by $index"></i>
+                                                    <i class="far fa-star" ng-repeat="i in getEmptyStars(product.rating) track by $index"></i>
+                                                    <span class="rating-count">(@{{ product.reviewCount }} Reviews)</span>
                                                 </div>
                                                 
                                                 <div class="product-price">
-                                                    <span class="price-current">$@{{ product.price | number:2 }}</span>
-                                                    <span class="price-old" ng-if="product.oldPrice">$@{{ product.oldPrice | number:2 }}</span>
+                                                    <span class="price-current" ng-class="{'has-discount': product.discount}">$@{{ product.price.toFixed(2) }}</span>
+                                                    <span class="price-old" ng-if="product.oldPrice">$@{{ product.oldPrice.toFixed(2) }}</span>
                                                 </div>
                                                 
-                                                <p class="product-description">@{{ product.description }}</p>
-                                                
-                                                <div class="product-colors">
-                                                    <span>Available Colors:</span>
-                                                    <span class="color-dot" 
-                                                          ng-repeat="color in product.colors" 
-                                                          style="background-color: @{{ color.code }};"
-                                                          title="@{{ color.name }}">
-                                                    </span>
+                                                <div class="product-description">
+                                                    <p>@{{ product.description | limitTo:200 }}@{{ product.description.length > 200 ? '...' : '' }}</p>
                                                 </div>
                                                 
                                                 <div class="product-sizes">
@@ -311,6 +303,9 @@
                                                     <button class="btn btn-outline-secondary" ng-click="addToWishlist(product)">
                                                         <i class="far fa-heart"></i> Wishlist
                                                     </button>
+                                                    <a href="/catalog/product/@{{ product.id }}" class="btn btn-outline-secondary">
+                                                        <i class="fas fa-info-circle"></i> View Details
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -361,7 +356,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="quick-view-content">
-                                    <h2 class="product-name">@{{ quickViewProduct.name }}</h2>
+                                    <h2 class="product-name">
+                                        <a href="/catalog/product/@{{ quickViewProduct.id }}">@{{ quickViewProduct.name }}</a>
+                                    </h2>
                                     
                                     <div class="product-rating">
                                         <i class="fas fa-star" ng-repeat="n in [].constructor(quickViewProduct.rating) track by $index"></i>
@@ -380,11 +377,11 @@
                                         <label>Color:</label>
                                         <div class="color-options">
                                             <div class="color-option" 
-                                                 ng-repeat="color in quickViewProduct.colors" 
-                                                 ng-class="{'selected': selectedColor === color}"
-                                                 ng-click="selectColor(color)" 
-                                                 style="background-color: @{{ color.code }};" 
-                                                 title="@{{ color.name }}">
+                                                    ng-repeat="color in quickViewProduct.colors" 
+                                                    ng-class="{'selected': selectedColor === color}"
+                                                    ng-click="selectColor(color)" 
+                                                    style="background-color: @{{ color.code }};" 
+                                                    title="@{{ color.name }}">
                                             </div>
                                         </div>
                                     </div>
@@ -403,20 +400,20 @@
                                     
                                     <div class="quantity-selector">
                                         <label>Quantity:</label>
-                                        <div class="quantity-controls">
-                                            <button class="quantity-btn" ng-click="decreaseQuantity()">-</button>
-                                            <input type="number" ng-model="quantity" min="1" max="99">
-                                            <button class="quantity-btn" ng-click="increaseQuantity()">+</button>
+                                        <div class="quantity-input">
+                                            <button class="quantity-btn minus" ng-click="decreaseQuantity()">-</button>
+                                            <input type="text" ng-model="quantity" readonly>
+                                            <button class="quantity-btn plus" ng-click="increaseQuantity()">+</button>
                                         </div>
                                     </div>
                                     
-                                    <div class="modal-actions">
+                                    <div class="quick-view-actions">
                                         <button class="btn btn-primary" ng-click="addToCartFromModal()">
                                             <i class="fas fa-shopping-cart"></i> Add to Cart
                                         </button>
-                                        <button class="btn btn-outline-secondary" ng-click="addToWishlist(quickViewProduct)">
-                                            <i class="far fa-heart"></i> Add to Wishlist
-                                        </button>
+                                        <a href="/catalog/product/@{{ quickViewProduct.id }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-info-circle"></i> View Details
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -481,7 +478,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2023 Garmenique. All Rights Reserved.</p>
+                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>

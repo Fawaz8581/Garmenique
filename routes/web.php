@@ -39,3 +39,13 @@ Route::get('/account', function () {
 Route::get('/cart', function () {
     return redirect('/');
 });
+
+// Product detail route with dynamic product ID parameter
+Route::get('/catalog/product/{id}', function ($id) {
+    return view('product_detail', ['productId' => $id]);
+});
+
+// Redirect old product URLs to the new format
+Route::get('/product/{id}', function ($id) {
+    return redirect('/catalog/product/' . $id);
+});

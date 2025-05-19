@@ -290,38 +290,39 @@ app.controller('CatalogController', ['$scope', '$window', function($scope, $wind
             primaryImage: 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
             hoverImage: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
             price: 79.99,
-            oldPrice: null,
-            discount: null,
+            oldPrice: 119.99,
+            discount: 33,
             isNew: true,
             colors: [
-                { name: 'Blue', code: '#2E6ED4' },
-                { name: 'Red', code: '#D42E2E' }
+                { name: 'Floral', code: '#FF9CAA' },
+                { name: 'Blue', code: '#2E6ED4' }
             ],
             sizes: ['XS', 'S', 'M', 'L'],
             rating: 4,
-            reviewCount: 14,
+            reviewCount: 23,
             isHovered: false,
-            description: 'Light and flowy summer dress with a beautiful floral print. Features a V-neckline and a slightly flared skirt.'
+            description: 'Beautiful floral print summer dress with a flattering silhouette. Made from lightweight, breathable fabric perfect for warm weather.'
         },
         {
             id: 6,
-            name: 'Leather Ankle Boots',
+            name: 'Canvas Sneakers',
             categoryId: 6,
             primaryImage: 'https://images.unsplash.com/photo-1604001307862-2d953b875079?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
             hoverImage: 'https://images.unsplash.com/photo-1604001307862-2d953b875079?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            price: 149.99,
-            oldPrice: 189.99,
-            discount: 21,
+            price: 49.99,
+            oldPrice: null,
+            discount: null,
             isNew: false,
             colors: [
+                { name: 'White', code: '#FFFFFF' },
                 { name: 'Black', code: '#000000' },
-                { name: 'Brown', code: '#8B4513' }
+                { name: 'Red', code: '#D42E2E' }
             ],
-            sizes: ['36', '37', '38', '39', '40', '41'],
-            rating: 5,
-            reviewCount: 23,
+            sizes: ['38', '39', '40', '41', '42', '43', '44'],
+            rating: 4,
+            reviewCount: 31,
             isHovered: false,
-            description: 'Classic leather ankle boots with a side zipper for easy wear. Features a comfortable block heel and durable rubber sole.'
+            description: 'Classic canvas sneakers with a timeless design. Features a durable rubber sole and cushioned insole for all-day comfort.'
         },
         {
             id: 7,
@@ -329,120 +330,120 @@ app.controller('CatalogController', ['$scope', '$window', function($scope, $wind
             categoryId: 7,
             primaryImage: 'https://images.unsplash.com/photo-1624623278313-a930126a11c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
             hoverImage: 'https://images.unsplash.com/photo-1612902456551-333ac5afa26e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            price: 45.99,
-            oldPrice: null,
-            discount: null,
+            price: 39.99,
+            oldPrice: 59.99,
+            discount: 33,
             isNew: false,
             colors: [
-                { name: 'Black', code: '#000000' },
-                { name: 'Brown', code: '#8B4513' }
+                { name: 'Brown', code: '#8B4513' },
+                { name: 'Black', code: '#000000' }
             ],
-            sizes: ['S', 'M', 'L'],
-            rating: 4,
-            reviewCount: 8,
+            sizes: ['S', 'M', 'L', 'XL'],
+            rating: 5,
+            reviewCount: 14,
             isHovered: false,
-            description: 'Premium leather belt with a classic buckle design. Perfect for both casual and formal occasions.'
+            description: 'Premium genuine leather belt with a classic buckle design. Versatile and durable, perfect for both casual and formal outfits.'
         },
         {
             id: 8,
-            name: 'Pleated Midi Skirt',
-            categoryId: 3,
-            primaryImage: 'https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            hoverImage: 'https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            name: 'Silk Scarf',
+            categoryId: 7,
+            primaryImage: 'https://assets.vogue.com/photos/589208b00e6cdc8a1928e3ef/master/pass/celebrity-style-reese-witherspoon.jpg',
+            hoverImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTj9ZV6bEgOBw2fF55XnsZhgk4sjR58R_X1QA&s',
             price: 69.99,
             oldPrice: null,
             discount: null,
             isNew: true,
             colors: [
-                { name: 'Black', code: '#000000' },
-                { name: 'Green', code: '#2ED45B' }
+                { name: 'Multicolor', code: '#FF9CAA' },
+                { name: 'Blue', code: '#2E6ED4' }
             ],
-            sizes: ['XS', 'S', 'M', 'L', 'XL'],
+            sizes: ['One Size'],
             rating: 4,
-            reviewCount: 11,
+            reviewCount: 9,
             isHovered: false,
-            description: 'Elegant pleated midi skirt with an elastic waistband for comfort. Perfect for both casual and formal settings.'
+            description: 'Luxurious silk scarf with a beautiful pattern. Adds an elegant touch to any outfit and can be styled in multiple ways.'
         },
         {
             id: 9,
-            name: 'Striped Button-Up Shirt',
-            categoryId: 1,
-            primaryImage: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            hoverImage: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            price: 54.99,
-            oldPrice: 64.99,
-            discount: 15,
+            name: 'Denim Shorts',
+            categoryId: 3,
+            primaryImage: 'https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            hoverImage: 'https://images.unsplash.com/photo-1577900232427-18219b9166a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            price: 49.99,
+            oldPrice: 69.99,
+            discount: 29,
             isNew: false,
             colors: [
                 { name: 'Blue', code: '#2E6ED4' },
-                { name: 'White', code: '#FFFFFF' }
+                { name: 'Black', code: '#000000' }
             ],
-            sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-            rating: 3,
-            reviewCount: 7,
+            sizes: ['28', '30', '32', '34', '36'],
+            rating: 4,
+            reviewCount: 16,
             isHovered: false,
-            description: 'Classic button-up shirt with vertical stripes. Made from high-quality cotton for comfort and breathability.'
+            description: 'Classic denim shorts with a comfortable fit. Perfect for casual summer days and features a vintage-inspired wash.'
         },
         {
             id: 10,
-            name: 'Silk Scarf',
-            categoryId: 7,
-            primaryImage: 'https://assets.vogue.com/photos/589208b00e6cdc8a1928e3ef/master/pass/celebrity-style-reese-witherspoon.jpg',
-            hoverImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTj9ZV6bEgOBw2fF55XnsZhgk4sjR58R_X1QA&s',
-            price: 39.99,
-            oldPrice: null,
-            discount: null,
-            isNew: false,
-            colors: [
-                { name: 'Red', code: '#D42E2E' },
-                { name: 'Blue', code: '#2E6ED4' },
-                { name: 'Purple', code: '#9C2ED4' }
-            ],
-            sizes: ['One Size'],
-            rating: 5,
-            reviewCount: 15,
-            isHovered: false,
-            description: 'Luxury silk scarf with a beautiful print. Adds an elegant touch to any outfit and can be styled in multiple ways.'
-        },
-        {
-            id: 11,
-            name: 'Hooded Parka',
-            categoryId: 2,
-            primaryImage: 'https://images.unsplash.com/photo-1544923246-77307dd654cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            hoverImage: 'https://images.unsplash.com/photo-1544923246-77307dd654cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            price: 169.99,
+            name: 'Lightweight Cardigan',
+            categoryId: 4,
+            primaryImage: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            hoverImage: 'https://images.unsplash.com/photo-1620799139507-2a76f79a2f4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            price: 69.99,
             oldPrice: null,
             discount: null,
             isNew: true,
             colors: [
-                { name: 'Green', code: '#2ED45B' },
-                { name: 'Black', code: '#000000' }
+                { name: 'Gray', code: '#808080' },
+                { name: 'Navy', code: '#000080' },
+                { name: 'Beige', code: '#F5F5DC' }
             ],
             sizes: ['S', 'M', 'L', 'XL'],
             rating: 4,
-            reviewCount: 19,
+            reviewCount: 11,
             isHovered: false,
-            description: 'Warm and durable parka with a detachable hood. Features multiple pockets and a water-resistant outer layer.'
+            description: 'Soft and lightweight cardigan with an open front design. Perfect for layering in any season and adds a touch of elegance to your outfit.'
         },
         {
-            id: 12,
+            id: 11,
             name: 'Canvas Tote Bag',
             categoryId: 7,
             primaryImage: 'https://images.meesho.com/images/products/362459576/etoo8_512.webp',
             hoverImage: 'https://images.unsplash.com/photo-1572196284554-4e321b0e7e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            price: 35.99,
-            oldPrice: 45.99,
-            discount: 22,
+            price: 34.99,
+            oldPrice: null,
+            discount: null,
             isNew: false,
             colors: [
-                { name: 'White', code: '#FFFFFF' },
+                { name: 'Natural', code: '#F5F5DC' },
                 { name: 'Black', code: '#000000' }
             ],
             sizes: ['One Size'],
+            rating: 5,
+            reviewCount: 19,
+            isHovered: false,
+            description: 'Durable canvas tote bag with plenty of space for your essentials. Features sturdy handles and an inner pocket for small items.'
+        },
+        {
+            id: 12,
+            name: 'Patterned Button-Up Shirt',
+            categoryId: 1,
+            primaryImage: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            hoverImage: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+            price: 59.99,
+            oldPrice: 79.99,
+            discount: 25,
+            isNew: false,
+            colors: [
+                { name: 'Blue Pattern', code: '#2E6ED4' },
+                { name: 'Green Pattern', code: '#2ED45B' }
+            ],
+            sizes: ['S', 'M', 'L', 'XL', 'XXL'],
             rating: 4,
             reviewCount: 13,
             isHovered: false,
-            description: 'Spacious canvas tote bag with sturdy handles. Perfect for shopping, beach days, or as an everyday carry-all.'
+            description: 'Stylish button-up shirt with a modern pattern. Made from comfortable, breathable fabric and features a regular fit.'
         }
     ];
     
@@ -682,5 +683,10 @@ app.controller('CatalogController', ['$scope', '$window', function($scope, $wind
     $scope.addToCompare = function(product) {
         // In a real app, this would add the product to compare list
         alert('Added to compare: ' + product.name);
+    };
+    
+    // View product detail
+    $scope.viewProductDetail = function(product) {
+        window.location.href = '/catalog/product/' + product.id;
     };
 }]); 

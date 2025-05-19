@@ -497,6 +497,16 @@ body {
     white-space: nowrap;
 }
 
+.product-name a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.product-name a:hover {
+    color: #000;
+}
+
 .product-price {
     margin-bottom: 10px;
     font-weight: 600;
@@ -777,6 +787,32 @@ body {
     display: flex;
     gap: 10px;
     margin-top: 20px;
+}
+
+.quick-view-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.quick-view-actions .btn {
+    flex: 1;
+}
+
+.quick-view-content h2.product-name {
+    margin-bottom: 15px;
+}
+
+.quick-view-content h2.product-name a {
+    color: #333;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.quick-view-content h2.product-name a:hover {
+    color: #000;
 }
 
 /* Footer Styles */
