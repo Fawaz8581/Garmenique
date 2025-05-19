@@ -221,3 +221,19 @@ app.controller('NewsletterController', ['$scope', function($scope) {
         }
     };
 }]); 
+
+app.controller('AccountDropdownController', function($scope, $timeout) {
+    $scope.isOpen = false;
+    let hideTimeout;
+
+    $scope.openDropdown = function() {
+        if (hideTimeout) $timeout.cancel(hideTimeout);
+        $scope.isOpen = true;
+    };
+
+    $scope.closeDropdown = function() {
+        hideTimeout = $timeout(function() {
+            $scope.isOpen = false;
+        }, 200); // kasih delay agar tidak langsung hilang saat menuju dropdown
+    };
+});

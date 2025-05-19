@@ -44,8 +44,27 @@
                 
                 <div class="nav-icons">
                     <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
-                    <a href="/account" class="nav-icon"><i class="fas fa-user"></i></a>
+                    <!-- User dropdown -->
+                    <div class="nav-icon dropdown-wrapper"
+                        ng-controller="AccountDropdownController"
+                        ng-mouseenter="openDropdown()"
+                        ng-mouseleave="closeDropdown()">
+    
+                    <!-- Icon user -->
+                    <a href="javascript:void(0)" class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </a>
+
+                    <!-- Dropdown menu -->
+                    <div class="account-dropdown" ng-class="{'show': isOpen}">
+                        <a href="/register" class="dropdown-item">Register</a>
+                        <a href="/login" class="dropdown-item">Login</a>
+                    </div>
+                </div>
+
+                    <!-- Cart icon -->
                     <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
+
                 </div>
                 
                 <button class="mobile-toggle" ng-click="toggleNav()">
