@@ -6,6 +6,10 @@ Route::get('/', function () {
     return view('landing_page');
 });
 
+Route::get('/login_register', function () {
+    return view('login_register');
+});
+
 Route::get('/blog', function () {
     return view('blog');
 });
