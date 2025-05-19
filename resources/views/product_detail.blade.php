@@ -165,8 +165,8 @@
                             
                             <!-- Product Price -->
                             <div class="product-price mb-4">
-                                <span class="current-price" ng-class="{'has-discount': product.discount}">IDR @{{ product.price.toFixed(2) }}</span>
-                                <span class="old-price" ng-if="product.oldPrice">IDR @{{ product.oldPrice.toFixed(2) }}</span>
+                                <span class="current-price" ng-class="{'has-discount': product.discount}">$@{{ product.price.toFixed(2) }}</span>
+                                <span class="old-price" ng-if="product.oldPrice">$@{{ product.oldPrice.toFixed(2) }}</span>
                                 <span class="discount-badge" ng-if="product.discount">-@{{ product.discount }}%</span>
                             </div>
                             
@@ -415,8 +415,8 @@
                                         <a href="/catalog/product/@{{ relatedProduct.id }}">@{{ relatedProduct.name }}</a>
                                     </h3>
                                     <div class="product-price">
-                                        <span class="current-price" ng-class="{'has-discount': relatedProduct.discount}">IDR @{{ relatedProduct.price.toFixed(2) }}</span>
-                                        <span class="old-price" ng-if="relatedProduct.oldPrice">IDR @{{ relatedProduct.oldPrice.toFixed(2) }}</span>
+                                        <span class="current-price" ng-class="{'has-discount': relatedProduct.discount}">$@{{ relatedProduct.price.toFixed(2) }}</span>
+                                        <span class="old-price" ng-if="relatedProduct.oldPrice">$@{{ relatedProduct.oldPrice.toFixed(2) }}</span>
                                     </div>
                                     <div class="product-rating">
                                         <div class="stars">
