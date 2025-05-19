@@ -35,8 +35,8 @@ img {
 /* Container */
 .container {
     width: 100%;
-    max-width: 100%;
-    margin: 0;
+    max-width: 1280px;
+    margin: 0 auto;
     padding: 0 20px;
     box-sizing: border-box;
 }
@@ -73,14 +73,15 @@ img {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 40px;
 }
 
 .logo-container {
-    width: 200px;
+    flex: 1;
+    max-width: 200px;
     position: relative;
     z-index: 101;
-    padding-left: 0;
+    text-align: left;
 }
 
 .logo {
@@ -139,14 +140,14 @@ img {
 }
 
 .nav-icons {
-    width: 200px;
+    flex: 1;
+    max-width: 120px;
     display: flex;
-    justify-content: flex-end;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .nav-icon {
-    margin-left: 15px;
     font-size: 1rem;
     color: #333;
     text-decoration: none;
@@ -598,7 +599,11 @@ img {
     }
     
     .nav-container {
-        grid-template-columns: 180px 1fr 180px;
+        padding: 0 20px;
+    }
+
+    .main-nav ul li {
+        margin: 0 10px;
     }
 
     .hero-title {
@@ -609,8 +614,12 @@ img {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .logo-container, .nav-icons {
-        width: 150px;
+    .logo-container {
+        max-width: 180px;
+    }
+    
+    .nav-icons {
+        max-width: 120px;
     }
 }
 
@@ -619,13 +628,54 @@ img {
         font-size: 13px;
     }
     
+    .nav-container {
+        padding: 0 15px;
+    }
+    
     .logo-container {
+        flex: none;
+        max-width: none;
         z-index: 110;
-        width: auto;
+        text-align: center;
     }
     
     .nav-icons {
-        width: auto;
+        flex: none;
+        max-width: none;
+    }
+    
+    .main-nav {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        height: 100vh;
+        background-color: #fff;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 80px;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 90;
+    }
+    
+    .main-nav.active {
+        left: 0;
+    }
+    
+    .main-nav ul {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .main-nav ul li {
+        margin: 10px 0;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .mobile-toggle {
+        display: block;
     }
     
     .hero {
@@ -661,7 +711,6 @@ img {
     }
     
     .nav-container {
-        grid-template-columns: 1fr auto auto;
         padding: 0 10px;
     }
     
@@ -677,9 +726,9 @@ img {
     .featured-item {
         height: 18rem;
     }
-} 
+}
 
-/* Container hanya untuk icon user */
+/* Container for user icon dropdown */
 .dropdown-wrapper {
     position: relative;
     display: inline-block;
@@ -689,8 +738,7 @@ img {
 .account-dropdown {
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 0;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -700,6 +748,7 @@ img {
     z-index: 1000;
     text-align: center;
     padding: 8px 0;
+    margin-top: 5px;
     transition: all 0.2s ease;
 }
 

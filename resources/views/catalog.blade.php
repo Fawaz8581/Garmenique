@@ -35,13 +35,13 @@
                 
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
-                        <li><a href="/" class="nav-item">Home</a></li>
-                        <li><a href="/catalog" class="nav-item active">Catalog</a></li>
-                        <li><a href="/men" class="nav-item">Men</a></li>
-                        <li><a href="/women" class="nav-item">Women</a></li>
-                        <li><a href="/blog" class="nav-item">Blog</a></li>
-                        <li><a href="/about" class="nav-item">About</a></li>
-                        <li><a href="/contact" class="nav-item">Contact</a></li>
+                        <li><a href="/" class="nav-item">HOME</a></li>
+                        <li><a href="/catalog" class="nav-item active">CATALOG</a></li>
+                        <li><a href="/men" class="nav-item">MEN</a></li>
+                        <li><a href="/women" class="nav-item">WOMEN</a></li>
+                        <li><a href="/blog" class="nav-item">BLOG</a></li>
+                        <li><a href="/about" class="nav-item">ABOUT</a></li>
+                        <li><a href="/contact" class="nav-item">CONTACT</a></li>
                     </ul>
                 </nav>
                 

@@ -25,6 +25,34 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        
+        .logo-container {
+            flex: 1;
+            max-width: 200px;
+            position: relative;
+            z-index: 101;
+            text-align: left;
+        }
+        
+        .nav-icons {
+            flex: 1;
+            max-width: 120px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 <body ng-app="garmeniqueApp" ng-controller="BlogController">
     <!-- Header Section -->
@@ -36,13 +64,13 @@
             
             <nav class="main-nav" ng-class="{'active': isNavActive}">
                 <ul>
-                    <li><a href="/" class="nav-item">Home</a></li>
-                    <li><a href="/catalog" class="nav-item">Catalog</a></li>
-                    <li><a href="/men" class="nav-item">Men</a></li>
-                    <li><a href="/women" class="nav-item">Women</a></li>
-                    <li><a href="/blog" class="nav-item active">Blog</a></li>
-                    <li><a href="/about" class="nav-item">About</a></li>
-                    <li><a href="/contact" class="nav-item">Contact</a></li>
+                    <li><a href="/" class="nav-item">HOME</a></li>
+                    <li><a href="/catalog" class="nav-item">CATALOG</a></li>
+                    <li><a href="/men" class="nav-item">MEN</a></li>
+                    <li><a href="/women" class="nav-item">WOMEN</a></li>
+                    <li><a href="/blog" class="nav-item active">BLOG</a></li>
+                    <li><a href="/about" class="nav-item">ABOUT</a></li>
+                    <li><a href="/contact" class="nav-item">CONTACT</a></li>
                 </ul>
             </nav>
             
@@ -107,9 +135,11 @@
     <!-- Blog Header Section -->
     <section class="blog-hero">
         <div class="container">
-            <div class="blog-header-content">
-                <h1>Garmenique</h1>
-                <p class="mission-statement">We're on a mission to change the fashion industry.<br>These are the people, stories, and ideas that will help us get there.</p>
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto blog-header-content">
+                    <h1>Garmenique</h1>
+                    <p class="mission-statement">We're on a mission to change the fashion industry.<br>These are the people, stories, and ideas that will help us get there.</p>
+                </div>
             </div>
         </div>
     </section>

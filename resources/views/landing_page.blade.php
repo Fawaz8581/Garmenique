@@ -32,39 +32,20 @@
                 
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
-                        <li><a href="/" class="nav-item active">Home</a></li>
-                        <li><a href="/catalog" class="nav-item">Catalog</a></li>
-                        <li><a href="/men" class="nav-item">Men</a></li>
-                        <li><a href="/women" class="nav-item">Women</a></li>
-                        <li><a href="/blog" class="nav-item">Blog</a></li>
-                        <li><a href="/about" class="nav-item">About</a></li>
-                        <li><a href="/contact" class="nav-item">Contact</a></li>
+                        <li><a href="/" class="nav-item active">HOME</a></li>
+                        <li><a href="/catalog" class="nav-item">CATALOG</a></li>
+                        <li><a href="/men" class="nav-item">MEN</a></li>
+                        <li><a href="/women" class="nav-item">WOMEN</a></li>
+                        <li><a href="/blog" class="nav-item">BLOG</a></li>
+                        <li><a href="/about" class="nav-item">ABOUT</a></li>
+                        <li><a href="/contact" class="nav-item">CONTACT</a></li>
                     </ul>
                 </nav>
                 
                 <div class="nav-icons">
                     <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
-                    <!-- User dropdown -->
-                    <div class="nav-icon dropdown-wrapper"
-                        ng-controller="AccountDropdownController"
-                        ng-mouseenter="openDropdown()"
-                        ng-mouseleave="closeDropdown()">
-    
-                    <!-- Icon user -->
-                    <a href="javascript:void(0)" class="nav-icon">
-                        <i class="fas fa-user"></i>
-                    </a>
-
-                    <!-- Dropdown menu -->
-                    <div class="account-dropdown" ng-class="{'show': isOpen}">
-                        <a href="/register" class="dropdown-item">Register</a>
-                        <a href="/login" class="dropdown-item">Login</a>
-                    </div>
-                </div>
-
-                    <!-- Cart icon -->
+                    <a href="/account" class="nav-icon"><i class="fas fa-user"></i></a>
                     <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
-
                 </div>
                 
                 <button class="mobile-toggle" ng-click="toggleNav()">

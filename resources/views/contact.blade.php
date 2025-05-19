@@ -33,13 +33,13 @@
                 
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
-                        <li><a href="/" class="nav-item">Home</a></li>
-                        <li><a href="/catalog" class="nav-item">Catalog</a></li>
-                        <li><a href="/men" class="nav-item">Men</a></li>
-                        <li><a href="/women" class="nav-item">Women</a></li>
-                        <li><a href="/blog" class="nav-item">Blog</a></li>
-                        <li><a href="/about" class="nav-item">About</a></li>
-                        <li><a href="/contact" class="nav-item active">Contact</a></li>
+                        <li><a href="/" class="nav-item">HOME</a></li>
+                        <li><a href="/catalog" class="nav-item">CATALOG</a></li>
+                        <li><a href="/men" class="nav-item">MEN</a></li>
+                        <li><a href="/women" class="nav-item">WOMEN</a></li>
+                        <li><a href="/blog" class="nav-item">BLOG</a></li>
+                        <li><a href="/about" class="nav-item">ABOUT</a></li>
+                        <li><a href="/contact" class="nav-item active">CONTACT</a></li>
                     </ul>
                 </nav>
                 
@@ -101,54 +101,53 @@
             </div>
         </div>
         
-        <!-- Contact Section -->
-        <section class="contact-section">
-            <div class="container">
-                <div class="contact-content">
-                    <div class="contact-header">
-                        <span class="section-subtitle">Contact Us</span>
-                        <h1 class="contact-title">Let's talk about<br>your question</h1>
-                        <p class="contact-description">Drop us a line through the form below and we'll get back to you</p>
-                    </div>
-                    
-                    <div class="contact-form-container">
-                        <form class="contact-form" ng-controller="ContactFormController" ng-submit="submitForm()">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <input type="text" id="firstName" placeholder="First name*" ng-model="formData.firstName" required>
+            <!-- Contact Section -->
+            <section class="contact-section">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10 col-md-12">
+                            <div class="contact-content text-center">
+                                <div class="contact-header">
+                                    <span class="section-subtitle">CONTACT US</span>
+                                    <h1 class="contact-title">Let's talk about<br>your question</h1>
+                                    <p class="contact-description">Drop us a line through the form below and we'll get back to you</p>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" id="lastName" placeholder="Last name*" ng-model="formData.lastName" required>
+                                <div class="contact-form-container">
+                                    <form class="contact-form" ng-controller="ContactFormController" ng-submit="submitForm()">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="text" id="firstName" placeholder="First name*" ng-model="formData.firstName" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" id="lastName" placeholder="Last name*" ng-model="formData.lastName" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="email" id="email" placeholder="Email address*" ng-model="formData.email" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" id="jobRole" placeholder="Job role" ng-model="formData.jobRole">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group full-width">
+                                                <input type="text" id="companyDomain" placeholder="Company domain" ng-model="formData.companyDomain">
+                                            </div>
+                                        </div>
+                                        <div class="form-group full-width">
+                                            <textarea id="message" placeholder="Tell us what you're hoping to achieve with Garmenique. We're here to help bring your fashion needs to life!" ng-model="formData.message" rows="5" required></textarea>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn-submit">SEND MESSAGE</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <input type="email" id="email" placeholder="Email address*" ng-model="formData.email" required>
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" id="jobRole" placeholder="Job role" ng-model="formData.jobRole">
-                                </div>
-                            </div>
-                            
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <input type="text" id="companyDomain" placeholder="Company domain" ng-model="formData.companyDomain">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <textarea id="message" placeholder="Tell us what you're hoping to achieve with Garmenique. We're here to help bring your fashion needs to life!" ng-model="formData.message" rows="5" required></textarea>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn-submit">Send Message</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
         
         <!-- Additional Information Section -->
         <section class="contact-info-section">

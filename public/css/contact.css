@@ -1,23 +1,47 @@
+/* Container styles */
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+    .container {
+        padding: 0 40px;
+    }
+}
+
 /* Contact page styles for Garmenique */
 
 /* Contact Section */
 .contact-section {
-    padding: 80px 0;
+    padding: 120px 0 80px;
+    margin-top: 60px;
     background-color: #f8f8f8;
+    text-align: center;
+}
+
+.container-fluid {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .contact-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    width: 100%;
     max-width: 800px;
     margin: 0 auto;
+    text-align: center;
 }
 
 .contact-header {
     margin-bottom: 40px;
+    text-align: center;
+    width: 100%;
 }
 
 .section-subtitle {
@@ -26,6 +50,10 @@
     letter-spacing: 2px;
     color: #666;
     font-weight: 500;
+    display: block;
+    text-align: center;
+    margin-bottom: 10px;
+    margin-right: calc(-55% - 380px);
 }
 
 .contact-title {
@@ -34,17 +62,27 @@
     margin: 15px 0;
     line-height: 1.2;
     color: #222;
+    text-align: center;
+    margin-right: calc(-55% - 380px);
 }
 
 .contact-description {
     font-size: 16px;
     color: #555;
     margin-bottom: 30px;
+    text-align: center;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-right: calc(10% - 380px);
 }
 
 /* Contact Form Styles */
 .contact-form-container {
-    width: 100%;
+    width: 250%;
+    max-width: 8000px;
+    margin: 0 auto;
+    /* Remove transformation to allow true centering */
     background: #fff;
     padding: 40px;
     border-radius: 4px;
@@ -95,6 +133,7 @@
 
 .form-actions {
     text-align: center;
+    margin-top: 20px;
 }
 
 .btn-submit {
@@ -106,9 +145,10 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
-    border-radius: 4px;
+    border-radius: 0;
     cursor: pointer;
     transition: background-color 0.3s;
+    min-width: 180px;
 }
 
 .btn-submit:hover {
@@ -151,6 +191,11 @@
 
 /* Responsive styles */
 @media (max-width: 768px) {
+    .contact-section {
+        padding: 100px 0 60px;
+        margin-top: 50px;
+    }
+
     .contact-title {
         font-size: 32px;
     }
@@ -175,7 +220,8 @@
 
 @media (max-width: 576px) {
     .contact-section {
-        padding: 50px 0;
+        padding: 80px 0 50px;
+        margin-top: 60px;
     }
 
     .contact-title {
@@ -185,4 +231,119 @@
     .btn-submit {
         width: 100%;
     }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* Header & Navigation */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    padding: 15px 0;
+}
+
+.header.sticky {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.logo-container {
+    flex: 1;
+    max-width: 200px;
+    position: relative;
+    z-index: 101;
+    text-align: left;
+}
+
+.logo {
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000;
+}
+
+/* Navigation */
+.main-nav {
+    display: flex;
+    align-items: center;
+    flex: 2;
+    justify-content: center;
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+}
+
+.main-nav ul li {
+    margin: 0 15px;
+    text-align: center;
+}
+
+.nav-item {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: #333;
+    position: relative;
+    padding: 0 5px;
+}
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #000;
+    transition: width 0.2s ease;
+}
+
+.nav-item:hover::after,
+.nav-item.active::after {
+    width: 100%;
+}
+
+.nav-icons {
+    flex: 1;
+    max-width: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-icon {
+    font-size: 1rem;
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-icon:hover {
+    color: #000;
 } 
