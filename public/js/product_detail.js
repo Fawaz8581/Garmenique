@@ -463,4 +463,21 @@ app.controller('ProductDetailController', ['$scope', '$window', '$http', functio
         alert('Product added to wishlist');
         // In a real app, this would send the product to a wishlist service
     };
-}]); 
+}]);
+
+// Account Dropdown Controller
+app.controller('AccountDropdownController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.isOpen = false;
+    let hideTimeout;
+
+    $scope.openDropdown = function() {
+        if (hideTimeout) $timeout.cancel(hideTimeout);
+        $scope.isOpen = true;
+    };
+
+    $scope.closeDropdown = function() {
+        hideTimeout = $timeout(function() {
+            $scope.isOpen = false;
+        }, 200); // Small delay to improve user experience
+    };
+}]);

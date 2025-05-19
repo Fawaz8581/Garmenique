@@ -1080,4 +1080,44 @@ body {
     .modal-actions {
         flex-direction: column;
     }
-} 
+}
+
+/* Container for user icon dropdown */
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown styling */
+.account-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    min-width: 160px;
+    display: none;
+    z-index: 1000;
+    text-align: center;
+    padding: 8px 0;
+    margin-top: 5px;
+    transition: all 0.2s ease;
+}
+
+.account-dropdown.show {
+    display: block;
+}
+
+.account-dropdown .dropdown-item {
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    display: block;
+}
+
+.account-dropdown .dropdown-item:hover {
+    background-color: #f7f7f7;
+}

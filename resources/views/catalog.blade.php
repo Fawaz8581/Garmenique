@@ -47,7 +47,13 @@
                 
                 <div class="nav-icons">
                     <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
-                    <a href="/account" class="nav-icon"><i class="fas fa-user"></i></a>
+                    <div class="dropdown-wrapper" ng-controller="AccountDropdownController" ng-mouseenter="openDropdown()" ng-mouseleave="closeDropdown()">
+                        <a href="javascript:void(0)" class="nav-icon"><i class="fas fa-user"></i></a>
+                        <div class="account-dropdown" ng-class="{'show': isOpen}">
+                            <a href="/login" class="dropdown-item">Login</a>
+                            <a href="/register" class="dropdown-item">Register</a>
+                        </div>
+                    </div>
                     <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
                 </div>
                 
@@ -487,4 +493,4 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/catalog.js') }}"></script>
     </body>
-</html> 
+</html>

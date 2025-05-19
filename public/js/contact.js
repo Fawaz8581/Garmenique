@@ -164,4 +164,21 @@ app.controller('SearchController', ['$scope', '$rootScope', '$document', functio
         // Search logic would go here
         console.log('Searching for:', $scope.searchQuery);
     };
-}]); 
+}]);
+
+// Account Dropdown Controller
+app.controller('AccountDropdownController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.isOpen = false;
+    let hideTimeout;
+
+    $scope.openDropdown = function() {
+        if (hideTimeout) $timeout.cancel(hideTimeout);
+        $scope.isOpen = true;
+    };
+
+    $scope.closeDropdown = function() {
+        hideTimeout = $timeout(function() {
+            $scope.isOpen = false;
+        }, 200); // Small delay to improve user experience
+    };
+}]);

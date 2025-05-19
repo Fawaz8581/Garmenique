@@ -217,4 +217,21 @@ app.controller('NewsletterController', ['$scope', function($scope) {
             $scope.email = '';
         }
     };
-}]); 
+}]);
+
+// Account Dropdown Controller
+app.controller('AccountDropdownController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.isOpen = false;
+    let hideTimeout;
+
+    $scope.openDropdown = function() {
+        if (hideTimeout) $timeout.cancel(hideTimeout);
+        $scope.isOpen = true;
+    };
+
+    $scope.closeDropdown = function() {
+        hideTimeout = $timeout(function() {
+            $scope.isOpen = false;
+        }, 200); // Small delay to improve user experience
+    };
+}]);

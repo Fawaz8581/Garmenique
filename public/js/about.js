@@ -132,6 +132,23 @@ app.controller('SearchController', ['$scope', '$rootScope', '$document', functio
     };
 }]);
 
+// Account Dropdown Controller
+app.controller('AccountDropdownController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.isOpen = false;
+    let hideTimeout;
+
+    $scope.openDropdown = function() {
+        if (hideTimeout) $timeout.cancel(hideTimeout);
+        $scope.isOpen = true;
+    };
+
+    $scope.closeDropdown = function() {
+        hideTimeout = $timeout(function() {
+            $scope.isOpen = false;
+        }, 200); // Small delay to improve user experience
+    };
+}]);
+
 // Initialize image galleries if needed
 document.addEventListener('DOMContentLoaded', function() {
     // Add scroll animations
@@ -166,4 +183,4 @@ document.addEventListener('DOMContentLoaded', function() {
             item.classList.add('active');
         }
     });
-}); 
+});
