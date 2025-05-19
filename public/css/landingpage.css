@@ -77,6 +77,7 @@ img {
 }
 
 .logo-container {
+    width: 200px;
     position: relative;
     z-index: 101;
     padding-left: 0;
@@ -94,7 +95,7 @@ img {
 .main-nav {
     display: flex;
     align-items: center;
-    flex: 1;
+    flex: 2;
     justify-content: center;
 }
 
@@ -103,10 +104,12 @@ img {
     list-style: none;
     margin: 0;
     padding: 0;
+    justify-content: center;
 }
 
 .main-nav ul li {
     margin: 0 15px;
+    text-align: center;
 }
 
 .nav-item {
@@ -116,6 +119,7 @@ img {
     font-weight: 500;
     color: #333;
     position: relative;
+    padding: 0 5px;
 }
 
 .nav-item::after {
@@ -135,15 +139,22 @@ img {
 }
 
 .nav-icons {
+    width: 200px;
     display: flex;
-    align-items: center;
-    padding-right: 0;
+    justify-content: flex-end;
+    gap: 20px;
 }
 
 .nav-icon {
     margin-left: 15px;
     font-size: 1rem;
     color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-icon:hover {
+    color: #000;
 }
 
 /* Mobile menu button */
@@ -597,6 +608,10 @@ img {
     .featured-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    .logo-container, .nav-icons {
+        width: 150px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -606,6 +621,11 @@ img {
     
     .logo-container {
         z-index: 110;
+        width: auto;
+    }
+    
+    .nav-icons {
+        width: auto;
     }
     
     .hero {

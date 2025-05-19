@@ -17,3 +17,25 @@ Route::get('/about', function () {
 Route::get('/contact', function () {
     return view('contact');
 });
+
+Route::get('/catalog', function () {
+    return view('catalog');
+});
+
+// Temporary routes for Men and Women sections
+Route::get('/men', function () {
+    return redirect('/catalog');
+});
+
+Route::get('/women', function () {
+    return redirect('/catalog');
+});
+
+// Temporary routes for Account and Cart
+Route::get('/account', function () {
+    return redirect('/');
+});
+
+Route::get('/cart', function () {
+    return redirect('/');
+});

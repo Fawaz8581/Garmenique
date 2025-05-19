@@ -380,6 +380,7 @@
 }
 
 .logo-container {
+    width: 200px;
     position: relative;
     z-index: 101;
     padding-left: 0;
@@ -397,7 +398,7 @@
 .main-nav {
     display: flex;
     align-items: center;
-    flex: 1;
+    flex: 2;
     justify-content: center;
 }
 
@@ -406,10 +407,12 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    justify-content: center;
 }
 
 .main-nav ul li {
     margin: 0 15px;
+    text-align: center;
 }
 
 .nav-item {
@@ -419,6 +422,7 @@
     font-weight: 500;
     color: #333;
     position: relative;
+    padding: 0 5px;
 }
 
 .nav-item::after {
@@ -438,13 +442,20 @@
 }
 
 .nav-icons {
+    width: 200px;
     display: flex;
-    align-items: center;
-    padding-right: 0;
+    justify-content: flex-end;
+    gap: 20px;
 }
 
 .nav-icon {
     margin-left: 15px;
     font-size: 1rem;
     color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-icon:hover {
+    color: #000;
 } 

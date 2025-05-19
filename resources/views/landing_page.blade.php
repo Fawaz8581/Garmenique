@@ -27,15 +27,15 @@
         <header class="header" ng-controller="HeaderController">
             <div class="container nav-container">
                 <div class="logo-container">
-                    <a href="#" class="logo">GARMENIQUE</a>
+                    <a href="/" class="logo">GARMENIQUE</a>
                 </div>
                 
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
                         <li><a href="/" class="nav-item active">Home</a></li>
-                        <li><a href="#" class="nav-item">Catalog</a></li>
-                        <li><a href="#" class="nav-item">Men</a></li>
-                        <li><a href="#" class="nav-item">Women</a></li>
+                        <li><a href="/catalog" class="nav-item">Catalog</a></li>
+                        <li><a href="/men" class="nav-item">Men</a></li>
+                        <li><a href="/women" class="nav-item">Women</a></li>
                         <li><a href="/blog" class="nav-item">Blog</a></li>
                         <li><a href="/about" class="nav-item">About</a></li>
                         <li><a href="/contact" class="nav-item">Contact</a></li>
@@ -44,8 +44,8 @@
                 
                 <div class="nav-icons">
                     <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
-                    <a href="#" class="nav-icon"><i class="fas fa-user"></i></a>
-                    <a href="#" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="/account" class="nav-icon"><i class="fas fa-user"></i></a>
+                    <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
                 </div>
                 
                 <button class="mobile-toggle" ng-click="toggleNav()">
@@ -74,13 +74,13 @@
                     <!-- Categories Navigation as Bullets -->
                     <div class="categories-list">
                         <ul>
-                            <li><a href="#">BEST SELLERS</a></li>
-                            <li><a href="#">CLOTHING</a></li>
-                            <li><a href="#">TOPS & SWEATERS</a></li>
-                            <li><a href="#">PANTS & JEANS</a></li>
-                            <li><a href="#">OUTERWEAR</a></li>
-                            <li><a href="#">SHOES & BAGS</a></li>
-                            <li><a href="#">SALE</a></li>
+                            <li><a href="/catalog">BEST SELLERS</a></li>
+                            <li><a href="/catalog">CLOTHING</a></li>
+                            <li><a href="/catalog">TOPS & SWEATERS</a></li>
+                            <li><a href="/catalog">PANTS & JEANS</a></li>
+                            <li><a href="/catalog">OUTERWEAR</a></li>
+                            <li><a href="/catalog">SHOES & BAGS</a></li>
+                            <li><a href="/catalog">SALE</a></li>
                         </ul>
                     </div>
 
@@ -106,7 +106,7 @@
                 <div class="hero-content">
                     <h1 class="hero-title">GARMENIQUE</h1>
                     <p class="hero-description">Elegance in every stitch. Premium clothing crafted for those who appreciate quality and style.</p>
-                    <a href="#" class="btn">SHOP NOW</a>
+                    <a href="/catalog" class="btn">SHOP NOW</a>
                 </div>
             </div>
         </section>
@@ -143,7 +143,7 @@
         <section class="mission-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1553413077-190dd305871c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=70');">
             <div class="container">
                 <h2 class="mission-title">We're on a Mission To Clean Up the Industry</h2>
-                <a href="#" class="btn">LEARN MORE</a>
+                <a href="/about" class="btn">LEARN MORE</a>
             </div>
         </section>
 
@@ -155,45 +155,44 @@
                         <h4>Company</h4>
                         <ul class="footer-links">
                             <li><a href="/about">About Us</a></li>
+                            <li><a href="#">Our Story</a></li>
                             <li><a href="#">Careers</a></li>
                             <li><a href="#">Sustainability</a></li>
-                            <li><a href="#">Press</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-col">
-                        <h4>Our Store</h4>
+                        <h4>Help</h4>
                         <ul class="footer-links">
-                            <li><a href="#">Store Locator</a></li>
-                            <li><a href="#">Gift Cards</a></li>
-                            <li><a href="#">Student Discount</a></li>
-                            <li><a href="#">Refer a Friend</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-col">
-                        <h4>Customer Care</h4>
-                        <ul class="footer-links">
-                            <li><a href="/contact">Contact Us</a></li>
-                            <li><a href="#">Shipping & Returns</a></li>
+                            <li><a href="#">Customer Service</a></li>
                             <li><a href="#">Track Order</a></li>
-                            <li><a href="#">FAQs</a></li>
+                            <li><a href="#">Returns & Exchanges</a></li>
+                            <li><a href="#">Shipping Info</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-col">
-                        <h4>Our Social Media</h4>
+                        <h4>Quick Links</h4>
+                        <ul class="footer-links">
+                            <li><a href="/men">Men's Collection</a></li>
+                            <li><a href="/women">Women's Collection</a></li>
+                            <li><a href="#">Gift Cards</a></li>
+                            <li><a href="/blog">Blog</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4>Connect With Us</h4>
                         <div class="social-email-section">
                             <div class="social-icons">
                                 <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
                                 <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
                                 <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
                                 <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-youtube"></i></a>
                             </div>
-                            <p class="email-title">Stay in Touch</p>
+                            <p class="email-title">Sign Up for Updates</p>
                             <form class="email-form">
-                                <input type="email" placeholder="Email Address" class="email-input" required>
+                                <input type="email" placeholder="Enter your email" class="email-input" required>
                                 <button type="submit" class="email-button">
                                     <i class="fas fa-arrow-right"></i>
                                 </button>
@@ -203,7 +202,7 @@
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
+                    <p>&copy; 2023 Garmenique. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>

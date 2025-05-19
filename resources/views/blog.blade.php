@@ -37,9 +37,9 @@
             <nav class="main-nav" ng-class="{'active': isNavActive}">
                 <ul>
                     <li><a href="/" class="nav-item">Home</a></li>
-                    <li><a href="#" class="nav-item">Catalog</a></li>
-                    <li><a href="#" class="nav-item">Men</a></li>
-                    <li><a href="#" class="nav-item">Women</a></li>
+                    <li><a href="/catalog" class="nav-item">Catalog</a></li>
+                    <li><a href="/men" class="nav-item">Men</a></li>
+                    <li><a href="/women" class="nav-item">Women</a></li>
                     <li><a href="/blog" class="nav-item active">Blog</a></li>
                     <li><a href="/about" class="nav-item">About</a></li>
                     <li><a href="/contact" class="nav-item">Contact</a></li>
@@ -48,8 +48,8 @@
             
             <div class="nav-icons">
                 <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
-                <a href="#" class="nav-icon"><i class="fas fa-user"></i></a>
-                <a href="#" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
+                <a href="/account" class="nav-icon"><i class="fas fa-user"></i></a>
+                <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
             </div>
             
             <button class="mobile-toggle" ng-click="toggleNav()">
@@ -78,13 +78,13 @@
                 <!-- Categories Navigation as Bullets -->
                 <div class="categories-list">
                     <ul>
-                        <li><a href="#">BEST SELLERS</a></li>
-                        <li><a href="#">CLOTHING</a></li>
-                        <li><a href="#">TOPS & SWEATERS</a></li>
-                        <li><a href="#">PANTS & JEANS</a></li>
-                        <li><a href="#">OUTERWEAR</a></li>
-                        <li><a href="#">SHOES & BAGS</a></li>
-                        <li><a href="#">SALE</a></li>
+                        <li><a href="/catalog">BEST SELLERS</a></li>
+                        <li><a href="/catalog">CLOTHING</a></li>
+                        <li><a href="/catalog">TOPS & SWEATERS</a></li>
+                        <li><a href="/catalog">PANTS & JEANS</a></li>
+                        <li><a href="/catalog">OUTERWEAR</a></li>
+                        <li><a href="/catalog">SHOES & BAGS</a></li>
+                        <li><a href="/catalog">SALE</a></li>
                     </ul>
                 </div>
 
