@@ -1,18 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('landing_page');
 });
 
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
-
-Route::get('/register', function () {
-    return view('register');
-})->name('register');
+// Authentication Routes
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/blog', function () {
     return view('blog');
@@ -39,9 +39,15 @@ Route::get('/women', function () {
     return redirect('/catalog');
 });
 
-// Temporary routes for Account and Cart
-Route::get('/account', function () {
-    return redirect('/');
+// Account routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/account/settings', function () {
+        return view('account.settings');
+    })->name('account.settings');
+    
+    Route::get('/account/orders', function () {
+        return view('account.orders');
+    })->name('account.orders');
 });
 
 Route::get('/cart', function () {
@@ -59,10 +65,12 @@ Route::get('/product/{id}', function ($id) {
 });
 
 // Admin Dashboard routes
-Route::get('/admin', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard');
+Route::middleware(['admin'])->group(function () {
+    Route::get('/admin', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
 
-Route::get('/admin/products', function () {
-    return view('admin.products');
-})->name('admin.products');
+    Route::get('/admin/products', function () {
+        return view('admin.products');
+    })->name('admin.products');
+});
