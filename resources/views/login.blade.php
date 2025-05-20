@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <meta name="keyword" content="Emre Piriştine">
-    <meta name="description" content="Emre Piriştine">
+    <title>Garmenique - Login</title>
+    <meta name="keyword" content="Garmenique">
+    <meta name="description" content="Garmenique - Premium Clothing Brand">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="icon" href="images/icons/GarmeniqueLogo.png" type="image/png">
 
     <!-- Tablet -->
     <!-- link rel="stylesheet" media="(max-width:768px)" href="css/tablet.css" -->
