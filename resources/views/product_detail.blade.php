@@ -27,6 +27,81 @@
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
+        <!-- Navbar Fix CSS -->
+        <style>
+            /* Override styles for the navbar to match other pages */
+            .header .nav-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 40px;
+            }
+            
+            .header .logo-container {
+                flex: 1;
+                max-width: 200px;
+                position: relative;
+                z-index: 101;
+                text-align: left;
+            }
+            
+            .header .logo {
+                font-weight: 600;
+                font-size: 1.5rem;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                color: #000;
+            }
+            
+            .header .main-nav {
+                flex: 2;
+                display: flex;
+                justify-content: center;
+            }
+            
+            .header .main-nav ul {
+                display: flex;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                justify-content: center;
+            }
+            
+            .header .main-nav li {
+                margin: 0 15px;
+                text-align: center;
+            }
+            
+            .header .nav-icons {
+                flex: 1;
+                max-width: 120px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .header .nav-icon {
+                font-size: 1rem;
+                color: #333;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+            
+            /* Mobile responsive fix */
+            @media (max-width: 991px) {
+                .header .mobile-toggle {
+                    display: block;
+                }
+                
+                .header .logo-container, .header .nav-icons {
+                    max-width: 120px;
+                }
+            }
+        </style>
     </head>
     <body ng-app="garmeniqueApp">
         <!-- Header Section -->
@@ -167,8 +242,8 @@
                             
                             <!-- Product Price -->
                             <div class="product-price mb-4">
-                                <span class="current-price" ng-class="{'has-discount': product.discount}">$@{{ product.price.toFixed(2) }}</span>
-                                <span class="old-price" ng-if="product.oldPrice">$@{{ product.oldPrice.toFixed(2) }}</span>
+                                <span class="current-price" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
+                                <span class="old-price" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
                                 <span class="discount-badge" ng-if="product.discount">-@{{ product.discount }}%</span>
                             </div>
                             
@@ -231,7 +306,7 @@
                             <div class="product-meta mb-4">
                                 <div class="meta-item">
                                     <i class="fas fa-truck"></i>
-                                    <span>Free shipping on orders over $100</span>
+                                    <span>Free shipping on orders over IDR 1.500.000</span>
                                 </div>
                                 <div class="meta-item">
                                     <i class="fas fa-undo"></i>
@@ -417,8 +492,8 @@
                                         <a href="/catalog/product/@{{ relatedProduct.id }}">@{{ relatedProduct.name }}</a>
                                     </h3>
                                     <div class="product-price">
-                                        <span class="current-price" ng-class="{'has-discount': relatedProduct.discount}">$@{{ relatedProduct.price.toFixed(2) }}</span>
-                                        <span class="old-price" ng-if="relatedProduct.oldPrice">$@{{ relatedProduct.oldPrice.toFixed(2) }}</span>
+                                        <span class="current-price" ng-class="{'has-discount': relatedProduct.discount}">IDR @{{ (relatedProduct.price * 15500).toLocaleString('id-ID') }}</span>
+                                        <span class="old-price" ng-if="relatedProduct.oldPrice">IDR @{{ (relatedProduct.oldPrice * 15500).toLocaleString('id-ID') }}</span>
                                     </div>
                                     <div class="product-rating">
                                         <div class="stars">

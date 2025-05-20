@@ -131,12 +131,12 @@
                         </div>
 
                         <div class="filter-block">
-                            <h3>Price Range</h3>
+                            <h3>Price Range (IDR)</h3>
                             <div class="price-range">
                                 <div class="price-inputs">
-                                    <input type="number" ng-model="priceRange.min" placeholder="Min" ng-change="filterProducts()">
+                                    <input type="number" ng-model="priceRange.min" placeholder="Min" ng-change="filterProducts()" step="10000">
                                     <span>-</span>
-                                    <input type="number" ng-model="priceRange.max" placeholder="Max" ng-change="filterProducts()">
+                                    <input type="number" ng-model="priceRange.max" placeholder="Max" ng-change="filterProducts()" step="10000">
                                 </div>
                             </div>
                         </div>
@@ -234,8 +234,8 @@
                                                 <a href="/catalog/product/@{{ product.id }}">@{{ product.name }}</a>
                                             </h3>
                                             <div class="product-price">
-                                                <span class="price-current" ng-class="{'has-discount': product.discount}">$@{{ product.price.toFixed(2) }}</span>
-                                                <span class="price-old" ng-if="product.oldPrice">$@{{ product.oldPrice.toFixed(2) }}</span>
+                                                <span class="price-current" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
+                                                <span class="price-old" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
                                             </div>
                                             
                                             <div class="product-colors">
@@ -282,8 +282,8 @@
                                                 </div>
                                                 
                                                 <div class="product-price">
-                                                    <span class="price-current" ng-class="{'has-discount': product.discount}">$@{{ product.price.toFixed(2) }}</span>
-                                                    <span class="price-old" ng-if="product.oldPrice">$@{{ product.oldPrice.toFixed(2) }}</span>
+                                                    <span class="price-current" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
+                                                    <span class="price-old" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
                                                 </div>
                                                 
                                                 <div class="product-description">
@@ -369,8 +369,8 @@
                                     </div>
                                     
                                     <div class="product-price">
-                                        <span class="price-current">$@{{ quickViewProduct.price | number:2 }}</span>
-                                        <span class="price-old" ng-if="quickViewProduct.oldPrice">$@{{ quickViewProduct.oldPrice | number:2 }}</span>
+                                        <span class="price-current">IDR @{{ (quickViewProduct.price * 15500).toLocaleString('id-ID') }}</span>
+                                        <span class="price-old" ng-if="quickViewProduct.oldPrice">IDR @{{ (quickViewProduct.oldPrice * 15500).toLocaleString('id-ID') }}</span>
                                     </div>
                                     
                                     <p class="product-description">@{{ quickViewProduct.description }}</p>
