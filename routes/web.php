@@ -73,4 +73,8 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
     Route::get('/admin/products', function () {
         return view('admin.products');
     })->name('admin.products');
+
+    Route::get('/admin/login', function () {
+        return view('admin.login');
+    })->name('admin.login');
 });
