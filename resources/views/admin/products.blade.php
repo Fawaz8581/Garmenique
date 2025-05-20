@@ -219,7 +219,7 @@
                 category: 'T-Shirts',
                 price: 49.99,
                 stock: 125,
-                image: 'https://via.placeholder.com/300x300?text=T-Shirt',
+                image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
                 status: 'In Stock'
             },
             {
@@ -228,7 +228,7 @@
                 category: 'Jeans',
                 price: 89.99,
                 stock: 78,
-                image: 'https://via.placeholder.com/300x300?text=Jeans',
+                image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
                 status: 'In Stock'
             },
             {
@@ -237,7 +237,7 @@
                 category: 'Dresses',
                 price: 65.50,
                 stock: 42,
-                image: 'https://via.placeholder.com/300x300?text=Dress',
+                image: 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
                 status: 'Low Stock'
             },
             {
@@ -246,7 +246,7 @@
                 category: 'Outerwear',
                 price: 125.00,
                 stock: 15,
-                image: 'https://via.placeholder.com/300x300?text=Jacket',
+                image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
                 status: 'Low Stock'
             },
             {
@@ -255,7 +255,7 @@
                 category: 'Accessories',
                 price: 35.75,
                 stock: 0,
-                image: 'https://via.placeholder.com/300x300?text=Scarf',
+                image: 'https://assets.vogue.com/photos/589208b00e6cdc8a1928e3ef/master/pass/celebrity-style-reese-witherspoon.jpg',
                 status: 'Out of Stock'
             }
         ];
@@ -380,7 +380,7 @@
                 const category = document.getElementById('productCategory').value;
                 const price = parseFloat(document.getElementById('productPrice').value);
                 const stock = parseInt(document.getElementById('productStock').value) || 0;
-                const image = document.getElementById('productImage').value || 'https://via.placeholder.com/300x300?text=Product';
+                const image = document.getElementById('productImage').value || 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
                 
                 if (!name || !category || isNaN(price)) {
                     alert('Please fill in all required fields');
