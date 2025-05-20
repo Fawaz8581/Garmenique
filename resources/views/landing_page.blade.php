@@ -6,6 +6,7 @@
         <title>Garmenique - Home</title>
         <meta name="keyword" content="Garmenique">
         <meta name="description" content="Garmenique - Premium Clothing Brand">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Favicon -->
         <link rel="icon" href="images/icons/GarmeniqueLogo.png" type="image/png">
@@ -36,9 +37,7 @@
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
                         <li><a href="/" class="nav-item active">HOME</a></li>
-                        <li><a href="/catalog" class="nav-item">CATALOG</a></li>
-                        <li><a href="/men" class="nav-item">MEN</a></li>
-                        <li><a href="/women" class="nav-item">WOMEN</a></li>
+                        <li><a href="/catalog" class="nav-item">SHOP</a></li>
                         <li><a href="/blog" class="nav-item">BLOG</a></li>
                         <li><a href="/about" class="nav-item">ABOUT</a></li>
                         <li><a href="/contact" class="nav-item">CONTACT</a></li>

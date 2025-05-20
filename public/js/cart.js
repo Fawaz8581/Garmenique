@@ -10,38 +10,102 @@
     }
 
     // Cart Controller - Handles the sliding cart functionality
-    app.controller('CartController', ['$scope', '$window', '$rootScope', function($scope, $window, $rootScope) {
+    app.controller('CartController', ['$scope', '$window', '$rootScope', '$http', '$timeout', function($scope, $window, $rootScope, $http, $timeout) {
         // Initialize cart
         $scope.isCartActive = false;
         $scope.cartItems = [];
+        $scope.isAuthenticated = false;
+        $scope.isLoading = true;
         
-        // Load cart items from localStorage on initialization
-        function loadCartFromStorage() {
-            try {
-                var storedCart = localStorage.getItem('garmenique_cart');
-                if (storedCart) {
-                    $scope.cartItems = JSON.parse(storedCart);
+        // Setup CSRF token for all AJAX requests
+        var token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            $http.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+        } else {
+            console.error('CSRF token not found');
+        }
+        
+        // Check if user is authenticated
+        function checkAuth() {
+            $scope.isLoading = true;
+            return $http.get('/check-auth?_=' + new Date().getTime(), {
+                headers: {'Cache-Control': 'no-cache'}
+            })
+            .then(function(response) {
+                console.log('Auth check response:', response.data);
+                $scope.isAuthenticated = response.data.authenticated;
+                
+                if ($scope.isAuthenticated) {
+                    $scope.userId = response.data.user_id;
+                    return loadCartFromSession();
+                } else {
+                    // If not logged in, show empty cart
+                    $scope.cartItems = [];
+                    $scope.isLoading = false;
                 }
-            } catch (e) {
-                console.error('Error loading cart from storage:', e);
-            }
+            })
+            .catch(function(error) {
+                console.error('Auth check error:', error);
+                $scope.isLoading = false;
+            });
         }
         
-        // Save cart items to localStorage
-        function saveCartToStorage() {
-            try {
-                localStorage.setItem('garmenique_cart', JSON.stringify($scope.cartItems));
-            } catch (e) {
-                console.error('Error saving cart to storage:', e);
-            }
+        // Load cart from session storage
+        function loadCartFromSession() {
+            return $http.get('/get-cart?_=' + new Date().getTime(), {
+                headers: {'Cache-Control': 'no-cache'}
+            })
+            .then(function(response) {
+                console.log('Get cart response:', response.data);
+                if (response.data.cart && Array.isArray(response.data.cart)) {
+                    $scope.cartItems = response.data.cart;
+                } else {
+                    $scope.cartItems = [];
+                }
+                $scope.isLoading = false;
+            })
+            .catch(function(error) {
+                console.error('Error loading cart from session:', error);
+                $scope.cartItems = [];
+                $scope.isLoading = false;
+            });
         }
         
-        // Initialize from localStorage
-        loadCartFromStorage();
+        // Save cart to session for authenticated users
+        function saveCartToSession() {
+            if (!$scope.isAuthenticated) {
+                console.error('Cannot save cart: not authenticated');
+                return Promise.reject('Not authenticated');
+            }
+            
+            return $http.post('/save-cart', {
+                cart: $scope.cartItems
+            })
+            .then(function(response) {
+                console.log('Cart saved to session:', response.data);
+                return response;
+            })
+            .catch(function(error) {
+                console.error('Error saving cart to session:', error);
+                throw error;
+            });
+        }
+        
+        // Initialize by checking auth status
+        $timeout(function() {
+            checkAuth();
+        }, 100);
+        
+        // Force re-check auth when cart is opened
+        $scope.recheckAuth = function() {
+            return checkAuth();
+        };
         
         // Listen for broadcast events
         $rootScope.$on('openCart', function() {
-            $scope.openCart();
+            $scope.recheckAuth().then(function() {
+                $scope.openCart();
+            });
         });
         
         // Open cart function
@@ -58,51 +122,98 @@
         
         // Add to cart function
         $scope.addToCart = function(item) {
-            // Check if the item is already in the cart
-            var existingItem = $scope.cartItems.find(function(cartItem) {
-                return cartItem.id === item.id && 
-                       cartItem.size === item.size && 
-                       cartItem.color === item.color;
+            console.log("Adding item to cart:", item);
+            
+            // Always recheck auth before adding
+            $scope.recheckAuth().then(function() {
+                console.log("Auth status after recheck:", $scope.isAuthenticated);
+                
+                if (!$scope.isAuthenticated) {
+                    console.log("Not authenticated, redirecting to login");
+                    alert('Please login to add items to your cart');
+                    $window.location.href = '/login';
+                    return;
+                }
+                
+                console.log("Proceeding with add to cart");
+                
+                // Check if the item is already in the cart
+                var existingItem = $scope.cartItems.find(function(cartItem) {
+                    return cartItem.id === item.id && 
+                        cartItem.size === item.size && 
+                        cartItem.color === item.color;
+                });
+                
+                if(existingItem) {
+                    // If item exists, increase quantity
+                    existingItem.quantity += item.quantity || 1;
+                } else {
+                    // Otherwise add new item
+                    $scope.cartItems.push(item);
+                }
+                
+                // Save cart
+                saveCartToSession().then(function() {
+                    // Open the cart on success
+                    $scope.openCart();
+                    
+                    // Apply changes to update the UI
+                    if(!$scope.$$phase) {
+                        $scope.$apply();
+                    }
+                }).catch(function(err) {
+                    console.error("Error saving cart:", err);
+                    // Try one more auth check if saving fails
+                    checkAuth().then(function() {
+                        if ($scope.isAuthenticated) {
+                            saveCartToSession();
+                        } else {
+                            alert('Session expired. Please log in again.');
+                            $window.location.href = '/login';
+                        }
+                    });
+                });
+            }).catch(function(error) {
+                console.error("Error checking auth:", error);
+                alert('Error checking login status. Please refresh the page and try again.');
             });
-            
-            if(existingItem) {
-                // If item exists, increase quantity
-                existingItem.quantity += item.quantity || 1;
-            } else {
-                // Otherwise add new item
-                $scope.cartItems.push(item);
-            }
-            
-            // Save updated cart to localStorage
-            saveCartToStorage();
-            
-            // Open the cart
-            $scope.openCart();
-            
-            // Apply changes to update the UI
-            if(!$scope.$$phase) {
-                $scope.$apply();
-            }
         };
         
         // Increase quantity
         $scope.increaseQuantity = function(item) {
-            item.quantity++;
-            saveCartToStorage();
+            $scope.recheckAuth().then(function() {
+                if (!$scope.isAuthenticated) {
+                    alert('Please login to manage your cart');
+                    $window.location.href = '/login';
+                    return;
+                }
+                
+                item.quantity++;
+                saveCartToSession();
+            });
         };
         
         // Decrease quantity
         $scope.decreaseQuantity = function(item) {
-            if(item.quantity > 1) {
-                item.quantity--;
-            } else {
-                // Remove item if quantity becomes 0
-                var index = $scope.cartItems.indexOf(item);
-                if(index !== -1) {
-                    $scope.cartItems.splice(index, 1);
+            $scope.recheckAuth().then(function() {
+                if (!$scope.isAuthenticated) {
+                    alert('Please login to manage your cart');
+                    $window.location.href = '/login';
+                    return;
                 }
-            }
-            saveCartToStorage();
+                
+                if(item.quantity > 1) {
+                    item.quantity--;
+                } else {
+                    // Remove item if quantity becomes 0
+                    var index = $scope.cartItems.indexOf(item);
+                    if(index !== -1) {
+                        $scope.cartItems.splice(index, 1);
+                    }
+                }
+                
+                saveCartToSession();
+            });
         };
         
         // Calculate subtotal
@@ -128,7 +239,15 @@
         
         // Proceed to checkout
         $scope.proceedToCheckout = function() {
-            $window.location.href = '/checkout';
+            $scope.recheckAuth().then(function() {
+                if (!$scope.isAuthenticated) {
+                    alert('Please login to checkout');
+                    $window.location.href = '/login';
+                    return;
+                }
+                
+                $window.location.href = '/checkout';
+            });
         };
     }]);
 

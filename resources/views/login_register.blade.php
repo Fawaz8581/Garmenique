@@ -7,6 +7,7 @@
     <title>Garmenique - {{ Request::is('register') ? 'Register' : 'Login' }}</title>
     <meta name="keyword" content="Garmenique">
     <meta name="description" content="Garmenique - Premium Clothing Brand">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="icon" href="{{ asset('images/icons/GarmeniqueLogo.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

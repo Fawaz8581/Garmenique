@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('landing_page');
@@ -82,4 +84,79 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     });
+});
+
+// Cart data management routes
+Route::get('/check-auth', function () {
+    // Add headers to prevent caching
+    return response()->json([
+        'authenticated' => Auth::check(),
+        'user_id' => Auth::check() ? Auth::id() : null,
+        'timestamp' => now()->timestamp
+    ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+      ->header('Pragma', 'no-cache')
+      ->header('Expires', '0');
+});
+
+Route::get('/get-cart', function (Request $request) {
+    if (!Auth::check()) {
+        return response()->json([
+            'error' => 'Unauthenticated',
+            'authenticated' => false
+        ], 401);
+    }
+    
+    try {
+        $userId = Auth::id();
+        $cart = $request->session()->get('user_cart_'.$userId, []);
+        
+        return response()->json([
+            'cart' => $cart,
+            'authenticated' => true,
+            'user_id' => $userId
+        ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+          ->header('Pragma', 'no-cache')
+          ->header('Expires', '0');
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to retrieve cart',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+Route::post('/save-cart', function (Request $request) {
+    if (!Auth::check()) {
+        return response()->json([
+            'error' => 'Unauthenticated',
+            'authenticated' => false
+        ], 401);
+    }
+    
+    try {
+        $userId = Auth::id();
+        $cart = $request->input('cart', []);
+        
+        // Make sure cart is an array
+        if (!is_array($cart)) {
+            return response()->json([
+                'error' => 'Invalid cart format',
+                'message' => 'Cart must be an array'
+            ], 400);
+        }
+        
+        $request->session()->put('user_cart_'.$userId, $cart);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Cart saved successfully',
+            'authenticated' => true,
+            'cart_size' => count($cart)
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to save cart',
+            'message' => $e->getMessage()
+        ], 500);
+    }
 });

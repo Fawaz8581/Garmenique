@@ -52,6 +52,12 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
+            
+            // Create an empty cart for the user if one doesn't exist
+            $userId = Auth::id();
+            if (!$request->session()->has('user_cart_'.$userId)) {
+                $request->session()->put('user_cart_'.$userId, []);
+            }
 
             return redirect()->intended('/');
         }
@@ -94,6 +100,12 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        // Clear the cart before logging out
+        if (Auth::check()) {
+            $userId = Auth::id();
+            $request->session()->forget('user_cart_'.$userId);
+        }
+        
         Auth::logout();
 
         $request->session()->invalidate();
