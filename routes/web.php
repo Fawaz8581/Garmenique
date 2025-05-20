@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return view('landing_page');
@@ -74,7 +76,10 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         return view('admin.products');
     })->name('admin.products');
 
-    Route::get('/admin/login', function () {
-        return view('admin.login');
-    })->name('admin.login');
+    Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/admin/login', [AdminAuthController::class, 'login']);
+
+    Route::middleware(['auth', 'admin'])->group(function () {
+        Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    });
 });
