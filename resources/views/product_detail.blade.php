@@ -255,7 +255,7 @@
                             <!-- Product Colors -->
                             <div class="product-colors mb-4">
                                 <h5>Color: <span>@{{ selectedColor.name }}</span></h5>
-                                <div class="color-options">
+                                <div class="color-options" style="padding-left: 30px;">
                                     <button ng-repeat="color in product.colors" 
                                             ng-click="selectColor(color)" 
                                             ng-class="{'active': selectedColor.name === color.name}" 
@@ -290,13 +290,27 @@
                                     <input type="text" ng-model="quantity" readonly>
                                     <button class="quantity-btn" ng-click="increaseQuantity()">+</button>
                                 </div>
+                                
+                                <!-- User Selection Summary -->
+                                <div class="user-selection-summary mt-3 mb-2" ng-if="selectedSize || selectedColor">
+                                    <p class="text-muted mb-1">You selected: 
+                                        <span ng-if="selectedSize">Size <strong>@{{ selectedSize }}</strong></span>
+                                        <span ng-if="selectedSize && selectedColor.name">, </span>
+                                        <span ng-if="selectedColor.name">Color <strong>@{{ selectedColor.name }}</strong></span>
+                                    </p>
+                                </div>
+                                
+                                <!-- Shopping Cart Icon aligned left with text -->
+                                <div class="mt-3 text-left">
+                                    <a href="javascript:void(0)" class="nav-icon d-inline-flex align-items-center" ng-click="addToCart()">
+                                        <i class="fas fa-shopping-cart" style="font-size: 24px;"></i>
+                                        <span class="ml-2" style="margin-left: 10px; font-size: 16px;">Add to Cart</span>
+                                    </a>
+                                </div>
                             </div>
                             
                             <!-- Action Buttons -->
                             <div class="product-actions mb-4">
-                                <button class="btn btn-primary add-to-cart-btn" ng-click="addToCart()">
-                                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                                </button>
                                 <button class="btn btn-outline-secondary wishlist-btn" ng-click="addToWishlist()">
                                     <i class="far fa-heart"></i>
                                 </button>
