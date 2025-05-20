@@ -11,6 +11,12 @@
     <link rel="icon" href="{{ asset('images/icons/GarmeniqueLogo.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ asset('css/login_register.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/landing.page.search.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sliding-cart.css') }}">
+
     <!-- Tablet -->
     <!-- link rel="stylesheet" media="(max-width:768px)" href="css/tablet.css" -->
     <!-- Mobile -->
