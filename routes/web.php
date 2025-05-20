@@ -6,9 +6,13 @@ Route::get('/', function () {
     return view('landing_page');
 });
 
-Route::get('/login_register', function () {
-    return view('login_register');
-});
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::get('/register', function () {
+    return view('register');
+})->name('register');
 
 Route::get('/blog', function () {
     return view('blog');
