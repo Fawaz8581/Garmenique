@@ -57,3 +57,12 @@ Route::get('/catalog/product/{id}', function ($id) {
 Route::get('/product/{id}', function ($id) {
     return redirect('/catalog/product/' . $id);
 });
+
+// Admin Dashboard routes
+Route::get('/admin', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
+Route::get('/admin/products', function () {
+    return view('admin.products');
+})->name('admin.products');
