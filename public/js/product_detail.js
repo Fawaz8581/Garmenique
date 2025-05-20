@@ -1,3 +1,6 @@
+// Initialize Angular App if not already defined
+var app = angular.module('garmeniqueApp', []);
+
 // Product Detail Controller
 app.controller('ProductDetailController', ['$scope', '$window', '$http', function($scope, $window, $http) {
     // Get the product ID from the URL
@@ -444,18 +447,39 @@ app.controller('ProductDetailController', ['$scope', '$window', '$http', functio
     
     // Add to cart
     $scope.addToCart = function() {
-        if (!$scope.selectedSize) {
-            alert('Please select a size before adding to cart');
+        if(!$scope.selectedSize || !$scope.selectedColor) {
+            alert('Please select a size and color');
             return;
         }
         
-        if (!$scope.selectedColor) {
-            alert('Please select a color before adding to cart');
-            return;
-        }
+        var cartItem = {
+            id: $scope.product.id,
+            name: $scope.product.name,
+            image: $scope.product.primaryImage,
+            price: $scope.product.price,
+            oldPrice: $scope.product.oldPrice,
+            discount: $scope.product.discount,
+            size: $scope.selectedSize,
+            color: $scope.selectedColor.name,
+            quantity: $scope.quantity
+        };
         
-        alert('Product added to cart');
-        // In a real app, this would send the product to a cart service
+        // Get the CartController scope
+        var cartScope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+        
+        // Check if the cart scope exists
+        if(cartScope) {
+            // Add the item to cart
+            cartScope.addToCart(cartItem);
+            
+            // Open the cart panel
+            cartScope.openCart();
+            
+            // Apply changes to update the UI
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
+        }
     };
     
     // Add to wishlist
@@ -479,5 +503,192 @@ app.controller('AccountDropdownController', ['$scope', '$timeout', function($sco
         hideTimeout = $timeout(function() {
             $scope.isOpen = false;
         }, 200); // Small delay to improve user experience
+    };
+}]);
+
+// Cart Controller
+app.controller('CartController', ['$scope', '$window', '$rootScope', function($scope, $window, $rootScope) {
+    // Initialize cart
+    $scope.isCartActive = false;
+    $scope.cartItems = [];
+    
+    // Load cart items from localStorage on initialization
+    function loadCartFromStorage() {
+        try {
+            var storedCart = localStorage.getItem('garmenique_cart');
+            if (storedCart) {
+                $scope.cartItems = JSON.parse(storedCart);
+            }
+        } catch (e) {
+            console.error('Error loading cart from storage:', e);
+        }
+    }
+    
+    // Save cart items to localStorage
+    function saveCartToStorage() {
+        try {
+            localStorage.setItem('garmenique_cart', JSON.stringify($scope.cartItems));
+        } catch (e) {
+            console.error('Error saving cart to storage:', e);
+        }
+    }
+    
+    // Initialize from localStorage
+    loadCartFromStorage();
+    
+    // Listen for broadcast events
+    $rootScope.$on('openCart', function() {
+        $scope.openCart();
+    });
+    
+    // Open cart function
+    $scope.openCart = function() {
+        $scope.isCartActive = true;
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    };
+    
+    // Close cart function
+    $scope.closeCart = function() {
+        $scope.isCartActive = false;
+        document.body.style.overflow = ''; // Restore scrolling
+    };
+    
+    // Add to cart function
+    $scope.addToCart = function(item) {
+        // Check if the item is already in the cart
+        var existingItem = $scope.cartItems.find(function(cartItem) {
+            return cartItem.id === item.id && 
+                   cartItem.size === item.size && 
+                   cartItem.color === item.color;
+        });
+        
+        if(existingItem) {
+            // If item exists, increase quantity
+            existingItem.quantity += item.quantity || 1;
+        } else {
+            // Otherwise add new item
+            $scope.cartItems.push(item);
+        }
+        
+        // Save updated cart to localStorage
+        saveCartToStorage();
+        
+        // Open the cart
+        $scope.openCart();
+        
+        // Apply changes to update the UI
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
+    };
+    
+    // Increase quantity
+    $scope.increaseQuantity = function(item) {
+        item.quantity++;
+        saveCartToStorage();
+    };
+    
+    // Decrease quantity
+    $scope.decreaseQuantity = function(item) {
+        if(item.quantity > 1) {
+            item.quantity--;
+        } else {
+            // Remove item if quantity becomes 0
+            var index = $scope.cartItems.indexOf(item);
+            if(index !== -1) {
+                $scope.cartItems.splice(index, 1);
+            }
+        }
+        saveCartToStorage();
+    };
+    
+    // Calculate subtotal
+    $scope.calculateSubtotal = function() {
+        var subtotal = 0;
+        $scope.cartItems.forEach(function(item) {
+            var price = item.discount ? 
+                item.price * (1 - item.discount/100) : 
+                item.price;
+            subtotal += price * item.quantity;
+        });
+        return subtotal * 15500; // Converting to IDR
+    };
+    
+    // Get total items
+    $scope.getTotalItems = function() {
+        var total = 0;
+        $scope.cartItems.forEach(function(item) {
+            total += item.quantity;
+        });
+        return total;
+    };
+    
+    // Proceed to checkout
+    $scope.proceedToCheckout = function() {
+        $window.location.href = '/checkout';
+    };
+}]);
+
+// Header Controller
+app.controller('HeaderController', ['$scope', '$rootScope', function($scope, $rootScope) {
+    $scope.isNavActive = false;
+    $scope.isSearchActive = false;
+    
+    $scope.toggleNav = function() {
+        $scope.isNavActive = !$scope.isNavActive;
+    };
+    
+    $scope.toggleSearch = function() {
+        $scope.isSearchActive = !$scope.isSearchActive;
+    };
+    
+    $scope.closeSearch = function() {
+        $scope.isSearchActive = false;
+    };
+    
+    // Function to open cart using $rootScope broadcast
+    $scope.openCartPanel = function() {
+        $rootScope.$broadcast('openCart');
+    };
+}]);
+
+// Search Controller
+app.controller('SearchController', ['$scope', function($scope) {
+    $scope.searchQuery = '';
+    
+    $scope.closeSearch = function() {
+        var headerScope = angular.element(document.querySelector('[ng-controller="HeaderController"]')).scope();
+        headerScope.closeSearch();
+    };
+    
+    $scope.popularCategories = [
+        {
+            name: 'T-Shirts',
+            image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+            isHovered: false
+        },
+        {
+            name: 'Dresses',
+            image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+            isHovered: false
+        },
+        {
+            name: 'Outerwear',
+            image: 'https://images.unsplash.com/photo-1551794840-8ae3b9c814d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+            isHovered: false
+        },
+        {
+            name: 'Accessories',
+            image: 'https://images.unsplash.com/photo-1612902456551-333ac5afa26e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80',
+            isHovered: false
+        }
+    ];
+    
+    $scope.hover = function(category) {
+        category.isHovered = true;
+    };
+    
+    $scope.unhover = function(category) {
+        category.isHovered = false;
     };
 }]);

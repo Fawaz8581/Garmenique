@@ -1,0 +1,257 @@
+/* Sliding Cart Styles */
+.sliding-cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sliding-cart-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sliding-cart-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100%;
+    background-color: white;
+    z-index: 9999;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sliding-cart-panel.active {
+    right: 0;
+}
+
+.sliding-cart-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sliding-cart-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #333;
+}
+
+.sliding-cart-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.cart-items {
+    padding: 0;
+}
+
+.cart-item {
+    display: flex;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+    margin-right: 15px;
+}
+
+.cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-title {
+    margin: 0 0 5px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.cart-item-variants {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.cart-item-price {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.current-price {
+    font-weight: 600;
+    font-size: 15px;
+    margin-right: 10px;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 14px;
+}
+
+.discount-badge {
+    color: #e53637;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.cart-item-quantity .quantity-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.cart-item-quantity input {
+    width: 40px;
+    height: 28px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
+}
+
+.empty-cart {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+}
+
+.before-you-go {
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.before-you-go h3 {
+    margin: 0 0 15px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.recommended-product {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.recommended-product-image {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+}
+
+.recommended-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recommended-product-details {
+    flex: 1;
+}
+
+.recommended-product-details h4 {
+    margin: 0 0 5px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.recommended-product-details p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.recommended-product-price {
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.add-recommended-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sliding-cart-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.cart-subtotal {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.subtotal-price {
+    font-weight: 600;
+}
+
+.checkout-btn {
+    width: 100%;
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.sell-out-notice {
+    text-align: center;
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: #666;
+} 

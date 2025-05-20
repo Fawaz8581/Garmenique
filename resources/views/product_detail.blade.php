@@ -24,6 +24,7 @@
         <link rel="stylesheet" href="{{ asset('css/product_detail.css') }}">
         <link rel="stylesheet" href="{{ asset('css/landing.page.search.css') }}">
         <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/sliding-cart.css') }}">
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -126,7 +127,7 @@
                 <div class="nav-icons">
                     <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
                     @include('partials.account-dropdown')
-                    <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="javascript:void(0)" class="nav-icon" ng-click="openCartPanel()"><i class="fas fa-shopping-cart"></i></a>
                 </div>
                 
                 <button class="mobile-toggle" ng-click="toggleNav()">
@@ -523,6 +524,9 @@
                 </div>
             </div>
         </section>
+
+        <!-- Include Sliding Cart Partial -->
+        @include('partials.sliding-cart')
 
         <!-- Footer -->
         <footer class="footer">

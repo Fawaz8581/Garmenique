@@ -17,6 +17,11 @@ app.controller('HeaderController', ['$scope', '$window', '$rootScope', function(
         $rootScope.$broadcast('toggleSearch');
     };
     
+    // Function to open cart using $rootScope broadcast
+    $scope.openCartPanel = function() {
+        $rootScope.$broadcast('openCart');
+    };
+    
     // Sticky Header
     var headerHeight = 0;
     
@@ -662,14 +667,70 @@ app.controller('CatalogController', ['$scope', '$window', function($scope, $wind
     
     // Add to cart function
     $scope.addToCart = function(product) {
-        // In a real app, this would add the product to the cart
-        alert('Added to cart: ' + product.name);
+        // Make sure size and color are selected
+        if (!$scope.selectedSize) $scope.selectedSize = product.sizes[0];
+        if (!$scope.selectedColor) $scope.selectedColor = product.colors[0];
+        
+        var cartItem = {
+            id: product.id,
+            name: product.name,
+            image: product.primaryImage,
+            price: product.price,
+            oldPrice: product.oldPrice,
+            discount: product.discount,
+            size: $scope.selectedSize,
+            color: $scope.selectedColor.name,
+            quantity: 1
+        };
+        
+        // Get the CartController scope
+        var cartScope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+        
+        // Add to cart if cart controller exists
+        if (cartScope) {
+            cartScope.addToCart(cartItem);
+            
+            // Apply changes to update the UI
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
+        }
     };
     
     // Add to cart from modal
     $scope.addToCartFromModal = function() {
         if ($scope.quickViewProduct && $scope.selectedSize && $scope.selectedColor) {
-            alert('Added to cart: ' + $scope.quickViewProduct.name + '\nSize: ' + $scope.selectedSize + '\nColor: ' + $scope.selectedColor.name + '\nQuantity: ' + $scope.quantity);
+            var cartItem = {
+                id: $scope.quickViewProduct.id,
+                name: $scope.quickViewProduct.name,
+                image: $scope.quickViewProduct.primaryImage,
+                price: $scope.quickViewProduct.price,
+                oldPrice: $scope.quickViewProduct.oldPrice,
+                discount: $scope.quickViewProduct.discount,
+                size: $scope.selectedSize,
+                color: $scope.selectedColor.name,
+                quantity: $scope.quantity
+            };
+            
+            // Get the CartController scope
+            var cartScope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+            
+            // Add to cart if cart controller exists
+            if (cartScope) {
+                cartScope.addToCart(cartItem);
+                
+                // Apply changes to update the UI
+                if(!$scope.$$phase) {
+                    $scope.$apply();
+                }
+            }
+            
+            // Close the modal
+            var modalElement = document.getElementById('quickViewModal');
+            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
         }
     };
     
@@ -705,5 +766,128 @@ app.controller('AccountDropdownController', ['$scope', '$timeout', function($sco
         hideTimeout = $timeout(function() {
             $scope.isOpen = false;
         }, 200); // Small delay to improve user experience
+    };
+}]);
+
+// Cart Controller
+app.controller('CartController', ['$scope', '$window', '$rootScope', function($scope, $window, $rootScope) {
+    // Initialize cart
+    $scope.isCartActive = false;
+    $scope.cartItems = [];
+    
+    // Load cart items from localStorage on initialization
+    function loadCartFromStorage() {
+        try {
+            var storedCart = localStorage.getItem('garmenique_cart');
+            if (storedCart) {
+                $scope.cartItems = JSON.parse(storedCart);
+            }
+        } catch (e) {
+            console.error('Error loading cart from storage:', e);
+        }
+    }
+    
+    // Save cart items to localStorage
+    function saveCartToStorage() {
+        try {
+            localStorage.setItem('garmenique_cart', JSON.stringify($scope.cartItems));
+        } catch (e) {
+            console.error('Error saving cart to storage:', e);
+        }
+    }
+    
+    // Initialize from localStorage
+    loadCartFromStorage();
+    
+    // Listen for broadcast events
+    $rootScope.$on('openCart', function() {
+        $scope.openCart();
+    });
+    
+    // Open cart function
+    $scope.openCart = function() {
+        $scope.isCartActive = true;
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    };
+    
+    // Close cart function
+    $scope.closeCart = function() {
+        $scope.isCartActive = false;
+        document.body.style.overflow = ''; // Restore scrolling
+    };
+    
+    // Add to cart function
+    $scope.addToCart = function(item) {
+        // Check if the item is already in the cart
+        var existingItem = $scope.cartItems.find(function(cartItem) {
+            return cartItem.id === item.id && 
+                   cartItem.size === item.size && 
+                   cartItem.color === item.color;
+        });
+        
+        if(existingItem) {
+            // If item exists, increase quantity
+            existingItem.quantity += item.quantity || 1;
+        } else {
+            // Otherwise add new item
+            $scope.cartItems.push(item);
+        }
+        
+        // Save updated cart to localStorage
+        saveCartToStorage();
+        
+        // Open the cart
+        $scope.openCart();
+        
+        // Apply changes to update the UI
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
+    };
+    
+    // Increase quantity
+    $scope.increaseQuantity = function(item) {
+        item.quantity++;
+        saveCartToStorage();
+    };
+    
+    // Decrease quantity
+    $scope.decreaseQuantity = function(item) {
+        if(item.quantity > 1) {
+            item.quantity--;
+        } else {
+            // Remove item if quantity becomes 0
+            var index = $scope.cartItems.indexOf(item);
+            if(index !== -1) {
+                $scope.cartItems.splice(index, 1);
+            }
+        }
+        saveCartToStorage();
+    };
+    
+    // Calculate subtotal
+    $scope.calculateSubtotal = function() {
+        var subtotal = 0;
+        $scope.cartItems.forEach(function(item) {
+            var price = item.discount ? 
+                item.price * (1 - item.discount/100) : 
+                item.price;
+            subtotal += price * item.quantity;
+        });
+        return subtotal * 15500; // Converting to IDR
+    };
+    
+    // Get total items
+    $scope.getTotalItems = function() {
+        var total = 0;
+        $scope.cartItems.forEach(function(item) {
+            total += item.quantity;
+        });
+        return total;
+    };
+    
+    // Proceed to checkout
+    $scope.proceedToCheckout = function() {
+        $window.location.href = '/checkout';
     };
 }]);
