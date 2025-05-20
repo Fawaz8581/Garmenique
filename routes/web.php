@@ -65,7 +65,7 @@ Route::get('/product/{id}', function ($id) {
 });
 
 // Admin Dashboard routes
-Route::middleware(['admin'])->group(function () {
+Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
     Route::get('/admin', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');

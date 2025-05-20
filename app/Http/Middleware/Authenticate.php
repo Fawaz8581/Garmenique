@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class Authenticate
 {
     /**
      * Handle an incoming request.
@@ -18,9 +18,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Authentication check removed for testing purposes
-        // Will be reimplemented later with proper rules
-        
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
         return $next($request);
     }
 } 
