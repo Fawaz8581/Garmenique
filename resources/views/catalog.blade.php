@@ -211,20 +211,6 @@
                                                 <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="primary-img">
                                                 <img ng-src="@{{ product.hoverImage }}" alt="@{{ product.name }}" class="hover-img">
                                             </a>
-                                            <div class="product-actions" ng-if="product.isHovered">
-                                                <button class="action-btn" ng-click="quickView(product)" title="Quick View">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="action-btn" ng-click="addToCart(product)" title="Add to Cart">
-                                                    <i class="fas fa-shopping-cart"></i>
-                                                </button>
-                                                <button class="action-btn" ng-click="addToWishlist(product)" title="Add to Wishlist">
-                                                    <i class="far fa-heart"></i>
-                                                </button>
-                                                <button class="action-btn" ng-click="addToCompare(product)" title="Compare">
-                                                    <i class="fas fa-exchange-alt"></i>
-                                                </button>
-                                            </div>
                                             <span class="product-tag new" ng-if="product.isNew">New</span>
                                             <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
                                         </div>
@@ -247,10 +233,6 @@
                                                 <i class="far fa-star" ng-repeat="n in [].constructor(5 - product.rating) track by $index"></i>
                                                 <span class="rating-count">(@{{ product.reviewCount }})</span>
                                             </div>
-                                            
-                                            <button class="add-to-cart-btn" ng-click="addToCart(product)">
-                                                Add to Cart
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -293,21 +275,6 @@
                                                 <div class="product-sizes">
                                                     <span>Available Sizes:</span>
                                                     <span class="size-tag" ng-repeat="size in product.sizes">@{{ size }}</span>
-                                                </div>
-                                                
-                                                <div class="list-product-actions">
-                                                    <button class="btn btn-primary" ng-click="addToCart(product)">
-                                                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                                                    </button>
-                                                    <button class="btn btn-outline-secondary" ng-click="quickView(product)">
-                                                        <i class="fas fa-eye"></i> Quick View
-                                                    </button>
-                                                    <button class="btn btn-outline-secondary" ng-click="addToWishlist(product)">
-                                                        <i class="far fa-heart"></i> Wishlist
-                                                    </button>
-                                                    <a href="/catalog/product/@{{ product.id }}" class="btn btn-outline-secondary">
-                                                        <i class="fas fa-info-circle"></i> View Details
-                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -407,15 +374,6 @@
                                             <input type="text" ng-model="quantity" readonly>
                                             <button class="quantity-btn plus" ng-click="increaseQuantity()">+</button>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="quick-view-actions">
-                                        <button class="btn btn-primary" ng-click="addToCartFromModal()">
-                                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                                        </button>
-                                        <a href="/catalog/product/@{{ quickViewProduct.id }}" class="btn btn-outline-secondary">
-                                            <i class="fas fa-info-circle"></i> View Details
-                                        </a>
                                     </div>
                                 </div>
                             </div>
