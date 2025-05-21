@@ -532,11 +532,11 @@
         </div>
         
         <!-- Main Content -->
-            <div class="container">
-            <h1 class="page-title">Men's Clothing & Apparel - New Arrivals</h1>
-            <p class="text-muted small">{{ count($products) }} product(s)</p>
-
-                <div class="row">
+            <div class="container mt-5 pt-5">
+                <!-- Spacer -->
+                <div class="spacer py-4"></div>
+            
+                <div class="row mt-5">
                 <!-- Filters -->
                 <div class="col-md-3 filters-section">
                     <div class="filter-group">
@@ -619,7 +619,7 @@
                         </div>
                                         </div>
                                         
-                    <div class="row mt-4" id="productsContainer">
+                    <div class="row mt-5 pt-3" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
                             <div class="col-md-6 product-card mb-5">
