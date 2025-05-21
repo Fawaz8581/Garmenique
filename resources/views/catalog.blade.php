@@ -474,11 +474,11 @@
         </div>
         
         <!-- Main Content -->
-        <div class="container">
+            <div class="container">
             <h1 class="page-title">Men's Clothing & Apparel - New Arrivals</h1>
             <p class="text-muted small">{{ count($products) }} product(s)</p>
 
-            <div class="row">
+                <div class="row">
                 <!-- Filters -->
                 <div class="col-md-3 filters-section">
                     <div class="filter-group">
@@ -502,8 +502,8 @@
                         <label class="checkbox-label">
                             <input type="checkbox" class="category-filter" data-category="5"> 
                             Hoodie (7)
-                        </label>
-                    </div>
+                                    </label>
+                        </div>
 
                     <div class="filter-group">
                         <h3 class="filter-heading">Color</h3>
@@ -528,8 +528,8 @@
                             <button class="size-btn">L</button>
                             <button class="size-btn">XL</button>
                             <button class="size-btn">XXL</button>
+                            </div>
                         </div>
-                    </div>
 
                     <div class="filter-group">
                         <h3 class="filter-heading">Price Range</h3>
@@ -542,25 +542,25 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                            </div>
 
                 <!-- Products -->
                 <div class="col-md-9">
                     <div class="products-header">
                         <div class="products-count">
                             Showing {{ count($products) }} of {{ count($products) }} products
-                        </div>
+                                </div>
 
                         <div class="view-options">
                             <select class="sort-select" id="sortSelect">
-                                <option value="featured">Featured</option>
+                                        <option value="featured">Featured</option>
                                 <option value="newest">New Arrivals</option>
-                                <option value="price_low">Price: Low to High</option>
-                                <option value="price_high">Price: High to Low</option>
-                            </select>
+                                        <option value="price_low">Price: Low to High</option>
+                                        <option value="price_high">Price: High to Low</option>
+                                    </select>
                         </div>
-                    </div>
-
+                                        </div>
+                                        
                     <div class="row" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
@@ -575,15 +575,15 @@
                                     </a>
                                     <div class="discount-badge">40% off</div>
                                 </div>
-                                <div class="product-info">
+                                        <div class="product-info">
                                     <h3 class="product-title">
                                         <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
-                                    </h3>
+                                            </h3>
                                     <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
-                                    <div class="product-price">
+                                            <div class="product-price">
                                         <span class="sale-price">IDR {{ number_format($product->price * 0.6, 0, ',', '.') }}</span>
                                         <span class="regular-price">IDR {{ number_format($product->price, 0, ',', '.') }}</span>
-                                    </div>
+                                            </div>
                                     <div class="color-dots">
                                         <span class="color-dot" style="background-color: #000"></span>
                                         <span class="color-dot" style="background-color: #663300"></span>
@@ -597,26 +597,26 @@
                                 <p class="text-center">No products found. Please check back later.</p>
                             </div>
                         @endif
-                    </div>
+                        </div>
 
-                    <!-- Pagination -->
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination">
+                        <!-- Pagination -->
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
                             <li class="page-item">
                                 <a class="page-link" href="#" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
                             <li class="page-item active"><a class="page-link" href="#">1</a></li>
                             <li class="page-item"><a class="page-link" href="#">2</a></li>
                             <li class="page-item"><a class="page-link" href="#">3</a></li>
                             <li class="page-item">
                                 <a class="page-link" href="#" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
                 </div>
             </div>
         </div>
