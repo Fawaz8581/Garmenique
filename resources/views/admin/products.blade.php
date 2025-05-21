@@ -155,8 +155,9 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="productImage" class="form-label">Image URL</label>
-                            <input type="text" class="form-control" id="productImage" placeholder="https://example.com/image.jpg">
+                            <label for="productImage" class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="productImage" accept="image/*">
+                            <small class="form-text text-muted">Upload an image for the product</small>
                         </div>
                         <div class="mb-3">
                             <label for="productDescription" class="form-label">Description</label>
@@ -211,8 +212,13 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="editProductImage" class="form-label">Image URL</label>
-                            <input type="text" class="form-control" id="editProductImage" placeholder="https://example.com/image.jpg">
+                            <label for="editProductImage" class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="editProductImage" accept="image/*">
+                            <small class="form-text text-muted">Upload a new image or keep the existing one</small>
+                            <div id="currentImagePreview" class="mt-2" style="max-width: 200px; display: none;">
+                                <img id="currentImage" src="" alt="Current Product Image" class="img-fluid">
+                                <p class="mt-1 mb-0"><small>Current image</small></p>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="editProductDescription" class="form-label">Description</label>
@@ -334,9 +340,11 @@
             const categoryName = product.category ? product.category.name : 'Uncategorized';
             
             // Get product image
-            const imageUrl = product.images && product.images.length > 0 
-                ? product.images[0] 
+            const imageUrl = product.image_url
+                ? product.image_url
                 : 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
+            
+            console.log('Product image URL:', imageUrl); // Debug log to verify image URL
             
             col.innerHTML = `
                 <div class="product-card" data-id="${product.id}">
@@ -410,7 +418,6 @@
                 const category_id = document.getElementById('productCategory').value;
                 const price = parseInt(document.getElementById('productPrice').value.replace(/\./g, ''));
                 const stock = parseInt(document.getElementById('productStock').value) || 0;
-                const image = document.getElementById('productImage').value;
                 const description = document.getElementById('productDescription').value;
                 
                 if (!name || !category_id || isNaN(price)) {
@@ -423,7 +430,6 @@
                     category_id,
                     price,
                     stock,
-                    image,
                     description
                 };
                 
@@ -437,7 +443,6 @@
                 const category_id = document.getElementById('editProductCategory').value;
                 const price = parseInt(document.getElementById('editProductPrice').value.replace(/\./g, ''));
                 const stock = parseInt(document.getElementById('editProductStock').value) || 0;
-                const image = document.getElementById('editProductImage').value;
                 const description = document.getElementById('editProductDescription').value;
                 
                 if (!name || !category_id || isNaN(price)) {
@@ -450,7 +455,6 @@
                     category_id,
                     price,
                     stock,
-                    image,
                     description
                 };
                 
@@ -461,17 +465,37 @@
         // Create a new product
         function createProduct(productData) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
+            const formData = new FormData();
+            
+            // Append all product data to FormData
+            Object.keys(productData).forEach(key => {
+                if (key !== 'image') {
+                    formData.append(key, productData[key]);
+                }
+            });
+            
+            // Append the image file if exists
+            const imageFile = document.getElementById('productImage').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+                console.log('Image file appended:', imageFile.name, imageFile.type, imageFile.size);
+            }
             
             fetch(API_ENDPOINTS.products, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': token
                 },
-                body: JSON.stringify(productData)
+                body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Server response not OK:', response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Server response:', data);
                 if (data.success) {
                     products.push(data.product);
                     renderProducts(products);
@@ -487,11 +511,11 @@
                     alert('Product added successfully!');
                 } else {
                     console.error('Error creating product:', data);
-                    alert('Error adding product. Please try again.');
+                    alert('Error adding product: ' + (data.message || 'Please try again.'));
                 }
             })
             .catch(error => {
-                console.error('Error creating product:', error);
+                console.error('Fetch error:', error);
                 alert('Error adding product. Please try again.');
             });
         }
@@ -499,17 +523,40 @@
         // Update a product
         function updateProduct(id, productData) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
+            const formData = new FormData();
+            
+            // Append all product data to FormData
+            Object.keys(productData).forEach(key => {
+                if (key !== 'image') {
+                    formData.append(key, productData[key]);
+                }
+            });
+            
+            // Append the image file if exists
+            const imageFile = document.getElementById('editProductImage').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+                console.log('Edit image file appended:', imageFile.name, imageFile.type, imageFile.size);
+            }
+            
+            // Append the _method field to simulate PUT request
+            formData.append('_method', 'PUT');
             
             fetch(`${API_ENDPOINTS.products}/${id}`, {
-                method: 'PUT',
+                method: 'POST', // Using POST with _method for file uploads
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': token
                 },
-                body: JSON.stringify(productData)
+                body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Server response not OK:', response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Server response:', data);
                 if (data.success) {
                     const index = products.findIndex(p => p.id == id);
                     if (index !== -1) {
@@ -525,11 +572,11 @@
                     alert('Product updated successfully!');
                 } else {
                     console.error('Error updating product:', data);
-                    alert('Error updating product. Please try again.');
+                    alert('Error updating product: ' + (data.message || 'Please try again.'));
                 }
             })
             .catch(error => {
-                console.error('Error updating product:', error);
+                console.error('Fetch error:', error);
                 alert('Error updating product. Please try again.');
             });
         }
@@ -578,8 +625,17 @@
                         document.getElementById('editProductCategory').value = product.category_id;
                         document.getElementById('editProductPrice').value = product.price;
                         document.getElementById('editProductStock').value = product.stock;
-                        document.getElementById('editProductImage').value = product.images && product.images.length > 0 ? product.images[0] : '';
                         document.getElementById('editProductDescription').value = product.description || '';
+                        
+                        // Display current image if available
+                        const currentImagePreview = document.getElementById('currentImagePreview');
+                        const currentImage = document.getElementById('currentImage');
+                        if (product.image_url) {
+                            currentImage.src = product.image_url;
+                            currentImagePreview.style.display = 'block';
+                        } else {
+                            currentImagePreview.style.display = 'none';
+                        }
                     }
                 });
             });
