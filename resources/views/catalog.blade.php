@@ -543,25 +543,25 @@
                         <h3 class="filter-heading">Categories</h3>
                         <label class="checkbox-label">
                             <input type="checkbox" class="category-filter" data-category="1"> 
-                            T-shirt (12)
+                            T-shirt ({{ App\Models\Product::where('category_id', 1)->count() }})
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" class="category-filter" data-category="2"> 
-                            Shirt (8)
+                            Shirt ({{ App\Models\Product::where('category_id', 2)->count() }})
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" class="category-filter" data-category="3"> 
-                            Jackets (10)
+                            Jackets ({{ App\Models\Product::where('category_id', 3)->count() }})
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" class="category-filter" data-category="4"> 
-                            Pants (15)
+                            Pants ({{ App\Models\Product::where('category_id', 4)->count() }})
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" class="category-filter" data-category="5"> 
-                            Hoodie (7)
-                                    </label>
-                        </div>
+                            Hoodie ({{ App\Models\Product::where('category_id', 5)->count() }})
+                        </label>
+                    </div>
 
                     <div class="filter-group">
                         <h3 class="filter-heading">Color</h3>
@@ -595,9 +595,14 @@
                             <input type="range" class="form-range" id="priceRange" min="0" max="500000" value="250000">
                             <div class="d-flex justify-content-between">
                                 <span>IDR 0</span>
-                                <span>IDR {{ number_format(250000, 0, ',', '.') }}</span>
+                                <span class="price-range-value">IDR {{ number_format(250000, 0, ',', '.') }}</span>
                                 <span>IDR {{ number_format(500000, 0, ',', '.') }}</span>
                             </div>
+                        </div>
+                        
+                        <!-- Reset Filters Button -->
+                        <div class="mb-4 mt-4 text-center">
+                            <button id="resetFilters" class="btn btn-outline-secondary btn-sm">Reset All Filters</button>
                         </div>
                     </div>
                             </div>
@@ -611,18 +616,18 @@
 
                         <div class="view-options">
                             <select class="sort-select" id="sortSelect">
-                                        <option value="featured">Featured</option>
+                                <option value="featured">Featured</option>
                                 <option value="newest">New Arrivals</option>
-                                        <option value="price_low">Price: Low to High</option>
-                                        <option value="price_high">Price: High to Low</option>
-                                    </select>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                            </select>
                         </div>
                                         </div>
                                         
                     <div class="row mt-5 pt-3" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
-                            <div class="col-md-6 product-card mb-5">
+                            <div class="col-md-6 product-card mb-5" data-category="{{ $product->category_id ?? 0 }}" data-price="{{ $product->price }}">
                                 <div class="product-container">
                                     <div class="product-image">
                                         <a href="/catalog/product/{{ $product->id }}">
@@ -725,6 +730,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
         <script src="{{ asset('js/landingpage.js') }}"></script>
         <script src="{{ asset('js/cart.js') }}"></script>
+        <script src="{{ asset('js/catalog.js') }}"></script>
         
         <script>
             // Legacy non-angular code for filters
@@ -760,6 +766,57 @@
                     priceRange.addEventListener('input', function() {
                         // Update displayed value
                         console.log('Price range: IDR 0 - IDR ' + Number(this.value).toLocaleString('id-ID'));
+                    });
+                }
+                
+                // Reset filters button functionality
+                const resetButton = document.getElementById('resetFilters');
+                if (resetButton) {
+                    resetButton.addEventListener('click', function() {
+                        // Reset category checkboxes
+                        const categoryCheckboxes = document.querySelectorAll('.category-filter');
+                        categoryCheckboxes.forEach(checkbox => {
+                            checkbox.checked = false;
+                        });
+                        
+                        // Reset color swatches
+                        colorSwatches.forEach(swatch => {
+                            swatch.classList.remove('active');
+                        });
+                        
+                        // Reset size buttons
+                        sizeButtons.forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        // Reset price range
+                        if (priceRange) {
+                            priceRange.value = 500000;
+                            const priceRangeDisplays = document.querySelectorAll('.price-range-value');
+                            priceRangeDisplays.forEach(display => {
+                                display.textContent = 'IDR 500.000';
+                            });
+                        }
+                        
+                        // Reset sort select
+                        if (sortSelect) {
+                            sortSelect.value = 'featured';
+                        }
+                        
+                        // Show all products
+                        document.querySelectorAll('.product-card').forEach(card => {
+                            card.classList.remove('d-none');
+                        });
+                        
+                        // Update product count
+                        const productsCountEl = document.querySelector('.products-count');
+                        if (productsCountEl) {
+                            const totalProducts = document.querySelectorAll('.product-card').length;
+                            productsCountEl.textContent = `Showing ${totalProducts} of ${totalProducts} products`;
+                        }
+                        
+                        // Dispatch an event that catalog.js can listen for
+                        document.dispatchEvent(new CustomEvent('resetFilters'));
                     });
                 }
             });

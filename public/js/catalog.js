@@ -891,3 +891,229 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
         $window.location.href = '/checkout';
     };
 }]);
+
+// Document ready function to initialize catalog functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables to track filter state
+    let activeFilters = {
+        categories: [],
+        colors: [],
+        sizes: [],
+        priceRange: { min: 0, max: 500000 }
+    };
+    
+    // Get all products for filtering
+    const productCards = document.querySelectorAll('.product-card');
+    const totalProducts = productCards.length;
+    
+    // Update product count display
+    const updateProductCount = function() {
+        const visibleProducts = document.querySelectorAll('.product-card:not(.d-none)').length;
+        const productsCountEl = document.querySelector('.products-count');
+        if (productsCountEl) {
+            productsCountEl.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
+        }
+    };
+
+    // CATEGORY FILTERS
+    const categoryCheckboxes = document.querySelectorAll('.category-filter');
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const categoryId = this.getAttribute('data-category');
+            
+            if (this.checked) {
+                // Add to active filters
+                if (!activeFilters.categories.includes(categoryId)) {
+                    activeFilters.categories.push(categoryId);
+                }
+            } else {
+                // Remove from active filters
+                const index = activeFilters.categories.indexOf(categoryId);
+                if (index > -1) {
+                    activeFilters.categories.splice(index, 1);
+                }
+            }
+            
+            applyFilters();
+        });
+    });
+
+    // COLOR FILTERS
+    const colorSwatches = document.querySelectorAll('.color-swatch');
+    colorSwatches.forEach(swatch => {
+        swatch.addEventListener('click', function() {
+            // Toggle active class
+            this.classList.toggle('active');
+            
+            // Get color value (from the background color)
+            const colorStyle = window.getComputedStyle(this).backgroundColor;
+            
+            if (this.classList.contains('active')) {
+                // Add to active filters
+                if (!activeFilters.colors.includes(colorStyle)) {
+                    activeFilters.colors.push(colorStyle);
+                }
+            } else {
+                // Remove from active filters
+                const index = activeFilters.colors.indexOf(colorStyle);
+                if (index > -1) {
+                    activeFilters.colors.splice(index, 1);
+                }
+            }
+            
+            applyFilters();
+        });
+    });
+
+    // SIZE FILTERS
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    sizeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Toggle active class
+            this.classList.toggle('active');
+            
+            // Get size value
+            const sizeValue = this.textContent.trim();
+            
+            if (this.classList.contains('active')) {
+                // Add to active filters
+                if (!activeFilters.sizes.includes(sizeValue)) {
+                    activeFilters.sizes.push(sizeValue);
+                }
+            } else {
+                // Remove from active filters
+                const index = activeFilters.sizes.indexOf(sizeValue);
+                if (index > -1) {
+                    activeFilters.sizes.splice(index, 1);
+                }
+            }
+            
+            applyFilters();
+        });
+    });
+
+    // PRICE RANGE FILTER
+    const priceRangeSlider = document.getElementById('priceRange');
+    if (priceRangeSlider) {
+        priceRangeSlider.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            activeFilters.priceRange.max = value;
+            
+            // Update displayed value
+            const priceRangeDisplays = document.querySelectorAll('.price-range-value');
+            priceRangeDisplays.forEach(display => {
+                display.textContent = `IDR ${value.toLocaleString('id-ID')}`;
+            });
+            
+            applyFilters();
+        });
+    }
+
+    // SORTING
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            const sortValue = this.value;
+            sortProducts(sortValue);
+        });
+    }
+
+    // Sort products function
+    function sortProducts(sortOption) {
+        const productsContainer = document.getElementById('productsContainer');
+        const products = Array.from(productsContainer.querySelectorAll('.product-card'));
+        
+        products.sort((a, b) => {
+            const priceA = parseInt(a.querySelector('.product-price span').innerText.replace(/[^\d]/g, ''));
+            const priceB = parseInt(b.querySelector('.product-price span').innerText.replace(/[^\d]/g, ''));
+            
+            switch (sortOption) {
+                case 'price_low':
+                    return priceA - priceB;
+                case 'price_high':
+                    return priceB - priceA;
+                case 'newest':
+                    // This would ideally use a date field, but we'll use id as a proxy
+                    const idA = parseInt(a.querySelector('a').href.split('/').pop());
+                    const idB = parseInt(b.querySelector('a').href.split('/').pop());
+                    return idB - idA;
+                case 'featured':
+                default:
+                    // Default sorting (could be by popularity, but we'll use original order)
+                    return 0;
+            }
+        });
+        
+        // If sorting by "featured" (default), restore original order
+        if (sortOption === 'featured') {
+            products.sort((a, b) => {
+                const idA = parseInt(a.querySelector('a').href.split('/').pop());
+                const idB = parseInt(b.querySelector('a').href.split('/').pop());
+                return idA - idB;
+            });
+        }
+        
+        // Reattach sorted products to container
+        products.forEach(product => {
+            productsContainer.appendChild(product);
+        });
+    }
+
+    // Apply all active filters
+    function applyFilters() {
+        productCards.forEach(card => {
+            const productPrice = parseInt(card.querySelector('.product-price span').innerText.replace(/[^\d]/g, ''));
+            
+            // Initially assume the product passes all filters
+            let passesFilters = true;
+            
+            // Check price range filter
+            if (productPrice < activeFilters.priceRange.min || productPrice > activeFilters.priceRange.max) {
+                passesFilters = false;
+            }
+            
+            // Check category filter if any are selected
+            if (activeFilters.categories.length > 0) {
+                const productCategory = card.getAttribute('data-category');
+                if (!activeFilters.categories.includes(productCategory)) {
+                    passesFilters = false;
+                }
+            }
+            
+            // Color and size filters would need product data to be properly set up
+            // This is a simplified example assuming color dots represent available colors
+            
+            // Show or hide the product based on filter results
+            if (passesFilters) {
+                card.classList.remove('d-none');
+            } else {
+                card.classList.add('d-none');
+            }
+        });
+        
+        // Update product count
+        updateProductCount();
+    }
+
+    // Initialize product count
+    updateProductCount();
+
+    // Pre-select "Featured" in the sort dropdown
+    if (sortSelect) {
+        sortSelect.value = 'featured';
+    }
+
+    // Listen for reset event
+    document.addEventListener('resetFilters', function() {
+        // Reset filter state
+        activeFilters = {
+            categories: [],
+            colors: [],
+            sizes: [],
+            priceRange: { min: 0, max: 500000 }
+        };
+        
+        // Update product count
+        updateProductCount();
+    });
+});
