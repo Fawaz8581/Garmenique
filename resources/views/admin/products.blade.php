@@ -146,8 +146,8 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="productPrice" class="form-label">Price ($)</label>
-                                <input type="number" class="form-control" id="productPrice" step="0.01" min="0" required>
+                                <label for="productPrice" class="form-label">Price (IDR)</label>
+                                <input type="text" class="form-control" id="productPrice" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="productStock" class="form-label">Stock Quantity</label>
@@ -202,8 +202,8 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="editProductPrice" class="form-label">Price ($)</label>
-                                <input type="number" class="form-control" id="editProductPrice" step="0.01" min="0" required>
+                                <label for="editProductPrice" class="form-label">Price (IDR)</label>
+                                <input type="text" class="form-control" id="editProductPrice" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="editProductStock" class="form-label">Stock Quantity</label>
@@ -346,7 +346,7 @@
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <p class="product-category">${categoryName}</p>
-                        <p class="product-price">$${parseFloat(product.price).toFixed(2)}</p>
+                        <p class="product-price">IDR ${parseFloat(product.price).toLocaleString('id-ID')}</p>
                         <p class="product-stock">
                             <span class="stock-badge ${statusClass}">${product.status || statusText}</span>
                             <span class="ms-2">${product.stock} in stock</span>
@@ -408,7 +408,7 @@
             addProductBtn.addEventListener('click', function() {
                 const name = document.getElementById('productName').value;
                 const category_id = document.getElementById('productCategory').value;
-                const price = parseFloat(document.getElementById('productPrice').value);
+                const price = parseInt(document.getElementById('productPrice').value.replace(/\./g, ''));
                 const stock = parseInt(document.getElementById('productStock').value) || 0;
                 const image = document.getElementById('productImage').value;
                 const description = document.getElementById('productDescription').value;
@@ -435,7 +435,7 @@
                 const id = document.getElementById('editProductId').value;
                 const name = document.getElementById('editProductName').value;
                 const category_id = document.getElementById('editProductCategory').value;
-                const price = parseFloat(document.getElementById('editProductPrice').value);
+                const price = parseInt(document.getElementById('editProductPrice').value.replace(/\./g, ''));
                 const stock = parseInt(document.getElementById('editProductStock').value) || 0;
                 const image = document.getElementById('editProductImage').value;
                 const description = document.getElementById('editProductDescription').value;
@@ -595,6 +595,28 @@
                 });
             });
         }
+        
+        // Format price input
+        function formatPriceInput(input) {
+            // Remove non-numeric characters
+            let value = input.value.replace(/[^\d]/g, '');
+            
+            // Format with thousand separators
+            if (value.length > 0) {
+                value = parseInt(value).toLocaleString('id-ID');
+            }
+            
+            input.value = value;
+        }
+        
+        // Add event listeners for price inputs
+        document.getElementById('productPrice').addEventListener('input', function() {
+            formatPriceInput(this);
+        });
+        
+        document.getElementById('editProductPrice').addEventListener('input', function() {
+            formatPriceInput(this);
+        });
         
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);

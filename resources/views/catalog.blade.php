@@ -534,11 +534,11 @@
                     <div class="filter-group">
                         <h3 class="filter-heading">Price Range</h3>
                         <div class="mb-3">
-                            <input type="range" class="form-range" id="priceRange" min="0" max="500" value="250">
+                            <input type="range" class="form-range" id="priceRange" min="0" max="500000" value="250000">
                             <div class="d-flex justify-content-between">
-                                <span>$0</span>
-                                <span>$250</span>
-                                <span>$500</span>
+                                <span>IDR 0</span>
+                                <span>IDR {{ number_format(250000, 0, ',', '.') }}</span>
+                                <span>IDR {{ number_format(500000, 0, ',', '.') }}</span>
                             </div>
                         </div>
                     </div>
@@ -581,8 +581,8 @@
                                     </h3>
                                     <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
                                     <div class="product-price">
-                                        <span class="sale-price">${{ number_format($product->price * 0.6, 2) }}</span>
-                                        <span class="regular-price">${{ number_format($product->price, 2) }}</span>
+                                        <span class="sale-price">IDR {{ number_format($product->price * 0.6, 0, ',', '.') }}</span>
+                                        <span class="regular-price">IDR {{ number_format($product->price, 0, ',', '.') }}</span>
                                     </div>
                                     <div class="color-dots">
                                         <span class="color-dot" style="background-color: #000"></span>
@@ -666,7 +666,7 @@
                 if (priceRange) {
                     priceRange.addEventListener('input', function() {
                         // Update displayed value
-                        console.log('Price range: $0 - $' + this.value);
+                        console.log('Price range: IDR 0 - IDR ' + Number(this.value).toLocaleString('id-ID'));
                     });
                 }
             });

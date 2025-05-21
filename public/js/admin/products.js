@@ -8,7 +8,7 @@ app.controller('ProductsController', function($scope, $http) {
             id: 1,
             name: 'Classic T-Shirt',
             category: 'T-Shirts',
-            price: 49.99,
+            price: 149000,
             stock: 125,
             image: 'https://via.placeholder.com/150',
             status: 'In Stock'
@@ -17,7 +17,7 @@ app.controller('ProductsController', function($scope, $http) {
             id: 2,
             name: 'Designer Jeans',
             category: 'Jeans',
-            price: 89.99,
+            price: 399000,
             stock: 78,
             image: 'https://via.placeholder.com/150',
             status: 'In Stock'
@@ -26,7 +26,7 @@ app.controller('ProductsController', function($scope, $http) {
             id: 3,
             name: 'Summer Dress',
             category: 'Dresses',
-            price: 65.50,
+            price: 275000,
             stock: 42,
             image: 'https://via.placeholder.com/150',
             status: 'Low Stock'
@@ -35,7 +35,7 @@ app.controller('ProductsController', function($scope, $http) {
             id: 4,
             name: 'Winter Jacket',
             category: 'Outerwear',
-            price: 125.00,
+            price: 450000,
             stock: 15,
             image: 'https://via.placeholder.com/150',
             status: 'Low Stock'
@@ -44,7 +44,7 @@ app.controller('ProductsController', function($scope, $http) {
             id: 5,
             name: 'Silk Scarf',
             category: 'Accessories',
-            price: 35.75,
+            price: 125000,
             stock: 0,
             image: 'https://via.placeholder.com/150',
             status: 'Out of Stock'
