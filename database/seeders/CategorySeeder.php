@@ -15,24 +15,24 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'T-Shirts',
-                'description' => 'Men\'s and women\'s T-shirts'
+                'name' => 'T-shirt',
+                'description' => 'Casual short-sleeved t-shirts'
             ],
             [
-                'name' => 'Jeans',
-                'description' => 'Men\'s and women\'s jeans'
+                'name' => 'Shirt',
+                'description' => 'Formal and casual long-sleeved shirts'
             ],
             [
-                'name' => 'Dresses',
-                'description' => 'Women\'s dresses'
+                'name' => 'Jackets',
+                'description' => 'Outerwear jackets and coats'
             ],
             [
-                'name' => 'Outerwear',
-                'description' => 'Jackets, coats, and other outerwear'
+                'name' => 'Pants',
+                'description' => 'Formal and casual pants'
             ],
             [
-                'name' => 'Accessories',
-                'description' => 'Bags, scarves, and other accessories'
+                'name' => 'Hoodie',
+                'description' => 'Hooded sweatshirts and pullovers'
             ]
         ];
 

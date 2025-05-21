@@ -322,6 +322,19 @@
                 color: #fff;
             }
             
+            /* Custom 5-column grid */
+            .col-md-20p {
+                width: 20%;
+                padding-right: 15px;
+                padding-left: 15px;
+            }
+            
+            @media (max-width: 767px) {
+                .col-md-20p {
+                    width: 50%;
+                }
+            }
+            
             /* Mobile styles */
             @media (max-width: 991px) {
                 .main-nav {
@@ -412,12 +425,11 @@
                     <div class="categories-list">
                         <ul>
                             <li><a href="/catalog">BEST SELLERS</a></li>
-                            <li><a href="/catalog">CLOTHING</a></li>
-                            <li><a href="/catalog">TOPS & SWEATERS</a></li>
-                            <li><a href="/catalog">PANTS & JEANS</a></li>
-                            <li><a href="/catalog">OUTERWEAR</a></li>
-                            <li><a href="/catalog">SHOES & BAGS</a></li>
-                            <li><a href="/catalog">SALE</a></li>
+                            <li><a href="/catalog?category=t-shirt">T-SHIRT</a></li>
+                            <li><a href="/catalog?category=shirt">SHIRT</a></li>
+                            <li><a href="/catalog?category=jackets">JACKETS</a></li>
+                            <li><a href="/catalog?category=pants">PANTS</a></li>
+                            <li><a href="/catalog?category=hoodie">HOODIE</a></li>
                         </ul>
                     </div>
 
@@ -425,28 +437,34 @@
                     <section class="popular-categories">
                         <h2>Popular Categories</h2>
                         <div class="row">
-                            <div class="col-6 col-md-3">
+                            <div class="col-md-20p col-6">
                                 <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Tops" class="card-img-top">
-                                    <h5 class="category-card-title">Tops</h5>
+                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="T-shirts" class="card-img-top">
+                                    <h5 class="category-card-title">T-shirts</h5>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3">
+                            <div class="col-md-20p col-6">
                                 <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-bottoms.jpg') }}" alt="Bottoms" class="card-img-top">
-                                    <h5 class="category-card-title">Bottoms</h5>
+                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Shirts" class="card-img-top">
+                                    <h5 class="category-card-title">Shirts</h5>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3">
+                            <div class="col-md-20p col-6">
                                 <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-dresses.jpg') }}" alt="Dresses" class="card-img-top">
-                                    <h5 class="category-card-title">Dresses</h5>
+                                    <img src="{{ asset('images/catalog/category-outerwear.jpg') }}" alt="Jackets" class="card-img-top">
+                                    <h5 class="category-card-title">Jackets</h5>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3">
+                            <div class="col-md-20p col-6">
                                 <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-outerwear.jpg') }}" alt="Outerwear" class="card-img-top">
-                                    <h5 class="category-card-title">Outerwear</h5>
+                                    <img src="{{ asset('images/catalog/category-bottoms.jpg') }}" alt="Pants" class="card-img-top">
+                                    <h5 class="category-card-title">Pants</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-20p col-6">
+                                <div class="category-card">
+                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Hoodie" class="card-img-top">
+                                    <h5 class="category-card-title">Hoodie</h5>
                                 </div>
                             </div>
                         </div>
@@ -465,16 +483,26 @@
                 <div class="col-md-3 filters-section">
                     <div class="filter-group">
                         <h3 class="filter-heading">Categories</h3>
-                        @php
-                            $categories = \App\Models\Category::withCount('products')->get();
-                        @endphp
-                        
-                        @foreach($categories as $category)
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="{{ $category->id }}"> 
-                            {{ $category->name }} ({{ $category->products_count }})
+                            <input type="checkbox" class="category-filter" data-category="1"> 
+                            T-shirt (12)
                         </label>
-                        @endforeach
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="category-filter" data-category="2"> 
+                            Shirt (8)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="category-filter" data-category="3"> 
+                            Jackets (10)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="category-filter" data-category="4"> 
+                            Pants (15)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="category-filter" data-category="5"> 
+                            Hoodie (7)
+                        </label>
                     </div>
 
                     <div class="filter-group">

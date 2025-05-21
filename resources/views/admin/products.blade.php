@@ -136,9 +136,11 @@
                                 <label for="productCategory" class="form-label">Category</label>
                                 <select class="form-select" id="productCategory" required>
                                     <option value="">Select Category</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
+                                    <option value="1">T-shirt</option>
+                                    <option value="2">Shirt</option>
+                                    <option value="3">Jackets</option>
+                                    <option value="4">Pants</option>
+                                    <option value="5">Hoodie</option>
                                 </select>
                             </div>
                         </div>
@@ -190,9 +192,11 @@
                                 <label for="editProductCategory" class="form-label">Category</label>
                                 <select class="form-select" id="editProductCategory" required>
                                     <option value="">Select Category</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
+                                    <option value="1">T-shirt</option>
+                                    <option value="2">Shirt</option>
+                                    <option value="3">Jackets</option>
+                                    <option value="4">Pants</option>
+                                    <option value="5">Hoodie</option>
                                 </select>
                             </div>
                         </div>
