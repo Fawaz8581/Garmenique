@@ -231,25 +231,73 @@
                 font-size: 0.85rem;
             }
             
+            /* Styling for product cards */
             .product-card {
                 margin-bottom: 30px;
                 position: relative;
+                padding: 0 20px; /* Add horizontal spacing */
+            }
+            
+            /* Product container with shadow and hover effect */
+            .product-container {
+                border-radius: 10px;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+                height: 100%;
+                background-color: white;
+            }
+            
+            .product-container:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
             
             .product-image {
                 position: relative;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
                 overflow: hidden;
+                height: 400px; /* Fixed height for consistent sizing */
+                background-color: #f8f8f8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px 8px 0 0; /* Rounded top corners */
             }
             
             .product-image img {
                 width: 100%;
-                height: auto;
-                transition: all 0.3s ease;
+                height: 100%;
+                object-fit: cover; /* Maintain aspect ratio while filling container */
+                transition: all 0.4s ease;
             }
             
             .product-image:hover img {
                 transform: scale(1.05);
+            }
+            
+            .product-info {
+                padding: 15px 20px 20px;
+            }
+            
+            .product-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 10px;
+                line-height: 1.4;
+            }
+            
+            .product-brand {
+                font-size: 0.9rem;
+                color: #666;
+                margin-bottom: 12px;
+            }
+            
+            .product-price {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
             }
             
             .discount-badge {
@@ -261,33 +309,6 @@
                 padding: 3px 8px;
                 font-size: 0.75rem;
                 font-weight: 500;
-            }
-            
-            .product-title {
-                font-size: 0.9rem;
-                margin-bottom: 5px;
-                font-weight: 500;
-            }
-            
-            .product-brand {
-                font-size: 0.8rem;
-                color: #666;
-                margin-bottom: 5px;
-            }
-            
-            .product-price {
-                font-size: 0.9rem;
-                font-weight: 500;
-            }
-            
-            .sale-price {
-                color: #f54;
-                margin-right: 5px;
-            }
-            
-            .regular-price {
-                color: #999;
-                text-decoration: line-through;
             }
             
             .color-dots {
@@ -371,6 +392,43 @@
                 .logo-container, .nav-icons {
                     width: auto;
                 }
+            }
+
+            /* Pagination styling */
+            .pagination-container {
+                margin-bottom: 50px;
+            }
+            
+            .pagination .page-link {
+                color: #333;
+                border: 1px solid #ddd;
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                margin: 0 3px;
+                border-radius: 4px;
+                background-color: white;
+            }
+            
+            .pagination .page-item.active .page-link {
+                background-color: #333;
+                border-color: #333;
+                color: white;
+            }
+            
+            .pagination .page-link:hover {
+                background-color: #f8f8f8;
+                border-color: #ccc;
+                color: #333;
+            }
+            
+            .pagination .page-link:focus {
+                box-shadow: none;
+                outline: none;
+            }
+            
+            .pagination .page-item.disabled .page-link {
+                color: #999;
+                background-color: #f8f8f8;
             }
         </style>
     </head>
@@ -561,32 +619,33 @@
                         </div>
                                         </div>
                                         
-                    <div class="row" id="productsContainer">
+                    <div class="row mt-4" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
-                            <div class="col-md-4 product-card">
-                                <div class="product-image">
-                                    <a href="/catalog/product/{{ $product->id }}">
-                                        @if(!empty($product->images) && count($product->images) > 0)
-                                            <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
-                                        @else
-                                            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
-                                        @endif
-                                    </a>
-
-                                </div>
-                                        <div class="product-info">
-                                    <h3 class="product-title">
-                                        <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
-                                            </h3>
-                                    <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
-                                            <div class="product-price">
-                                        <span>IDR {{ number_format($product->price, 0, ',', '.') }}</span>
-                                            </div>
-                                    <div class="color-dots">
-                                        <span class="color-dot" style="background-color: #000"></span>
-                                        <span class="color-dot" style="background-color: #663300"></span>
-                                        <span class="color-dot" style="background-color: #999"></span>
+                            <div class="col-md-6 product-card mb-5">
+                                <div class="product-container">
+                                    <div class="product-image">
+                                        <a href="/catalog/product/{{ $product->id }}">
+                                            @if(!empty($product->images) && count($product->images) > 0)
+                                                <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
+                                            @else
+                                                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
+                                            @endif
+                                        </a>
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-title">
+                                            <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                                        </h3>
+                                        <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
+                                        <div class="product-price">
+                                            <span>IDR {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        </div>
+                                        <div class="color-dots">
+                                            <span class="color-dot" style="background-color: #000"></span>
+                                            <span class="color-dot" style="background-color: #663300"></span>
+                                            <span class="color-dot" style="background-color: #999"></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -599,23 +658,58 @@
                         </div>
 
                         <!-- Pagination -->
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
+                        <div class="pagination-container mt-5">
+                            <div class="row">
+                                <!-- Page numbers in center with Previous/Next -->
+                                <div class="col-12 mb-4">
+                                    <nav aria-label="Product pagination">
+                                        <ul class="pagination justify-content-center">
+                                            <!-- Previous page link -->
+                                            @if ($products->onFirstPage())
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">« Previous</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $products->previousPageUrl() }}" rel="prev">« Previous</a>
+                                                </li>
+                                            @endif
+
+                                            <!-- Pagination Elements -->
+                                            @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+                                                @if ($page == $products->currentPage())
+                                                    <li class="page-item active">
+                                                        <span class="page-link">{{ $page }}</span>
+                                                    </li>
+                                                @else
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+
+                                            <!-- Next Page Link -->
+                                            @if ($products->hasMorePages())
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $products->nextPageUrl() }}" rel="next">Next »</a>
+                                                </li>
+                                            @else
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">Next »</span>
+                                                </li>
+                                            @endif
+                                        </ul>
+                                    </nav>
+                                </div>
+                                
+                                <!-- Showing text centered with proper spacing -->
+                                <div class="col-12">
+                                    <p class="text-muted text-center">
+                                        Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} results
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                 </div>
             </div>
         </div>

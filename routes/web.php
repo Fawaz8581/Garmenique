@@ -32,10 +32,7 @@ Route::get('/contact', function () {
     return view('contact');
 });
 
-Route::get('/catalog', function () {
-    $products = \App\Models\Product::with('category')->get();
-    return view('catalog', compact('products'));
-});
+Route::get('/catalog', [\App\Http\Controllers\CatalogController::class, 'index']);
 
 // Temporary routes for Men and Women sections
 Route::get('/men', function () {
