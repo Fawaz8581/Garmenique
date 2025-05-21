@@ -102,8 +102,11 @@
     </div>
 
     <!-- Account Settings Section -->
-    <section class="account-section">
-        <div class="account-container">
+    <section class="account-section mt-5 pt-5">
+        <div class="account-container mt-5">
+            <!-- Spacer -->
+            <div class="spacer py-4"></div>
+            
             <div class="account-header">
                 <h1>Account Settings</h1>
                 <p>Manage your account information and preferences</p>
