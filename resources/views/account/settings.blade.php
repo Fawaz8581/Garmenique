@@ -24,6 +24,39 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .alert ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .text-muted {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body ng-app="garmeniqueApp">
     <!-- Header Section -->
@@ -127,19 +160,36 @@
                 <div class="account-main">
                     <h2>Profile Information</h2>
                     
-                    <form method="POST" action="#">
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    <form method="POST" action="{{ route('account.update') }}">
                         @csrf
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" id="name" name="name" class="form-control" value="{{ Auth::user()->name }}">
+                            <input type="text" id="name" name="name" class="form-control" value="{{ old('name', Auth::user()->name) }}">
                         </div>
                         
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" class="form-control" value="{{ Auth::user()->email }}">
+                            <input type="email" id="email" name="email" class="form-control" value="{{ old('email', Auth::user()->email) }}">
                         </div>
                         
                         <h3>Change Password</h3>
+                        <p class="text-muted">Leave password fields empty if you don't want to change it.</p>
                         
                         <div class="form-group">
                             <label for="current_password">Current Password</label>
@@ -226,4 +276,4 @@
     <!-- Scripts -->
     <script src="{{ asset('js/landingpage.js') }}"></script>
 </body>
-</html> 
+</html>

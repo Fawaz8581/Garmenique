@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductController;
@@ -45,13 +46,9 @@ Route::get('/women', function () {
 
 // Account routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/account/settings', function () {
-        return view('account.settings');
-    })->name('account.settings');
-    
-    Route::get('/account/orders', function () {
-        return view('account.orders');
-    })->name('account.orders');
+    Route::get('/account/settings', [AccountController::class, 'showSettings'])->name('account.settings');
+    Route::post('/account/settings', [AccountController::class, 'updateProfile'])->name('account.update');
+    Route::get('/account/orders', [AccountController::class, 'showOrders'])->name('account.orders');
 });
 
 Route::get('/cart', function () {
