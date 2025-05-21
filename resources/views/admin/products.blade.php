@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Garmenique - Products Management</title>
     <meta name="keyword" content="Garmenique">
     <meta name="description" content="Garmenique - Products Management">
@@ -100,6 +101,18 @@
             
             <div class="row" id="productContainer">
                 <!-- Product cards will be added here by JavaScript -->
+                <div class="text-center p-5" id="loadingIndicator">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading products...</p>
+                </div>
+                
+                <div class="text-center p-5 d-none" id="noProductsMessage">
+                    <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                    <h3>No Products Found</h3>
+                    <p>Start by adding a new product using the button above.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -123,11 +136,9 @@
                                 <label for="productCategory" class="form-label">Category</label>
                                 <select class="form-select" id="productCategory" required>
                                     <option value="">Select Category</option>
-                                    <option value="T-Shirts">T-Shirts</option>
-                                    <option value="Jeans">Jeans</option>
-                                    <option value="Dresses">Dresses</option>
-                                    <option value="Outerwear">Outerwear</option>
-                                    <option value="Accessories">Accessories</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -145,11 +156,15 @@
                             <label for="productImage" class="form-label">Image URL</label>
                             <input type="text" class="form-control" id="productImage" placeholder="https://example.com/image.jpg">
                         </div>
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="productDescription" rows="3"></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="addProductBtn" data-bs-dismiss="modal">Add Product</button>
+                    <button type="button" class="btn btn-primary" id="addProductBtn">Add Product</button>
                 </div>
             </div>
         </div>
@@ -175,11 +190,9 @@
                                 <label for="editProductCategory" class="form-label">Category</label>
                                 <select class="form-select" id="editProductCategory" required>
                                     <option value="">Select Category</option>
-                                    <option value="T-Shirts">T-Shirts</option>
-                                    <option value="Jeans">Jeans</option>
-                                    <option value="Dresses">Dresses</option>
-                                    <option value="Outerwear">Outerwear</option>
-                                    <option value="Accessories">Accessories</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -197,11 +210,15 @@
                             <label for="editProductImage" class="form-label">Image URL</label>
                             <input type="text" class="form-control" id="editProductImage" placeholder="https://example.com/image.jpg">
                         </div>
+                        <div class="mb-3">
+                            <label for="editProductDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editProductDescription" rows="3"></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveEditBtn" data-bs-dismiss="modal">Save Changes</button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -211,54 +228,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Sample products data
-        const products = [
-            {
-                id: 1,
-                name: 'Classic T-Shirt',
-                category: 'T-Shirts',
-                price: 49.99,
-                stock: 125,
-                image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                status: 'In Stock'
-            },
-            {
-                id: 2,
-                name: 'Designer Jeans',
-                category: 'Jeans',
-                price: 89.99,
-                stock: 78,
-                image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                status: 'In Stock'
-            },
-            {
-                id: 3,
-                name: 'Summer Dress',
-                category: 'Dresses',
-                price: 65.50,
-                stock: 42,
-                image: 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                status: 'Low Stock'
-            },
-            {
-                id: 4,
-                name: 'Winter Jacket',
-                category: 'Outerwear',
-                price: 125.00,
-                stock: 15,
-                image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                status: 'Low Stock'
-            },
-            {
-                id: 5,
-                name: 'Silk Scarf',
-                category: 'Accessories',
-                price: 35.75,
-                stock: 0,
-                image: 'https://assets.vogue.com/photos/589208b00e6cdc8a1928e3ef/master/pass/celebrity-style-reese-witherspoon.jpg',
-                status: 'Out of Stock'
-            }
-        ];
+        // API endpoints
+        const API_ENDPOINTS = {
+            products: '/admin/api/products',
+            categories: '/admin/api/categories'
+        };
         
         // DOM elements
         const productContainer = document.getElementById('productContainer');
@@ -266,30 +240,70 @@
         const addProductBtn = document.getElementById('addProductBtn');
         const saveEditBtn = document.getElementById('saveEditBtn');
         const dashboardLink = document.getElementById('dashboard-link');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const noProductsMessage = document.getElementById('noProductsMessage');
+        
+        // Global variables
+        let products = [];
+        let categories = [];
         
         // Initialize page
         function init() {
-            // Render products
-            renderProducts(products);
+            // Set up CSRF token for AJAX requests
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            
+            // Get products from API
+            fetchProducts();
             
             // Set up event listeners
             setupEventListeners();
-            
-            // Set current date
-            const today = new Date();
-            if (document.getElementById('selectedDate')) {
-                document.getElementById('selectedDate').valueAsDate = today;
-            }
+        }
+        
+        // Fetch products from API
+        function fetchProducts() {
+            fetch(API_ENDPOINTS.products)
+                .then(response => response.json())
+                .then(data => {
+                    products = data;
+                    renderProducts(products);
+                    loadingIndicator.classList.add('d-none');
+                    
+                    if (products.length === 0) {
+                        noProductsMessage.classList.remove('d-none');
+                    } else {
+                        noProductsMessage.classList.add('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                    loadingIndicator.classList.add('d-none');
+                    noProductsMessage.classList.remove('d-none');
+                    noProductsMessage.querySelector('p').textContent = 'Error loading products. Please try again.';
+                });
         }
         
         // Render products
         function renderProducts(productsArray) {
-            productContainer.innerHTML = '';
+            // Clear product container except for loading and no products messages
+            const elements = productContainer.querySelectorAll('.col-md-4');
+            elements.forEach(el => el.remove());
             
+            // Show no products message if empty
+            if (productsArray.length === 0) {
+                noProductsMessage.classList.remove('d-none');
+                return;
+            }
+            
+            noProductsMessage.classList.add('d-none');
+            
+            // Add product cards
             productsArray.forEach(product => {
                 const productCard = createProductCard(product);
                 productContainer.appendChild(productCard);
             });
+            
+            // Setup product buttons
+            setupProductButtons();
         }
         
         // Create product card
@@ -299,25 +313,38 @@
             
             // Determine stock status class
             let statusClass = '';
-            if (product.status === 'In Stock') {
+            let statusText = '';
+            
+            if (product.stock > 20) {
                 statusClass = 'stock-in';
-            } else if (product.status === 'Low Stock') {
+                statusText = 'In Stock';
+            } else if (product.stock > 0) {
                 statusClass = 'stock-low';
+                statusText = 'Low Stock';
             } else {
                 statusClass = 'stock-out';
+                statusText = 'Out of Stock';
             }
+            
+            // Get category name
+            const categoryName = product.category ? product.category.name : 'Uncategorized';
+            
+            // Get product image
+            const imageUrl = product.images && product.images.length > 0 
+                ? product.images[0] 
+                : 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
             
             col.innerHTML = `
                 <div class="product-card" data-id="${product.id}">
                     <div class="product-image">
-                        <img src="${product.image}" alt="${product.name}">
+                        <img src="${imageUrl}" alt="${product.name}">
                     </div>
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
-                        <p class="product-category">${product.category}</p>
-                        <p class="product-price">$${product.price.toFixed(2)}</p>
+                        <p class="product-category">${categoryName}</p>
+                        <p class="product-price">$${parseFloat(product.price).toFixed(2)}</p>
                         <p class="product-stock">
-                            <span class="stock-badge ${statusClass}">${product.status}</span>
+                            <span class="stock-badge ${statusClass}">${product.status || statusText}</span>
                             <span class="ms-2">${product.stock} in stock</span>
                         </p>
                         <div class="product-actions">
@@ -368,82 +395,168 @@
                 const searchTerm = this.value.toLowerCase();
                 const filteredProducts = products.filter(product => 
                     product.name.toLowerCase().includes(searchTerm) || 
-                    product.category.toLowerCase().includes(searchTerm)
+                    (product.category && product.category.name.toLowerCase().includes(searchTerm))
                 );
                 renderProducts(filteredProducts);
-                setupProductButtons();
             });
             
             // Add product
             addProductBtn.addEventListener('click', function() {
                 const name = document.getElementById('productName').value;
-                const category = document.getElementById('productCategory').value;
+                const category_id = document.getElementById('productCategory').value;
                 const price = parseFloat(document.getElementById('productPrice').value);
                 const stock = parseInt(document.getElementById('productStock').value) || 0;
-                const image = document.getElementById('productImage').value || 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
+                const image = document.getElementById('productImage').value;
+                const description = document.getElementById('productDescription').value;
                 
-                if (!name || !category || isNaN(price)) {
+                if (!name || !category_id || isNaN(price)) {
                     alert('Please fill in all required fields');
                     return;
                 }
                 
-                const status = stock > 0 ? (stock <= 20 ? 'Low Stock' : 'In Stock') : 'Out of Stock';
-                
-                const newId = Math.max(...products.map(p => p.id)) + 1;
-                
-                const newProduct = {
-                    id: newId,
+                const productData = {
                     name,
-                    category,
+                    category_id,
                     price,
                     stock,
                     image,
-                    status
+                    description
                 };
                 
-                products.push(newProduct);
-                renderProducts(products);
-                setupProductButtons();
-                
-                // Reset form
-                document.getElementById('addProductForm').reset();
+                createProduct(productData);
             });
             
             // Save edited product
             saveEditBtn.addEventListener('click', function() {
-                const id = parseInt(document.getElementById('editProductId').value);
+                const id = document.getElementById('editProductId').value;
                 const name = document.getElementById('editProductName').value;
-                const category = document.getElementById('editProductCategory').value;
+                const category_id = document.getElementById('editProductCategory').value;
                 const price = parseFloat(document.getElementById('editProductPrice').value);
                 const stock = parseInt(document.getElementById('editProductStock').value) || 0;
                 const image = document.getElementById('editProductImage').value;
+                const description = document.getElementById('editProductDescription').value;
                 
-                if (!name || !category || isNaN(price)) {
+                if (!name || !category_id || isNaN(price)) {
                     alert('Please fill in all required fields');
                     return;
                 }
                 
-                const status = stock > 0 ? (stock <= 20 ? 'Low Stock' : 'In Stock') : 'Out of Stock';
+                const productData = {
+                    name,
+                    category_id,
+                    price,
+                    stock,
+                    image,
+                    description
+                };
                 
-                const index = products.findIndex(p => p.id === id);
-                if (index !== -1) {
-                    products[index] = {
-                        ...products[index],
-                        name,
-                        category,
-                        price,
-                        stock,
-                        image: image || products[index].image,
-                        status
-                    };
-                    
-                    renderProducts(products);
-                    setupProductButtons();
-                }
+                updateProduct(id, productData);
             });
+        }
+        
+        // Create a new product
+        function createProduct(productData) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
             
-            // Setup edit and delete buttons
-            setupProductButtons();
+            fetch(API_ENDPOINTS.products, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify(productData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    products.push(data.product);
+                    renderProducts(products);
+                    
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+                    modal.hide();
+                    
+                    // Reset form
+                    document.getElementById('addProductForm').reset();
+                    
+                    // Show success message
+                    alert('Product added successfully!');
+                } else {
+                    console.error('Error creating product:', data);
+                    alert('Error adding product. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating product:', error);
+                alert('Error adding product. Please try again.');
+            });
+        }
+        
+        // Update a product
+        function updateProduct(id, productData) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            
+            fetch(`${API_ENDPOINTS.products}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify(productData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const index = products.findIndex(p => p.id == id);
+                    if (index !== -1) {
+                        products[index] = data.product;
+                    }
+                    renderProducts(products);
+                    
+                    // Hide modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+                    modal.hide();
+                    
+                    // Show success message
+                    alert('Product updated successfully!');
+                } else {
+                    console.error('Error updating product:', data);
+                    alert('Error updating product. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating product:', error);
+                alert('Error updating product. Please try again.');
+            });
+        }
+        
+        // Delete a product
+        function deleteProduct(id) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            
+            fetch(`${API_ENDPOINTS.products}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    products = products.filter(p => p.id != id);
+                    renderProducts(products);
+                    
+                    // Show success message
+                    alert('Product deleted successfully!');
+                } else {
+                    console.error('Error deleting product:', data);
+                    alert('Error deleting product. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+                alert('Error deleting product. Please try again.');
+            });
         }
         
         // Setup product buttons
@@ -452,16 +565,17 @@
             document.querySelectorAll('.edit-product-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const productCard = this.closest('.product-card');
-                    const id = parseInt(productCard.dataset.id);
-                    const product = products.find(p => p.id === id);
+                    const id = productCard.dataset.id;
+                    const product = products.find(p => p.id == id);
                     
                     if (product) {
                         document.getElementById('editProductId').value = product.id;
                         document.getElementById('editProductName').value = product.name;
-                        document.getElementById('editProductCategory').value = product.category;
+                        document.getElementById('editProductCategory').value = product.category_id;
                         document.getElementById('editProductPrice').value = product.price;
                         document.getElementById('editProductStock').value = product.stock;
-                        document.getElementById('editProductImage').value = product.image;
+                        document.getElementById('editProductImage').value = product.images && product.images.length > 0 ? product.images[0] : '';
+                        document.getElementById('editProductDescription').value = product.description || '';
                     }
                 });
             });
@@ -471,14 +585,8 @@
                 btn.addEventListener('click', function() {
                     if (confirm('Are you sure you want to delete this product?')) {
                         const productCard = this.closest('.product-card');
-                        const id = parseInt(productCard.dataset.id);
-                        
-                        const index = products.findIndex(p => p.id === id);
-                        if (index !== -1) {
-                            products.splice(index, 1);
-                            renderProducts(products);
-                            setupProductButtons();
-                        }
+                        const id = productCard.dataset.id;
+                        deleteProduct(id);
                     }
                 });
             });

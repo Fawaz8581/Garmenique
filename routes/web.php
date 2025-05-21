@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -31,7 +33,8 @@ Route::get('/contact', function () {
 });
 
 Route::get('/catalog', function () {
-    return view('catalog');
+    $products = \App\Models\Product::with('category')->get();
+    return view('catalog', compact('products'));
 });
 
 // Temporary routes for Men and Women sections
@@ -60,7 +63,8 @@ Route::get('/cart', function () {
 
 // Product detail route with dynamic product ID parameter
 Route::get('/catalog/product/{id}', function ($id) {
-    return view('product_detail', ['productId' => $id]);
+    $product = \App\Models\Product::findOrFail($id);
+    return view('product_detail', ['product' => $product]);
 });
 
 // Redirect old product URLs to the new format
@@ -74,9 +78,16 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         return view('admin.dashboard');
     })->name('admin.dashboard');
 
-    Route::get('/admin/products', function () {
-        return view('admin.products');
-    })->name('admin.products');
+    Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products');
+    
+    // Product Management API Routes
+    Route::get('/admin/api/products', [ProductController::class, 'getProducts']);
+    Route::post('/admin/api/products', [ProductController::class, 'store']);
+    Route::put('/admin/api/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/admin/api/products/{id}', [ProductController::class, 'destroy']);
+    
+    // Category API Routes
+    Route::get('/admin/api/categories', [CategoryController::class, 'index']);
 
     Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/admin/login', [AdminAuthController::class, 'login']);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" ng-app="garmeniqueApp">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,16 +9,13 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <!-- Favicon -->
-        <link rel="icon" href="images/icons/GarmeniqueLogo.png" type="image/png">
+        <link rel="icon" href="{{ asset('images/icons/GarmeniqueLogo.png') }}" type="image/png">
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        <!-- AngularJS -->
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
@@ -30,10 +27,341 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         
         <style>
-            /* ... existing styles ... */
+            body {
+                font-family: 'Inter', sans-serif;
+                color: #333;
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Header styles to match image */
+            .header {
+                background-color: white;
+                border-bottom: 1px solid #e5e5e5;
+                padding: 15px 0;
+                position: relative;
+            }
+            
+            .nav-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 40px;
+            }
+            
+            .logo-container {
+                flex: 1;
+                max-width: 200px;
+                position: relative;
+                z-index: 101;
+                text-align: left;
+            }
+            
+            .logo {
+                font-weight: 600;
+                font-size: 1.5rem;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                color: #000;
+                text-decoration: none;
+            }
+            
+            .main-nav {
+                display: flex;
+                justify-content: center;
+                flex: 2;
+            }
+            
+            .main-nav ul {
+                display: flex;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                justify-content: center;
+            }
+            
+            .main-nav li {
+                margin: 0 15px;
+                text-align: center;
+            }
+            
+            .nav-item {
+                font-size: 0.9rem;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                font-weight: 500;
+                color: #333;
+                text-decoration: none;
+                position: relative;
+                padding: 0 5px;
+            }
+            
+            .nav-item:hover, .nav-item.active {
+                color: #000;
+            }
+            
+            .nav-item::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background-color: #000;
+                transition: width 0.2s ease;
+            }
+            
+            .nav-item:hover::after,
+            .nav-item.active::after {
+                width: 100%;
+            }
+            
+            .nav-icons {
+                flex: 1;
+                max-width: 120px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .nav-icon {
+                font-size: 1rem;
+                color: #333;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+            
+            .nav-icon:hover {
+                color: #000;
+            }
+
+            /* Page title styling */
+            .page-title {
+                margin: 30px 0 20px;
+                font-size: 1.5rem;
+                font-weight: 600;
+            }
+            
+            .filters-section {
+                padding-right: 30px;
+            }
+            
+            .filter-heading {
+                font-size: 0.9rem;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+            
+            .filter-group {
+                margin-bottom: 25px;
+            }
+            
+            .checkbox-label {
+                display: flex;
+                align-items: center;
+                font-size: 0.85rem;
+                margin-bottom: 8px;
+                cursor: pointer;
+            }
+            
+            .checkbox-label input {
+                margin-right: 8px;
+            }
+            
+            .color-swatch {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 8px;
+                cursor: pointer;
+                border: 1px solid #ddd;
+            }
+            
+            .color-swatch.active {
+                box-shadow: 0 0 0 2px #fff, 0 0 0 3px #333;
+            }
+            
+            .size-btn {
+                background: #fff;
+                border: 1px solid #ddd;
+                width: 40px;
+                height: 40px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 8px;
+                margin-bottom: 8px;
+                cursor: pointer;
+                font-size: 0.8rem;
+            }
+            
+            .size-btn.active {
+                background: #333;
+                color: #fff;
+                border-color: #333;
+            }
+            
+            .products-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            
+            .products-count {
+                font-size: 0.85rem;
+                color: #666;
+            }
+            
+            .view-options {
+                display: flex;
+                align-items: center;
+            }
+            
+            .sort-select {
+                padding: 5px 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-left: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .product-card {
+                margin-bottom: 30px;
+                position: relative;
+            }
+            
+            .product-image {
+                position: relative;
+                margin-bottom: 10px;
+                overflow: hidden;
+            }
+            
+            .product-image img {
+                width: 100%;
+                height: auto;
+                transition: all 0.3s ease;
+            }
+            
+            .product-image:hover img {
+                transform: scale(1.05);
+            }
+            
+            .discount-badge {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #f54;
+                color: white;
+                padding: 3px 8px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+            
+            .product-title {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+            
+            .product-brand {
+                font-size: 0.8rem;
+                color: #666;
+                margin-bottom: 5px;
+            }
+            
+            .product-price {
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+            
+            .sale-price {
+                color: #f54;
+                margin-right: 5px;
+            }
+            
+            .regular-price {
+                color: #999;
+                text-decoration: line-through;
+            }
+            
+            .color-dots {
+                margin-top: 8px;
+            }
+            
+            .color-dot {
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 4px;
+                border: 1px solid #ddd;
+            }
+            
+            .pagination {
+                margin-top: 40px;
+                margin-bottom: 60px;
+                display: flex;
+                justify-content: center;
+            }
+            
+            .page-link {
+                border: none;
+                color: #333;
+                padding: 8px 14px;
+                margin: 0 5px;
+            }
+            
+            .page-item.active .page-link {
+                background: #333;
+                color: #fff;
+            }
+            
+            /* Mobile styles */
+            @media (max-width: 991px) {
+                .main-nav {
+                    position: fixed;
+                    top: 60px;
+                    left: -100%;
+                    width: 100%;
+                    height: calc(100vh - 60px);
+                    background-color: white;
+                    flex-direction: column;
+                    padding: 20px;
+                    transition: left 0.3s;
+                    z-index: 100;
+                }
+                
+                .main-nav.active {
+                    left: 0;
+                }
+                
+                .main-nav ul {
+                    flex-direction: column;
+                    width: 100%;
+                }
+                
+                .main-nav li {
+                    margin: 10px 0;
+                    text-align: center;
+                }
+                
+                .mobile-toggle {
+                    display: block;
+                }
+                
+                .logo-container, .nav-icons {
+                    width: auto;
+                }
+            }
         </style>
     </head>
-    <body ng-app="garmeniqueApp">
+    <body>
         <!-- Header Section -->
         <header class="header" ng-controller="HeaderController">
             <div class="container nav-container">
@@ -97,10 +425,28 @@
                     <section class="popular-categories">
                         <h2>Popular Categories</h2>
                         <div class="row">
-                            <div class="col-6 col-md-3" ng-repeat="category in popularCategories">
-                                <div class="category-card" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
-                                    <img ng-src="@{{ category.image }}" alt="@{{ category.name }}" class="card-img-top">
-                                    <h5 class="category-card-title">@{{ category.name }}</h5>
+                            <div class="col-6 col-md-3">
+                                <div class="category-card">
+                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Tops" class="card-img-top">
+                                    <h5 class="category-card-title">Tops</h5>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="category-card">
+                                    <img src="{{ asset('images/catalog/category-bottoms.jpg') }}" alt="Bottoms" class="card-img-top">
+                                    <h5 class="category-card-title">Bottoms</h5>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="category-card">
+                                    <img src="{{ asset('images/catalog/category-dresses.jpg') }}" alt="Dresses" class="card-img-top">
+                                    <h5 class="category-card-title">Dresses</h5>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="category-card">
+                                    <img src="{{ asset('images/catalog/category-outerwear.jpg') }}" alt="Outerwear" class="card-img-top">
+                                    <h5 class="category-card-title">Outerwear</h5>
                                 </div>
                             </div>
                         </div>
@@ -109,286 +455,140 @@
             </div>
         </div>
         
-        <!-- Page Title Banner -->
-        <section class="page-title-banner" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
-            <div class="container">
-                <h1>Our Catalog</h1>
-            </div>
-        </section>
+        <!-- Main Content -->
+        <div class="container">
+            <h1 class="page-title">Men's Clothing & Apparel - New Arrivals</h1>
+            <p class="text-muted small">{{ count($products) }} product(s)</p>
 
-        <!-- Catalog Section -->
-        <section class="catalog-section" ng-controller="CatalogController">
-            <div class="container">
-                <div class="row">
-                    <!-- Sidebar / Filters -->
-                    <div class="col-lg-3 filter-sidebar">
-                        <div class="filter-block">
-                            <h3>Categories</h3>
-                            <ul class="category-filter">
-                                <li ng-repeat="category in categories">
-                                    <label>
-                                        <input type="checkbox" ng-model="category.selected" ng-change="filterProducts()">
-                                        @{{ category.name }} <span>(@{{ category.count }})</span>
-                                    </label>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="filter-block">
-                            <h3>Price Range (IDR)</h3>
-                            <div class="price-range">
-                                <div class="price-inputs">
-                                    <input type="number" ng-model="priceRange.min" placeholder="Min" ng-change="filterProducts()" step="10000">
-                                    <span>-</span>
-                                    <input type="number" ng-model="priceRange.max" placeholder="Max" ng-change="filterProducts()" step="10000">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="filter-block">
-                            <h3>Size</h3>
-                            <div class="size-filter">
-                                <button ng-repeat="size in sizes" 
-                                        ng-class="{'active': size.selected}" 
-                                        ng-click="toggleSize(size)" 
-                                        class="size-btn">
-                                    @{{ size.label }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="filter-block">
-                            <h3>Color</h3>
-                            <div class="color-filter">
-                                <button ng-repeat="color in colors" 
-                                        ng-class="{'active': color.selected}" 
-                                        ng-click="toggleColor(color)" 
-                                        class="color-btn" 
-                                        style="background-color: @{{ color.code }};" 
-                                        title="@{{ color.name }}">
-                                </button>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-secondary w-100 mt-3" ng-click="resetFilters()">Reset Filters</button>
+            <div class="row">
+                <!-- Filters -->
+                <div class="col-md-3 filters-section">
+                    <div class="filter-group">
+                        <h3 class="filter-heading">Categories</h3>
+                        @php
+                            $categories = \App\Models\Category::withCount('products')->get();
+                        @endphp
+                        
+                        @foreach($categories as $category)
+                        <label class="checkbox-label">
+                            <input type="checkbox" class="category-filter" data-category="{{ $category->id }}"> 
+                            {{ $category->name }} ({{ $category->products_count }})
+                        </label>
+                        @endforeach
                     </div>
 
-                    <!-- Product List -->
-                    <div class="col-lg-9">
-                        <!-- Sorting and View Options -->
-                        <div class="catalog-header">
-                            <div class="results-count">
-                                <p>Showing <strong>@{{ filteredProducts.length }}</strong> of @{{ products.length }} products</p>
-                            </div>
-
-                            <div class="sorting-options">
-                                <div class="view-toggle">
-                                    <button class="grid-view" ng-class="{'active': viewMode === 'grid'}" ng-click="setViewMode('grid')">
-                                        <i class="fas fa-th"></i>
-                                    </button>
-                                    <button class="list-view" ng-class="{'active': viewMode === 'list'}" ng-click="setViewMode('list')">
-                                        <i class="fas fa-list"></i>
-                                    </button>
-                                </div>
-
-                                <div class="sort-dropdown">
-                                    <select ng-model="sortOption" ng-change="sortProducts()">
-                                        <option value="featured">Featured</option>
-                                        <option value="newest">Newest</option>
-                                        <option value="price_low">Price: Low to High</option>
-                                        <option value="price_high">Price: High to Low</option>
-                                        <option value="name_asc">Name: A to Z</option>
-                                        <option value="name_desc">Name: Z to A</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <div class="filter-group">
+                        <h3 class="filter-heading">Color</h3>
+                        <div>
+                            <span class="color-swatch" style="background-color: #000000;" title="Black"></span>
+                            <span class="color-swatch" style="background-color: #003366;" title="Navy"></span>
+                            <span class="color-swatch" style="background-color: #663300;" title="Brown"></span>
+                            <span class="color-swatch" style="background-color: #999999;" title="Grey"></span>
+                            <span class="color-swatch" style="background-color: #0066cc;" title="Blue"></span>
+                            <span class="color-swatch" style="background-color: #ffffff; border: 1px solid #ddd;" title="White"></span>
+                            <span class="color-swatch" style="background-color: #cc3333;" title="Red"></span>
+                            <span class="color-swatch" style="background-color: #cc9966;" title="Beige"></span>
                         </div>
+                    </div>
 
-                        <!-- Products Grid View -->
-                        <div class="products-container" ng-class="{'grid-view': viewMode === 'grid', 'list-view': viewMode === 'list'}">
-                            <!-- Grid View -->
-                            <div class="row" ng-if="viewMode === 'grid'">
-                                <div class="col-md-6 col-6" ng-repeat="product in filteredProducts | limitTo: itemsPerPage : (currentPage - 1) * itemsPerPage">
-                                    <div class="product-card" ng-mouseenter="hover(product)" ng-mouseleave="unhover(product)">
-                                        <div class="product-img-container">
-                                            <a href="/catalog/product/@{{ product.id }}">
-                                                <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="primary-img">
-                                                <img ng-src="@{{ product.hoverImage }}" alt="@{{ product.name }}" class="hover-img">
-                                            </a>
-                                            <span class="product-tag new" ng-if="product.isNew">New</span>
-                                            <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
-                                        </div>
-                                        
-                                        <div class="product-info">
-                                            <h3 class="product-name">
-                                                <a href="/catalog/product/@{{ product.id }}">@{{ product.name }}</a>
-                                            </h3>
-                                            <div class="product-price">
-                                                <span class="price-current" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
-                                                <span class="price-old" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
-                                            </div>
-                                            
-                                            <div class="product-colors">
-                                                <span class="color-dot" ng-repeat="color in product.colors | limitTo:4" style="background-color: @{{ color.code }}" title="@{{ color.name }}"></span>
-                                            </div>
-                                            
-                                            <div class="product-rating" ng-if="product.rating">
-                                                <i class="fas fa-star" ng-repeat="n in [].constructor(product.rating) track by $index"></i>
-                                                <i class="far fa-star" ng-repeat="n in [].constructor(5 - product.rating) track by $index"></i>
-                                                <span class="rating-count">(@{{ product.reviewCount }})</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- List View -->
-                            <div class="products-list" ng-if="viewMode === 'list'">
-                                <div class="product-list-item" ng-repeat="product in filteredProducts">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="product-img-container">
-                                                <a href="/catalog/product/@{{ product.id }}">
-                                                    <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }}" class="list-img">
-                                                </a>
-                                                <span class="product-tag new" ng-if="product.isNew">New</span>
-                                                <span class="product-tag sale" ng-if="product.discount">-@{{ product.discount }}%</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="list-product-info">
-                                                <h3 class="product-name">
-                                                    <a href="/catalog/product/@{{ product.id }}">@{{ product.name }}</a>
-                                                </h3>
-                                                
-                                                <div class="product-rating">
-                                                    <i class="fas fa-star" ng-repeat="i in getStars(product.rating) track by $index"></i>
-                                                    <i class="far fa-star" ng-repeat="i in getEmptyStars(product.rating) track by $index"></i>
-                                                    <span class="rating-count">(@{{ product.reviewCount }} Reviews)</span>
-                                                </div>
-                                                
-                                                <div class="product-price">
-                                                    <span class="price-current" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
-                                                    <span class="price-old" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
-                                                </div>
-                                                
-                                                <div class="product-description">
-                                                    <p>@{{ product.description | limitTo:200 }}@{{ product.description.length > 200 ? '...' : '' }}</p>
-                                                </div>
-                                                
-                                                <div class="product-sizes">
-                                                    <span>Available Sizes:</span>
-                                                    <span class="size-tag" ng-repeat="size in product.sizes">@{{ size }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="filter-group">
+                        <h3 class="filter-heading">Size</h3>
+                        <div>
+                            <button class="size-btn">XS</button>
+                            <button class="size-btn">S</button>
+                            <button class="size-btn">M</button>
+                            <button class="size-btn">L</button>
+                            <button class="size-btn">XL</button>
+                            <button class="size-btn">XXL</button>
                         </div>
+                    </div>
 
-                        <!-- Pagination -->
-                        <div class="pagination-container">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination">
-                                    <li class="page-item" ng-class="{'disabled': currentPage === 1}">
-                                        <a class="page-link" href="javascript:void(0)" aria-label="Previous" ng-click="goToPage(currentPage - 1)">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                    <li class="page-item" ng-repeat="page in getPages()" ng-class="{'active': page === currentPage}">
-                                        <a class="page-link" href="javascript:void(0)" ng-click="goToPage(page)">@{{ page }}</a>
-                                    </li>
-                                    <li class="page-item" ng-class="{'disabled': currentPage === totalPages}">
-                                        <a class="page-link" href="javascript:void(0)" aria-label="Next" ng-click="goToPage(currentPage + 1)">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
+                    <div class="filter-group">
+                        <h3 class="filter-heading">Price Range</h3>
+                        <div class="mb-3">
+                            <input type="range" class="form-range" id="priceRange" min="0" max="500" value="250">
+                            <div class="d-flex justify-content-between">
+                                <span>$0</span>
+                                <span>$250</span>
+                                <span>$500</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- Quick View Modal -->
-        <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="quickViewModalLabel">Quick View</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" ng-if="quickViewProduct">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="quick-view-img">
-                                    <img ng-src="@{{ quickViewProduct.primaryImage }}" alt="@{{ quickViewProduct.name }}" class="img-fluid">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="quick-view-content">
-                                    <h2 class="product-name">
-                                        <a href="/catalog/product/@{{ quickViewProduct.id }}">@{{ quickViewProduct.name }}</a>
-                                    </h2>
-                                    
-                                    <div class="product-rating">
-                                        <i class="fas fa-star" ng-repeat="n in [].constructor(quickViewProduct.rating) track by $index"></i>
-                                        <i class="far fa-star" ng-repeat="n in [].constructor(5 - quickViewProduct.rating) track by $index"></i>
-                                        <span class="rating-count">@{{ quickViewProduct.reviewCount }} Reviews</span>
-                                    </div>
-                                    
-                                    <div class="product-price">
-                                        <span class="price-current">IDR @{{ (quickViewProduct.price * 15500).toLocaleString('id-ID') }}</span>
-                                        <span class="price-old" ng-if="quickViewProduct.oldPrice">IDR @{{ (quickViewProduct.oldPrice * 15500).toLocaleString('id-ID') }}</span>
-                                    </div>
-                                    
-                                    <p class="product-description">@{{ quickViewProduct.description }}</p>
-                                    
-                                    <div class="color-selection">
-                                        <label>Color:</label>
-                                        <div class="color-options">
-                                            <div class="color-option" 
-                                                    ng-repeat="color in quickViewProduct.colors" 
-                                                    ng-class="{'selected': selectedColor === color}"
-                                                    ng-click="selectColor(color)" 
-                                                    style="background-color: @{{ color.code }};" 
-                                                    title="@{{ color.name }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="size-selection">
-                                        <label>Size:</label>
-                                        <div class="size-options">
-                                            <button class="size-option" 
-                                                    ng-repeat="size in quickViewProduct.sizes" 
-                                                    ng-class="{'selected': selectedSize === size}"
-                                                    ng-click="selectSize(size)">
-                                                @{{ size }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="quantity-selector">
-                                        <label>Quantity:</label>
-                                        <div class="quantity-input">
-                                            <button class="quantity-btn minus" ng-click="decreaseQuantity()">-</button>
-                                            <input type="text" ng-model="quantity" readonly>
-                                            <button class="quantity-btn plus" ng-click="increaseQuantity()">+</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="modal-actions mt-4">
-                                        <button class="btn btn-primary w-100" ng-click="addToCartFromModal()">
-                                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                <!-- Products -->
+                <div class="col-md-9">
+                    <div class="products-header">
+                        <div class="products-count">
+                            Showing {{ count($products) }} of {{ count($products) }} products
+                        </div>
+
+                        <div class="view-options">
+                            <select class="sort-select" id="sortSelect">
+                                <option value="featured">Featured</option>
+                                <option value="newest">New Arrivals</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="row" id="productsContainer">
+                        @if(count($products) > 0)
+                            @foreach($products as $product)
+                            <div class="col-md-4 product-card">
+                                <div class="product-image">
+                                    <a href="/catalog/product/{{ $product->id }}">
+                                        @if(!empty($product->images) && count($product->images) > 0)
+                                            <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
+                                        @else
+                                            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
+                                        @endif
+                                    </a>
+                                    <div class="discount-badge">40% off</div>
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">
+                                        <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                                    </h3>
+                                    <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
+                                    <div class="product-price">
+                                        <span class="sale-price">${{ number_format($product->price * 0.6, 2) }}</span>
+                                        <span class="regular-price">${{ number_format($product->price, 2) }}</span>
+                                    </div>
+                                    <div class="color-dots">
+                                        <span class="color-dot" style="background-color: #000"></span>
+                                        <span class="color-dot" style="background-color: #663300"></span>
+                                        <span class="color-dot" style="background-color: #999"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        @else
+                            <div class="col-12">
+                                <p class="text-center">No products found. Please check back later.</p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -397,68 +597,51 @@
         @include('partials.sliding-cart')
 
         <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="footer-grid">
-                    <div class="footer-col">
-                        <h4>Company</h4>
-                        <ul class="footer-links">
-                            <li><a href="/about">About Us</a></li>
-                            <li><a href="#">Our Story</a></li>
-                            <li><a href="#">Careers</a></li>
-                            <li><a href="#">Sustainability</a></li>
-                        </ul>
-                    </div>
+        @include('partials.footer')
 
-                    <div class="footer-col">
-                        <h4>Help</h4>
-                        <ul class="footer-links">
-                            <li><a href="#">Customer Service</a></li>
-                            <li><a href="#">Track Order</a></li>
-                            <li><a href="#">Returns & Exchanges</a></li>
-                            <li><a href="#">Shipping Info</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-col">
-                        <h4>Quick Links</h4>
-                        <ul class="footer-links">
-                            <li><a href="/men">Men's Collection</a></li>
-                            <li><a href="/women">Women's Collection</a></li>
-                            <li><a href="#">Gift Cards</a></li>
-                            <li><a href="/blog">Blog</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-col">
-                        <h4>Connect With Us</h4>
-                        <div class="social-email-section">
-                            <div class="social-icons">
-                                <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
-                            </div>
-                            <p class="email-title">Sign Up for Updates</p>
-                            <form class="email-form">
-                                <input type="email" placeholder="Enter your email" class="email-input" required>
-                                <button type="submit" class="email-button">
-                                    <i class="fas fa-arrow-right"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="footer-bottom">
-                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
-                </div>
-            </div>
-        </footer>
-
-        <!-- Scripts -->
+        <!-- Bootstrap Bundle with Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="{{ asset('js/catalog.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+        <script src="{{ asset('js/landingpage.js') }}"></script>
         <script src="{{ asset('js/cart.js') }}"></script>
+        
+        <script>
+            // Legacy non-angular code for filters
+            document.addEventListener('DOMContentLoaded', function() {
+                // Toggle color swatches
+                const colorSwatches = document.querySelectorAll('.color-swatch');
+                colorSwatches.forEach(swatch => {
+                    swatch.addEventListener('click', function() {
+                        swatch.classList.toggle('active');
+                    });
+                });
+                
+                // Toggle size buttons
+                const sizeButtons = document.querySelectorAll('.size-btn');
+                sizeButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        btn.classList.toggle('active');
+                    });
+                });
+                
+                // Sort functionality
+                const sortSelect = document.getElementById('sortSelect');
+                if (sortSelect) {
+                    sortSelect.addEventListener('change', function() {
+                        // Implement sorting functionality
+                        console.log('Sorting by: ' + this.value);
+                    });
+                }
+                
+                // Price range functionality
+                const priceRange = document.getElementById('priceRange');
+                if (priceRange) {
+                    priceRange.addEventListener('input', function() {
+                        // Update displayed value
+                        console.log('Price range: $0 - $' + this.value);
+                    });
+                }
+            });
+        </script>
     </body>
 </html>
