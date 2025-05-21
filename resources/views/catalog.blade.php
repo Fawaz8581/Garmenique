@@ -573,7 +573,7 @@
                                             <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
                                         @endif
                                     </a>
-                                    <div class="discount-badge">40% off</div>
+
                                 </div>
                                         <div class="product-info">
                                     <h3 class="product-title">
@@ -581,8 +581,7 @@
                                             </h3>
                                     <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
                                             <div class="product-price">
-                                        <span class="sale-price">IDR {{ number_format($product->price * 0.6, 0, ',', '.') }}</span>
-                                        <span class="regular-price">IDR {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        <span>IDR {{ number_format($product->price, 0, ',', '.') }}</span>
                                             </div>
                                     <div class="color-dots">
                                         <span class="color-dot" style="background-color: #000"></span>
