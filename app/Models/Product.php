@@ -62,10 +62,24 @@ class Product extends Model
     }
     
     /**
-     * Get the category that owns the product.
+     * Get the category name with proper capitalization
+     * 
+     * @return string
      */
-    public function category()
+    public function getCategoryNameAttribute()
     {
-        return $this->belongsTo(Category::class);
+        if (!$this->category_id) {
+            return 'Uncategorized';
+        }
+        
+        $categoryMap = [
+            "tshirt" => "T-shirt",
+            "shirt" => "Shirt",
+            "jackets" => "Jackets",
+            "pants" => "Pants",
+            "hoodie" => "Hoodie"
+        ];
+        
+        return $categoryMap[$this->category_id] ?? ucfirst($this->category_id);
     }
 } 

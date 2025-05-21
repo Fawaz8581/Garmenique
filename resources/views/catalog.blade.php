@@ -535,45 +535,45 @@
             <div class="container mt-5 pt-5">
                 <!-- Spacer -->
                 <div class="spacer py-4"></div>
-            
+
                 <div class="row mt-5">
                 <!-- Filters -->
                 <div class="col-md-3 filters-section">
                     <div class="filter-group">
                         <h3 class="filter-heading">Categories</h3>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="1"> 
-                            T-shirt ({{ App\Models\Product::where('category_id', 1)->count() }})
+                            <input type="checkbox" class="category-filter" data-category="tshirt"> 
+                            T-shirt (<span class="category-count" data-category="tshirt">0</span>)
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="2"> 
-                            Shirt ({{ App\Models\Product::where('category_id', 2)->count() }})
+                            <input type="checkbox" class="category-filter" data-category="shirt"> 
+                            Shirt (<span class="category-count" data-category="shirt">0</span>)
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="3"> 
-                            Jackets ({{ App\Models\Product::where('category_id', 3)->count() }})
+                            <input type="checkbox" class="category-filter" data-category="jackets"> 
+                            Jackets (<span class="category-count" data-category="jackets">0</span>)
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="4"> 
-                            Pants ({{ App\Models\Product::where('category_id', 4)->count() }})
+                            <input type="checkbox" class="category-filter" data-category="pants"> 
+                            Pants (<span class="category-count" data-category="pants">0</span>)
                         </label>
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="5"> 
-                            Hoodie ({{ App\Models\Product::where('category_id', 5)->count() }})
+                            <input type="checkbox" class="category-filter" data-category="hoodie"> 
+                            Hoodie (<span class="category-count" data-category="hoodie">0</span>)
                         </label>
                     </div>
 
                     <div class="filter-group">
                         <h3 class="filter-heading">Color</h3>
                         <div>
-                            <span class="color-swatch" style="background-color: #000000;" title="Black"></span>
-                            <span class="color-swatch" style="background-color: #003366;" title="Navy"></span>
-                            <span class="color-swatch" style="background-color: #663300;" title="Brown"></span>
-                            <span class="color-swatch" style="background-color: #999999;" title="Grey"></span>
-                            <span class="color-swatch" style="background-color: #0066cc;" title="Blue"></span>
-                            <span class="color-swatch" style="background-color: #ffffff; border: 1px solid #ddd;" title="White"></span>
-                            <span class="color-swatch" style="background-color: #cc3333;" title="Red"></span>
-                            <span class="color-swatch" style="background-color: #cc9966;" title="Beige"></span>
+                            <span class="color-swatch" style="background-color: #000000;" data-color="black" title="Black"></span>
+                            <span class="color-swatch" style="background-color: #003366;" data-color="navy" title="Navy"></span>
+                            <span class="color-swatch" style="background-color: #663300;" data-color="brown" title="Brown"></span>
+                            <span class="color-swatch" style="background-color: #999999;" data-color="grey" title="Grey"></span>
+                            <span class="color-swatch" style="background-color: #0066cc;" data-color="blue" title="Blue"></span>
+                            <span class="color-swatch" style="background-color: #ffffff; border: 1px solid #ddd;" data-color="white" title="White"></span>
+                            <span class="color-swatch" style="background-color: #cc3333;" data-color="red" title="Red"></span>
+                            <span class="color-swatch" style="background-color: #cc9966;" data-color="beige" title="Beige"></span>
                         </div>
                     </div>
 
@@ -611,45 +611,45 @@
                 <div class="col-md-9">
                     <div class="products-header">
                         <div class="products-count">
-                            Showing {{ count($products) }} of {{ count($products) }} products
-                                </div>
+                            Showing <span id="visibleProductCount">{{ count($products) }}</span> of <span id="totalProductCount">{{ count($products) }}</span> products
+                        </div>
 
                         <div class="view-options">
                             <select class="sort-select" id="sortSelect">
-                                <option value="featured">Featured</option>
+                                        <option value="featured">Featured</option>
                                 <option value="newest">New Arrivals</option>
-                                <option value="price_low">Price: Low to High</option>
-                                <option value="price_high">Price: High to Low</option>
-                            </select>
+                                        <option value="price_low">Price: Low to High</option>
+                                        <option value="price_high">Price: High to Low</option>
+                                    </select>
                         </div>
                                         </div>
                                         
                     <div class="row mt-5 pt-3" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
-                            <div class="col-md-6 product-card mb-5" data-category="{{ $product->category_id ?? 0 }}" data-price="{{ $product->price }}">
+                            <div class="col-md-6 product-card mb-5" data-category="{{ $product->category_id ?? 'uncategorized' }}" data-price="{{ $product->price }}">
                                 <div class="product-container">
-                                    <div class="product-image">
-                                        <a href="/catalog/product/{{ $product->id }}">
-                                            @if(!empty($product->images) && count($product->images) > 0)
-                                                <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
-                                            @else
-                                                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
-                                            @endif
-                                        </a>
-                                    </div>
-                                    <div class="product-info">
-                                        <h3 class="product-title">
-                                            <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
-                                        </h3>
-                                        <p class="product-brand">{{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
-                                        <div class="product-price">
+                                <div class="product-image">
+                                    <a href="/catalog/product/{{ $product->id }}">
+                                        @if(!empty($product->images) && count($product->images) > 0)
+                                            <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
+                                        @else
+                                            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
+                                        @endif
+                                    </a>
+                                </div>
+                                        <div class="product-info">
+                                    <h3 class="product-title">
+                                        <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                                            </h3>
+                                    <p class="product-brand">{{ $product->category_name ?? 'Uncategorized' }}</p>
+                                            <div class="product-price">
                                             <span>IDR {{ number_format($product->price, 0, ',', '.') }}</span>
-                                        </div>
-                                        <div class="color-dots">
-                                            <span class="color-dot" style="background-color: #000"></span>
-                                            <span class="color-dot" style="background-color: #663300"></span>
-                                            <span class="color-dot" style="background-color: #999"></span>
+                                            </div>
+                                    <div class="color-dots">
+                                        <span class="color-dot" style="background-color: #000"></span>
+                                        <span class="color-dot" style="background-color: #663300"></span>
+                                        <span class="color-dot" style="background-color: #999"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -687,24 +687,24 @@
                                                         <span class="page-link">{{ $page }}</span>
                                                     </li>
                                                 @else
-                                                    <li class="page-item">
+                            <li class="page-item">
                                                         <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                                    </li>
+                                    </li>
                                                 @endif
                                             @endforeach
 
                                             <!-- Next Page Link -->
                                             @if ($products->hasMorePages())
-                                                <li class="page-item">
+                            <li class="page-item">
                                                     <a class="page-link" href="{{ $products->nextPageUrl() }}" rel="next">Next »</a>
                                                 </li>
                                             @else
                                                 <li class="page-item disabled">
                                                     <span class="page-link">Next »</span>
-                                                </li>
+                                    </li>
                                             @endif
-                                        </ul>
-                                    </nav>
+                                </ul>
+                            </nav>
                                 </div>
                                 
                                 <!-- Showing text centered with proper spacing -->
@@ -735,11 +735,24 @@
         <script>
             // Legacy non-angular code for filters
             document.addEventListener('DOMContentLoaded', function() {
+                // Define static categories and count products for each category
+                const categories = ['tshirt', 'shirt', 'jackets', 'pants', 'hoodie'];
+                
+                // Count products per category
+                categories.forEach(category => {
+                    const productsInCategory = document.querySelectorAll(`.product-card[data-category="${category}"]`).length;
+                    const categoryCountEl = document.querySelector(`.category-count[data-category="${category}"]`);
+                    if (categoryCountEl) {
+                        categoryCountEl.textContent = productsInCategory;
+                    }
+                });
+                
                 // Toggle color swatches
                 const colorSwatches = document.querySelectorAll('.color-swatch');
                 colorSwatches.forEach(swatch => {
                     swatch.addEventListener('click', function() {
                         swatch.classList.toggle('active');
+                        filterProducts();
                     });
                 });
                 
@@ -748,24 +761,111 @@
                 sizeButtons.forEach(btn => {
                     btn.addEventListener('click', function() {
                         btn.classList.toggle('active');
+                        filterProducts();
                     });
+                });
+                
+                // Category filter checkboxes
+                const categoryCheckboxes = document.querySelectorAll('.category-filter');
+                categoryCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', filterProducts);
                 });
                 
                 // Sort functionality
                 const sortSelect = document.getElementById('sortSelect');
                 if (sortSelect) {
                     sortSelect.addEventListener('change', function() {
-                        // Implement sorting functionality
-                        console.log('Sorting by: ' + this.value);
+                        sortProducts(this.value);
                     });
                 }
                 
                 // Price range functionality
                 const priceRange = document.getElementById('priceRange');
+                const priceRangeValue = document.querySelector('.price-range-value');
+                
                 if (priceRange) {
                     priceRange.addEventListener('input', function() {
                         // Update displayed value
-                        console.log('Price range: IDR 0 - IDR ' + Number(this.value).toLocaleString('id-ID'));
+                        if (priceRangeValue) {
+                            priceRangeValue.textContent = 'IDR ' + Number(this.value).toLocaleString('id-ID');
+                        }
+                        filterProducts();
+                    });
+                }
+                
+                // Product filtering function
+                function filterProducts() {
+                    const products = document.querySelectorAll('.product-card');
+                    const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.dataset.category);
+                    const selectedColors = Array.from(document.querySelectorAll('.color-swatch.active')).map(swatch => swatch.dataset.color);
+                    const selectedSizes = Array.from(document.querySelectorAll('.size-btn.active')).map(btn => btn.textContent.trim());
+                    const maxPrice = parseInt(priceRange.value);
+                    
+                    let visibleCount = 0;
+                    
+                    products.forEach(product => {
+                        const productCategory = product.dataset.category;
+                        const productPrice = parseInt(product.dataset.price);
+                        
+                        // Apply filters
+                        let showProduct = true;
+                        
+                        // Category filter
+                        if (selectedCategories.length > 0 && !selectedCategories.includes(productCategory)) {
+                            showProduct = false;
+                        }
+                        
+                        // Price filter
+                        if (productPrice > maxPrice) {
+                            showProduct = false;
+                        }
+                        
+                        // Color filter - would need product to have data-colors attribute
+                        // Size filter - would need product to have data-sizes attribute
+                        
+                        // Show/hide based on filters
+                        if (showProduct) {
+                            product.style.display = '';
+                            visibleCount++;
+                        } else {
+                            product.style.display = 'none';
+                        }
+                    });
+                    
+                    // Update count display
+                    const visibleProductCountEl = document.getElementById('visibleProductCount');
+                    if (visibleProductCountEl) {
+                        visibleProductCountEl.textContent = visibleCount;
+                    }
+                }
+                
+                // Product sorting function
+                function sortProducts(sortBy) {
+                    const productsContainer = document.getElementById('productsContainer');
+                    const products = Array.from(productsContainer.querySelectorAll('.product-card'));
+                    
+                    products.sort((a, b) => {
+                        const priceA = parseInt(a.dataset.price);
+                        const priceB = parseInt(b.dataset.price);
+                        
+                        switch(sortBy) {
+                            case 'price_low':
+                                return priceA - priceB;
+                            case 'price_high':
+                                return priceB - priceA;
+                            case 'newest':
+                                // Would need a date attribute on products
+                                return 0;
+                            case 'featured':
+                            default:
+                                // Default ordering
+                                return 0;
+                        }
+                    });
+                    
+                    // Re-append products in sorted order
+                    products.forEach(product => {
+                        productsContainer.appendChild(product);
                     });
                 }
                 
@@ -791,11 +891,10 @@
                         
                         // Reset price range
                         if (priceRange) {
-                            priceRange.value = 500000;
-                            const priceRangeDisplays = document.querySelectorAll('.price-range-value');
-                            priceRangeDisplays.forEach(display => {
-                                display.textContent = 'IDR 500.000';
-                            });
+                            priceRange.value = 250000;
+                            if (priceRangeValue) {
+                                priceRangeValue.textContent = 'IDR ' + Number(250000).toLocaleString('id-ID');
+                            }
                         }
                         
                         // Reset sort select
@@ -805,20 +904,20 @@
                         
                         // Show all products
                         document.querySelectorAll('.product-card').forEach(card => {
-                            card.classList.remove('d-none');
+                            card.style.display = '';
                         });
                         
                         // Update product count
-                        const productsCountEl = document.querySelector('.products-count');
-                        if (productsCountEl) {
-                            const totalProducts = document.querySelectorAll('.product-card').length;
-                            productsCountEl.textContent = `Showing ${totalProducts} of ${totalProducts} products`;
+                        const visibleProductCountEl = document.getElementById('visibleProductCount');
+                        const totalProductCount = document.querySelectorAll('.product-card').length;
+                        if (visibleProductCountEl) {
+                            visibleProductCountEl.textContent = totalProductCount;
                         }
-                        
-                        // Dispatch an event that catalog.js can listen for
-                        document.dispatchEvent(new CustomEvent('resetFilters'));
                     });
                 }
+                
+                // Initialize filters
+                filterProducts();
             });
         </script>
     </body>

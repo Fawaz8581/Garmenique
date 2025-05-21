@@ -894,226 +894,225 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
 
 // Document ready function to initialize catalog functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Variables to track filter state
-    let activeFilters = {
+    // Define filters state
+    const filters = {
         categories: [],
         colors: [],
         sizes: [],
-        priceRange: { min: 0, max: 500000 }
+        priceRange: null,
+        sort: 'featured'
     };
     
-    // Get all products for filtering
-    const productCards = document.querySelectorAll('.product-card');
-    const totalProducts = productCards.length;
+    // Initialize price range display
+    const priceRange = document.getElementById('priceRange');
+    const priceRangeValue = document.querySelector('.price-range-value');
     
-    // Update product count display
-    const updateProductCount = function() {
-        const visibleProducts = document.querySelectorAll('.product-card:not(.d-none)').length;
-        const productsCountEl = document.querySelector('.products-count');
-        if (productsCountEl) {
-            productsCountEl.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
-        }
-    };
-
-    // CATEGORY FILTERS
+    if (priceRange) {
+        priceRange.addEventListener('input', function() {
+            if (priceRangeValue) {
+                priceRangeValue.textContent = 'IDR ' + Number(this.value).toLocaleString('id-ID');
+            }
+            
+            filters.priceRange = parseInt(this.value);
+            applyFilters();
+        });
+        
+        // Set initial price range value
+        filters.priceRange = parseInt(priceRange.value);
+    }
+    
+    // Set up category filters
     const categoryCheckboxes = document.querySelectorAll('.category-filter');
     categoryCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
-            const categoryId = this.getAttribute('data-category');
-            
             if (this.checked) {
-                // Add to active filters
-                if (!activeFilters.categories.includes(categoryId)) {
-                    activeFilters.categories.push(categoryId);
-                }
+                filters.categories.push(this.dataset.category);
             } else {
-                // Remove from active filters
-                const index = activeFilters.categories.indexOf(categoryId);
-                if (index > -1) {
-                    activeFilters.categories.splice(index, 1);
+                const index = filters.categories.indexOf(this.dataset.category);
+                if (index !== -1) {
+                    filters.categories.splice(index, 1);
                 }
             }
             
             applyFilters();
         });
     });
-
-    // COLOR FILTERS
+    
+    // Set up color filters
     const colorSwatches = document.querySelectorAll('.color-swatch');
     colorSwatches.forEach(swatch => {
         swatch.addEventListener('click', function() {
-            // Toggle active class
             this.classList.toggle('active');
             
-            // Get color value (from the background color)
-            const colorStyle = window.getComputedStyle(this).backgroundColor;
-            
+            const color = this.getAttribute('data-color');
             if (this.classList.contains('active')) {
-                // Add to active filters
-                if (!activeFilters.colors.includes(colorStyle)) {
-                    activeFilters.colors.push(colorStyle);
+                if (!filters.colors.includes(color)) {
+                    filters.colors.push(color);
                 }
             } else {
-                // Remove from active filters
-                const index = activeFilters.colors.indexOf(colorStyle);
-                if (index > -1) {
-                    activeFilters.colors.splice(index, 1);
+                const index = filters.colors.indexOf(color);
+                if (index !== -1) {
+                    filters.colors.splice(index, 1);
                 }
             }
             
             applyFilters();
         });
     });
-
-    // SIZE FILTERS
+    
+    // Set up size filters
     const sizeButtons = document.querySelectorAll('.size-btn');
     sizeButtons.forEach(btn => {
         btn.addEventListener('click', function() {
-            // Toggle active class
             this.classList.toggle('active');
             
-            // Get size value
-            const sizeValue = this.textContent.trim();
-            
+            const size = this.textContent.trim();
             if (this.classList.contains('active')) {
-                // Add to active filters
-                if (!activeFilters.sizes.includes(sizeValue)) {
-                    activeFilters.sizes.push(sizeValue);
+                if (!filters.sizes.includes(size)) {
+                    filters.sizes.push(size);
                 }
             } else {
-                // Remove from active filters
-                const index = activeFilters.sizes.indexOf(sizeValue);
-                if (index > -1) {
-                    activeFilters.sizes.splice(index, 1);
+                const index = filters.sizes.indexOf(size);
+                if (index !== -1) {
+                    filters.sizes.splice(index, 1);
                 }
             }
             
             applyFilters();
         });
     });
-
-    // PRICE RANGE FILTER
-    const priceRangeSlider = document.getElementById('priceRange');
-    if (priceRangeSlider) {
-        priceRangeSlider.addEventListener('input', function() {
-            const value = parseInt(this.value);
-            activeFilters.priceRange.max = value;
-            
-            // Update displayed value
-            const priceRangeDisplays = document.querySelectorAll('.price-range-value');
-            priceRangeDisplays.forEach(display => {
-                display.textContent = `IDR ${value.toLocaleString('id-ID')}`;
+    
+    // Set up sort functionality
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            filters.sort = this.value;
+            applyFilters();
+        });
+    }
+    
+    // Reset filters
+    const resetFiltersBtn = document.getElementById('resetFilters');
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', function() {
+            // Reset category checkboxes
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
             });
+            
+            // Reset color swatches
+            colorSwatches.forEach(swatch => {
+                swatch.classList.remove('active');
+            });
+            
+            // Reset size buttons
+            sizeButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Reset price range
+            if (priceRange) {
+                priceRange.value = 250000;
+                if (priceRangeValue) {
+                    priceRangeValue.textContent = 'IDR ' + Number(250000).toLocaleString('id-ID');
+                }
+            }
+            
+            // Reset sort select
+            if (sortSelect) {
+                sortSelect.value = 'featured';
+            }
+            
+            // Reset filters object
+            filters.categories = [];
+            filters.colors = [];
+            filters.sizes = [];
+            filters.priceRange = parseInt(priceRange.value);
+            filters.sort = 'featured';
             
             applyFilters();
         });
     }
-
-    // SORTING
-    const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            const sortValue = this.value;
-            sortProducts(sortValue);
+    
+    // Apply all filters and sorting
+    function applyFilters() {
+        const products = document.querySelectorAll('.product-card');
+        let visibleCount = 0;
+        
+        products.forEach(product => {
+            let visible = true;
+            
+            // Filter by category
+            if (filters.categories.length > 0) {
+                const productCategory = product.getAttribute('data-category');
+                if (!filters.categories.includes(productCategory)) {
+                    visible = false;
+                }
+            }
+            
+            // Filter by price
+            if (visible && filters.priceRange) {
+                const productPrice = parseInt(product.getAttribute('data-price'));
+                if (productPrice > filters.priceRange) {
+                    visible = false;
+                }
+            }
+            
+            // For color and size filters, we'd need to add data-colors and data-sizes attributes
+            // to the product cards in the blade template
+            
+            // Show or hide product
+            if (visible) {
+                product.style.display = '';
+                visibleCount++;
+            } else {
+                product.style.display = 'none';
+            }
         });
+        
+        // Update count display
+        const visibleCountEl = document.getElementById('visibleProductCount');
+        const totalCountEl = document.getElementById('totalProductCount');
+        if (visibleCountEl && totalCountEl) {
+            visibleCountEl.textContent = visibleCount;
+            totalCountEl.textContent = products.length;
+        }
+        
+        // Apply sorting
+        applySorting(filters.sort);
     }
-
-    // Sort products function
-    function sortProducts(sortOption) {
+    
+    // Sort products
+    function applySorting(sortOption) {
         const productsContainer = document.getElementById('productsContainer');
-        const products = Array.from(productsContainer.querySelectorAll('.product-card'));
+        if (!productsContainer) return;
+        
+        const products = Array.from(productsContainer.querySelectorAll('.product-card:not([style*="display: none"])'));
         
         products.sort((a, b) => {
-            const priceA = parseInt(a.querySelector('.product-price span').innerText.replace(/[^\d]/g, ''));
-            const priceB = parseInt(b.querySelector('.product-price span').innerText.replace(/[^\d]/g, ''));
+            const priceA = parseInt(a.getAttribute('data-price'));
+            const priceB = parseInt(b.getAttribute('data-price'));
             
-            switch (sortOption) {
+            switch(sortOption) {
                 case 'price_low':
                     return priceA - priceB;
                 case 'price_high':
                     return priceB - priceA;
                 case 'newest':
-                    // This would ideally use a date field, but we'll use id as a proxy
-                    const idA = parseInt(a.querySelector('a').href.split('/').pop());
-                    const idB = parseInt(b.querySelector('a').href.split('/').pop());
-                    return idB - idA;
+                    // Would need data-date attributes on products
+                    return 0;
                 case 'featured':
                 default:
-                    // Default sorting (could be by popularity, but we'll use original order)
-                    return 0;
+                    return 0; // Keep original order for featured
             }
         });
         
-        // If sorting by "featured" (default), restore original order
-        if (sortOption === 'featured') {
-            products.sort((a, b) => {
-                const idA = parseInt(a.querySelector('a').href.split('/').pop());
-                const idB = parseInt(b.querySelector('a').href.split('/').pop());
-                return idA - idB;
-            });
-        }
-        
-        // Reattach sorted products to container
+        // Re-append products to container in new order
         products.forEach(product => {
             productsContainer.appendChild(product);
         });
     }
-
-    // Apply all active filters
-    function applyFilters() {
-        productCards.forEach(card => {
-            const productPrice = parseInt(card.querySelector('.product-price span').innerText.replace(/[^\d]/g, ''));
-            
-            // Initially assume the product passes all filters
-            let passesFilters = true;
-            
-            // Check price range filter
-            if (productPrice < activeFilters.priceRange.min || productPrice > activeFilters.priceRange.max) {
-                passesFilters = false;
-            }
-            
-            // Check category filter if any are selected
-            if (activeFilters.categories.length > 0) {
-                const productCategory = card.getAttribute('data-category');
-                if (!activeFilters.categories.includes(productCategory)) {
-                    passesFilters = false;
-                }
-            }
-            
-            // Color and size filters would need product data to be properly set up
-            // This is a simplified example assuming color dots represent available colors
-            
-            // Show or hide the product based on filter results
-            if (passesFilters) {
-                card.classList.remove('d-none');
-            } else {
-                card.classList.add('d-none');
-            }
-        });
-        
-        // Update product count
-        updateProductCount();
-    }
-
-    // Initialize product count
-    updateProductCount();
-
-    // Pre-select "Featured" in the sort dropdown
-    if (sortSelect) {
-        sortSelect.value = 'featured';
-    }
-
-    // Listen for reset event
-    document.addEventListener('resetFilters', function() {
-        // Reset filter state
-        activeFilters = {
-            categories: [],
-            colors: [],
-            sizes: [],
-            priceRange: { min: 0, max: 500000 }
-        };
-        
-        // Update product count
-        updateProductCount();
-    });
+    
+    // Initialize filtering
+    applyFilters();
 });

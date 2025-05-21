@@ -136,11 +136,11 @@
                                 <label for="productCategory" class="form-label">Category</label>
                                 <select class="form-select" id="productCategory" required>
                                     <option value="">Select Category</option>
-                                    <option value="1">T-shirt</option>
-                                    <option value="2">Shirt</option>
-                                    <option value="3">Jackets</option>
-                                    <option value="4">Pants</option>
-                                    <option value="5">Hoodie</option>
+                                    <option value="tshirt">T-shirt</option>
+                                    <option value="shirt">Shirt</option>
+                                    <option value="jackets">Jackets</option>
+                                    <option value="pants">Pants</option>
+                                    <option value="hoodie">Hoodie</option>
                                 </select>
                             </div>
                         </div>
@@ -193,11 +193,11 @@
                                 <label for="editProductCategory" class="form-label">Category</label>
                                 <select class="form-select" id="editProductCategory" required>
                                     <option value="">Select Category</option>
-                                    <option value="1">T-shirt</option>
-                                    <option value="2">Shirt</option>
-                                    <option value="3">Jackets</option>
-                                    <option value="4">Pants</option>
-                                    <option value="5">Hoodie</option>
+                                    <option value="tshirt">T-shirt</option>
+                                    <option value="shirt">Shirt</option>
+                                    <option value="jackets">Jackets</option>
+                                    <option value="pants">Pants</option>
+                                    <option value="hoodie">Hoodie</option>
                                 </select>
                             </div>
                         </div>
@@ -275,6 +275,23 @@
                 .then(response => response.json())
                 .then(data => {
                     products = data;
+                    
+                    // Add category_name property to products for display
+                    products.forEach(product => {
+                        if (product.category_id) {
+                            const categoryMap = {
+                                "tshirt": "T-shirt",
+                                "shirt": "Shirt",
+                                "jackets": "Jackets",
+                                "pants": "Pants",
+                                "hoodie": "Hoodie"
+                            };
+                            product.category_name = categoryMap[product.category_id] || 'Uncategorized';
+                        } else {
+                            product.category_name = 'Uncategorized';
+                        }
+                    });
+                    
                     renderProducts(products);
                     loadingIndicator.classList.add('d-none');
                     
@@ -337,7 +354,7 @@
             }
             
             // Get category name
-            const categoryName = product.category ? product.category.name : 'Uncategorized';
+            const categoryName = product.category_name || 'Uncategorized';
             
             // Get product image
             const imageUrl = product.image_url
@@ -407,7 +424,7 @@
                 const searchTerm = this.value.toLowerCase();
                 const filteredProducts = products.filter(product => 
                     product.name.toLowerCase().includes(searchTerm) || 
-                    (product.category && product.category.name.toLowerCase().includes(searchTerm))
+                    (product.category_name && product.category_name.toLowerCase().includes(searchTerm))
                 );
                 renderProducts(filteredProducts);
             });
@@ -427,7 +444,7 @@
                 
                 const productData = {
                     name,
-                    category_id,
+                    category_id: category_id,
                     price,
                     stock,
                     description
@@ -452,7 +469,7 @@
                 
                 const productData = {
                     name,
-                    category_id,
+                    category_id: category_id,
                     price,
                     stock,
                     description
@@ -622,7 +639,7 @@
                     if (product) {
                         document.getElementById('editProductId').value = product.id;
                         document.getElementById('editProductName').value = product.name;
-                        document.getElementById('editProductCategory').value = product.category_id;
+                        document.getElementById('editProductCategory').value = product.category_id || '';
                         document.getElementById('editProductPrice').value = product.price;
                         document.getElementById('editProductStock').value = product.stock;
                         document.getElementById('editProductDescription').value = product.description || '';

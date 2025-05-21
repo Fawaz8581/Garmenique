@@ -17,8 +17,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        return view('admin.products', compact('categories'));
+        // No need to load categories anymore since we're using static categories
+        return view('admin.products');
     }
 
     /**
@@ -29,10 +29,10 @@ class ProductController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'category_id' => 'required|exists:categories,id',
+                'category_id' => 'required|string', // Validate as string instead of ID
                 'price' => 'required|numeric|min:0',
                 'stock' => 'nullable|integer|min:0',
-                'image' => 'nullable|image|max:2048', // Validate uploaded image
+                'image' => 'nullable|image|max:2048', 
                 'description' => 'nullable|string'
             ]);
 
@@ -54,9 +54,10 @@ class ProductController extends Controller
                 $imagePath = 'storage/' . $imagePath; // Adjust path for public URL
             }
 
+            // Create the product with the category name as string
             $product = Product::create([
                 'name' => $request->name,
-                'category_id' => $request->category_id,
+                'category_id' => $request->category_id, // Store as string now
                 'price' => $request->price,
                 'stock' => $request->stock ?? 0,
                 'status' => $status,
@@ -68,7 +69,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product created successfully',
-                'product' => $product->load('category')
+                'product' => $product // No need to load relationship
             ]);
         } catch (\Exception $e) {
             Log::error('Error creating product: ' . $e->getMessage());
@@ -87,10 +88,10 @@ class ProductController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'category_id' => 'required|exists:categories,id',
+                'category_id' => 'required|string', // Validate as string
                 'price' => 'required|numeric|min:0',
                 'stock' => 'nullable|integer|min:0',
-                'image' => 'nullable|image|max:2048', // Validate uploaded image
+                'image' => 'nullable|image|max:2048',
                 'description' => 'nullable|string'
             ]);
 
@@ -106,7 +107,7 @@ class ProductController extends Controller
                 'status' => $status,
                 'description' => $request->description ?? $product->description,
             ];
-            
+                
             // Handle image upload safely
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 $file = $request->file('image');
@@ -127,7 +128,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product updated successfully',
-                'product' => $product->load('category')
+                'product' => $product // No need to load relationship
             ]);
         } catch (\Exception $e) {
             Log::error('Error updating product: ' . $e->getMessage());
@@ -157,7 +158,8 @@ class ProductController extends Controller
      */
     public function getProducts()
     {
-        $products = Product::with('category')->get();
+        // Get products without loading the category relationship
+        $products = Product::all();
         return response()->json($products);
     }
 } 
