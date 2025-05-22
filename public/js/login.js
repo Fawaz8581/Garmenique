@@ -9,7 +9,10 @@ loginApp.controller('LoginController', ['$scope', '$window', '$timeout', functio
     
     // Function to handle staying on login view
     $scope.login = function() {
-        // Already on login, do nothing
+        // Already on login, just reset the position
+        angular.element(loginForm).css('left', '50px');
+        angular.element(registerForm).css('left', '450px');
+        angular.element(indicator).css('left', '0px');
     };
     
     // Function to handle register animation and navigation
@@ -22,7 +25,7 @@ loginApp.controller('LoginController', ['$scope', '$window', '$timeout', functio
         // Navigate to register page after animation
         $timeout(function() {
             $window.location.href = '/register';
-        }, 600);
+        }, 600); // Delay for smooth animation
     };
     
     // Initialize the login view
@@ -35,6 +38,22 @@ loginApp.controller('LoginController', ['$scope', '$window', '$timeout', functio
     
     // Initialize on page load
     angular.element(document).ready(function() {
+        // Force immediate positioning to prevent flashing of content
+        if (loginForm && registerForm && indicator) {
+            loginForm.style.left = '50px';
+            registerForm.style.left = '450px';
+            indicator.style.left = '0px';
+        }
+        
         $scope.initLoginPage();
     });
-}]); 
+}]);
+
+// Set up initial button state
+document.addEventListener('DOMContentLoaded', function() {
+    // The button is already positioned for login in CSS
+    const btn = document.getElementById('btn');
+    if (btn) {
+        btn.style.left = "0px";
+    }
+}); 

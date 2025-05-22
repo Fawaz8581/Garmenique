@@ -18,7 +18,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect('/');
         }
-        return view('login_register');
+        return view('login');
     }
 
     /**
@@ -29,7 +29,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect('/');
         }
-        return view('login_register');
+        return view('register');
     }
 
     /**
@@ -38,17 +38,22 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'username' => 'required',
             'password' => 'required',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
-                ->withInput($request->only('email'));
+                ->withInput($request->only('username'));
         }
 
-        $credentials = $request->only('email', 'password');
+        // Check if username is email or username
+        $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+        $credentials = [
+            $fieldType => $request->username,
+            'password' => $request->password,
+        ];
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
@@ -63,8 +68,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->withInput($request->only('email'));
+            'username' => 'The provided credentials do not match our records.',
+        ])->withInput($request->only('username'));
     }
 
     /**
@@ -73,24 +78,29 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
-                ->withInput($request->except('password', 'password_confirmation'));
+                ->withInput($request->except('password'));
         }
 
         $user = User::create([
-            'name' => $request->name,
+            'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
         Auth::login($user);
+
+        // Create an empty cart for the user
+        if (!$request->session()->has('user_cart_'.$user->id)) {
+            $request->session()->put('user_cart_'.$user->id, []);
+        }
 
         return redirect('/');
     }

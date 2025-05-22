@@ -17,12 +17,15 @@ registerApp.controller('RegisterController', ['$scope', '$window', '$timeout', f
         // Navigate to login page after animation
         $timeout(function() {
             $window.location.href = '/login';
-        }, 600);
+        }, 600); // Delay for smooth animation
     };
     
     // Function to handle staying on register view
     $scope.register = function() {
-        // Already on register, do nothing
+        // Already on register, just reset the position
+        angular.element(loginForm).css('left', '-400px');
+        angular.element(registerForm).css('left', '50px');
+        angular.element(indicator).css('left', '110px');
     };
     
     // Initialize the register view
@@ -35,6 +38,22 @@ registerApp.controller('RegisterController', ['$scope', '$window', '$timeout', f
     
     // Initialize on page load
     angular.element(document).ready(function() {
+        // Force immediate positioning to prevent flashing of content
+        if (loginForm && registerForm && indicator) {
+            loginForm.style.left = '-400px';
+            registerForm.style.left = '50px';
+            indicator.style.left = '110px';
+        }
+        
         $scope.initRegisterPage();
     });
-}]); 
+}]);
+
+// Set up initial button state
+document.addEventListener('DOMContentLoaded', function() {
+    // The button is already positioned for register in CSS
+    const btn = document.getElementById('btn');
+    if (btn) {
+        btn.style.left = "110px";
+    }
+}); 

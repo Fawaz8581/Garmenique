@@ -21,6 +21,11 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Password Reset Routes
+Route::get('/forgot-password', function() {
+    return view('password.request');
+})->name('password.request');
+
 Route::get('/blog', function () {
     return view('blog');
 });
