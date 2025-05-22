@@ -35,20 +35,10 @@ class AccountController extends Controller
         // Validate the request
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
         ]);
         
-        // Update name and email if they've changed
+        // Update name
         $user->name = $validated['name'];
-        if ($user->email !== $validated['email']) {
-            $user->email = $validated['email'];
-        }
         
         // Handle password change if requested
         if ($request->filled('current_password')) {
