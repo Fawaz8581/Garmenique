@@ -25,6 +25,12 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
+    
+    <!-- IP-based Geolocation API -->
+    <script src="https://cdn.jsdelivr.net/npm/ipinfo-api/dist/ipinfo.min.js"></script>
+    
     <style>
         .alert {
             padding: 15px;
@@ -193,6 +199,123 @@
             word-wrap: break-word;
             box-sizing: border-box;
         }
+
+        .location-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 6px 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .location-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .location-btn i {
+            margin-right: 5px;
+        }
+        
+        .location-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 5px;
+        }
+        
+        @keyframes spin {
+            to {transform: rotate(360deg);}
+        }
+
+        #map-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-top: 10px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #pac-input {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: calc(100% - 20px);
+            max-width: 300px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .address-field {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .address-full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .suggestion-dropdown {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .address-section-title {
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: block;
+        }
     </style>
 </head>
 <body ng-app="garmeniqueApp">
@@ -351,6 +474,46 @@
                         <div class="form-group">
                             <label for="address">Address</label>
                             <textarea id="address" name="address" class="form-control" placeholder="Enter your full address" rows="1" oninput="expandTextarea(this)"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="address-field-container">
+                                <label for="street_address">Street Address</label>
+                                <input type="text" id="street_address" name="street_address" class="address-field address-full-width" placeholder="Enter your street address, building, house number">
+                            </div>
+                            
+                            <div class="address-grid">
+                                <div>
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" name="city" class="address-field" placeholder="City">
+                                </div>
+                                <div>
+                                    <label for="state">State/Province</label>
+                                    <input type="text" id="state" name="state" class="address-field" placeholder="State or province">
+                                </div>
+                            </div>
+                            
+                            <div class="address-grid">
+                                <div>
+                                    <label for="postal_code">Postal Code</label>
+                                    <input type="text" id="postal_code" name="postal_code" class="address-field" placeholder="Postal/ZIP code">
+                                </div>
+                                <div>
+                                    <label for="country">Country</label>
+                                    <input type="text" id="country" name="country" class="address-field" placeholder="Country">
+                                </div>
+                            </div>
+                            
+                            <div class="address-field-container">
+                                <label for="address_notes">Address Notes (Optional)</label>
+                                <textarea id="address_notes" name="address_notes" class="form-control" rows="2" placeholder="Landmark, delivery instructions, etc."></textarea>
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: 10px;">
+                                <button type="button" class="btn-save" onclick="saveFullAddressWithNotes()">Add</button>
+                            </div>
+                            
+                            <input type="hidden" id="full_address" name="address">
                         </div>
                         
                         <h3>Change Password</h3>
@@ -763,6 +926,692 @@
                     element.style.width = (element.scrollWidth + 20) + "px";
                 }
             }, 0);
+        }
+
+        // Function to get current location - optimized for maximum speed
+        function getCurrentLocation() {
+            const locationBtn = document.querySelector('.location-btn');
+            const addressField = document.getElementById('address');
+            
+            // Show visual feedback immediately
+            const originalContent = locationBtn.innerHTML;
+            locationBtn.innerHTML = '<span class="location-spinner"></span> Getting location...';
+            locationBtn.disabled = true;
+            
+            // Try to use the fastest method available
+            
+            // 1. Check for cached location first (instant)
+            const cachedLocation = checkCachedLocation();
+            if (cachedLocation) {
+                addressField.value = cachedLocation;
+                expandTextarea(addressField);
+                locationBtn.innerHTML = originalContent;
+                locationBtn.disabled = false;
+                // Still try to update in background for next time
+                updateLocationInBackground();
+                return;
+            }
+            
+            // 2. Try to use the Geolocation API with low accuracy (faster)
+            if ('permissions' in navigator) {
+                // Check if we already have permission (much faster than prompting)
+                navigator.permissions.query({ name: 'geolocation' })
+                    .then(permissionStatus => {
+                        if (permissionStatus.state === 'granted') {
+                            // We have permission, get location directly
+                            getLocationAndAddress();
+                        } else {
+                            // Need to ask permission, try IP first for immediate feedback
+                            tryIpLocationFirst();
+                        }
+                    })
+                    .catch(tryIpLocationFirst);
+            } else {
+                tryIpLocationFirst();
+            }
+            
+            // Helper functions
+            function tryIpLocationFirst() {
+                // 3. Use IP-based geolocation for immediate feedback while waiting for GPS
+                Promise.race([
+                    // Try multiple IP services simultaneously and use the first one to respond
+                    fetch('https://ipapi.co/json/').then(r => r.json()),
+                    fetch('https://api.ipdata.co/?api-key=YOUR_IPDATA_KEY').then(r => r.json()),
+                    fetch('https://ipgeolocation.abstractapi.com/v1/?api_key=YOUR_ABSTRACT_API_KEY').then(r => r.json())
+                ])
+                .then(data => {
+                    // Different services have different response formats
+                    const city = data.city || data.location?.city;
+                    const region = data.region || data.region_code || data.location?.region_code;
+                    const country = data.country_name || data.country || data.location?.country;
+                    
+                    if (city) {
+                        const ipLocation = [city, region, country].filter(Boolean).join(', ');
+                        addressField.value = ipLocation;
+                        expandTextarea(addressField);
+                    }
+                    
+                    // Still try GPS in background
+                    getLocationAndAddress();
+                })
+                .catch(error => {
+                    console.warn('IP location failed:', error);
+                    // Still try GPS
+                    getLocationAndAddress();
+                });
+            }
+            
+            function getLocationAndAddress() {
+                // High speed mode - no high accuracy to improve speed
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            // Got GPS position - now get address
+                            const { latitude, longitude } = position.coords;
+                            
+                            // Try multiple geocoding services in parallel for speed
+                            Promise.race([
+                                // Try OpenStreetMap (fastest, no API key needed)
+                                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                                    .then(r => r.json())
+                                    .then(data => data.display_name),
+                                
+                                // Also try opencage in parallel
+                                new Promise(resolve => {
+                                    setTimeout(() => {
+                                        loadOpencageApi();
+                                        if (typeof OpenCage !== 'undefined') {
+                                            const opencage = new OpenCage({ key: 'YOUR_OPENCAGE_API_KEY' });
+                                            opencage.geocode({ q: `${latitude},${longitude}` })
+                                                .then(data => resolve(data.results[0].formatted))
+                                                .catch(() => resolve(null));
+                                        } else {
+                                            resolve(null);
+                                        }
+                                    }, 100); // Small delay to allow faster services to win
+                                })
+                            ])
+                            .then(address => {
+                                if (address) {
+                                    addressField.value = address;
+                                    expandTextarea(addressField);
+                                    cacheLocation(address);
+                                }
+                                locationBtn.innerHTML = originalContent;
+                                locationBtn.disabled = false;
+                            })
+                            .catch(() => {
+                                locationBtn.innerHTML = originalContent;
+                                locationBtn.disabled = false;
+                            });
+                        },
+                        error => {
+                            console.warn('Geolocation error:', error);
+                            locationBtn.innerHTML = originalContent;
+                            locationBtn.disabled = false;
+                        },
+                        {
+                            enableHighAccuracy: false, // Much faster
+                            timeout: 3000,            // Quick timeout
+                            maximumAge: 300000       // Allow 5-minute old cache
+                        }
+                    );
+                } else {
+                    locationBtn.innerHTML = originalContent;
+                    locationBtn.disabled = false;
+                }
+            }
+            
+            // Try to update location in background for next time
+            function updateLocationInBackground() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            getReverseGeocode(position.coords.latitude, position.coords.longitude)
+                                .then(address => {
+                                    if (address) {
+                                        cacheLocation(address);
+                                    }
+                                })
+                                .catch(() => {});
+                        },
+                        () => {},
+                        { enableHighAccuracy: false, timeout: 5000 }
+                    );
+                }
+            }
+        }
+        
+        // Function to check for cached location
+        function checkCachedLocation() {
+            try {
+                const cachedData = localStorage.getItem('userLocationCache');
+                if (cachedData) {
+                    const { address, timestamp } = JSON.parse(cachedData);
+                    const now = new Date().getTime();
+                    const hoursSinceCached = (now - timestamp) / (1000 * 60 * 60);
+                    
+                    // Return cached address if less than 24 hours old
+                    if (hoursSinceCached < 24) {
+                        return address;
+                    }
+                }
+            } catch (e) {
+                console.error("Error reading cached location", e);
+            }
+            return null;
+        }
+        
+        // Function to cache location
+        function cacheLocation(address) {
+            try {
+                const cacheData = {
+                    address: address,
+                    timestamp: new Date().getTime()
+                };
+                localStorage.setItem('userLocationCache', JSON.stringify(cacheData));
+            } catch (e) {
+                console.error("Error caching location", e);
+            }
+        }
+        
+        // Map functionality
+        let map, marker, autocomplete;
+        const addressField = document.getElementById('address');
+        
+        // Toggle map visibility
+        function toggleMap() {
+            const mapContainer = document.getElementById('map-container');
+            
+            if (mapContainer.style.display === 'block') {
+                mapContainer.style.display = 'none';
+                return;
+            }
+            
+            mapContainer.style.display = 'block';
+            
+            if (window.mapError) {
+                // Already showing error message
+                return;
+            }
+            
+            // Load the Maps API if not already loaded
+            if (!window.google || !window.google.maps) {
+                loadGoogleMapsScript();
+                return;
+            }
+            
+            // Initialize map if it doesn't exist yet
+            if (!map && window.google && window.google.maps) {
+                try {
+                    initializeMap();
+                } catch (e) {
+                    handleMapError('Error initializing map: ' + e.message);
+                }
+            }
+        }
+        
+        // Initialize Google Map - renamed to not conflict with Google's callback
+        function initializeMap() {
+            // Default center (can be anywhere, user will search or move)
+            const defaultLocation = { lat: -6.2088, lng: 106.8456 }; // Jakarta, Indonesia
+            
+            try {
+                // Create map
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: defaultLocation,
+                    zoom: 13,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: true
+                });
+                
+                // Create marker for selected location
+                marker = new google.maps.Marker({
+                    map: map,
+                    draggable: true,
+                    position: defaultLocation
+                });
+                
+                // Initialize search box
+                const input = document.getElementById('pac-input');
+                autocomplete = new google.maps.places.Autocomplete(input);
+                autocomplete.bindTo('bounds', map);
+                
+                // When a place is selected
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    
+                    if (!place.geometry) {
+                        // User entered the name of a place that was not suggested
+                        alert("No details available for: '" + place.name + "'");
+                        return;
+                    }
+                    
+                    // If the place has a geometry, present it on a map
+                    if (place.geometry.viewport) {
+                        map.fitBounds(place.geometry.viewport);
+                    } else {
+                        map.setCenter(place.geometry.location);
+                        map.setZoom(17);
+                    }
+                    
+                    // Set the position of the marker
+                    marker.setPosition(place.geometry.location);
+                    
+                    // Update form fields
+                    updateFormWithLocation(place.formatted_address, place.geometry.location);
+                });
+                
+                // When marker is dragged
+                google.maps.event.addListener(marker, 'dragend', function() {
+                    const position = marker.getPosition();
+                    geocodePosition(position);
+                });
+                
+                // Try to get user's current location if available
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const pos = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            
+                            map.setCenter(pos);
+                            marker.setPosition(pos);
+                            geocodePosition(pos);
+                        },
+                        function() {
+                            // Error or permission denied - keep default location
+                        }
+                    );
+                }
+            } catch (e) {
+                handleMapError('Error initializing map components: ' + e.message);
+            }
+        }
+        
+        // Geocode position to address
+        function geocodePosition(pos) {
+            const geocoder = new google.maps.Geocoder();
+            
+            geocoder.geocode({
+                location: pos
+            }, function(results, status) {
+                if (status === google.maps.GeocoderStatus.OK && results[0]) {
+                    updateFormWithLocation(results[0].formatted_address, pos);
+                }
+            });
+        }
+        
+        // Update form fields with selected location
+        function updateFormWithLocation(address, position) {
+            // Update the address field
+            addressField.value = address;
+            expandTextarea(addressField);
+            
+            // Update hidden coordinate fields
+            document.getElementById('lat').value = position.lat();
+            document.getElementById('lng').value = position.lng();
+        }
+        
+        // Initialize map when API is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Map will initialize when the toggle button is first clicked
+        });
+
+        // We'll load the API dynamically to handle errors better
+        window.mapInitialized = false;
+        window.mapError = false;
+        
+        function loadGoogleMapsScript() {
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA8isdmQgA51XoH-UfGCCXpYXghm3aeZvs&libraries=places&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            script.onerror = function() {
+                handleMapError('Failed to load Google Maps API');
+            };
+            document.head.appendChild(script);
+            
+            // Set a timeout in case the API doesn't load
+            setTimeout(function() {
+                if (!window.mapInitialized && !window.mapError) {
+                    handleMapError('Google Maps API took too long to load');
+                }
+            }, 5000);
+        }
+        
+        function handleMapError(errorMessage) {
+            window.mapError = true;
+            console.error('Google Maps Error:', errorMessage);
+            const mapContainer = document.getElementById('map-container');
+            if (mapContainer) {
+                mapContainer.innerHTML = `
+                    <div style="padding: 20px; text-align: center; background: #f8f9fa;">
+                        <p><i class="fas fa-exclamation-circle" style="font-size: 24px; color: #dc3545;"></i></p>
+                        <h4>Map could not be loaded</h4>
+                        <p>${errorMessage}</p>
+                        <p>Please try entering your address manually.</p>
+                    </div>
+                `;
+                mapContainer.style.display = 'block';
+            }
+        }
+        
+        // Global function that Google Maps will call
+        window.initMap = function() {
+            window.mapInitialized = true;
+            // The actual initialization will happen when user clicks the button
+        };
+    </script>
+
+    <!-- Optional: Minimal Autocomplete Script (No Maps Needed) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple helper to load scripts asynchronously
+            function loadScript(url, callback) {
+                const script = document.createElement('script');
+                script.src = url;
+                script.async = true;
+                script.defer = true;
+                script.onload = callback || function(){};
+                script.onerror = function() {
+                    console.warn('Failed to load script:', url);
+                };
+                document.head.appendChild(script);
+            }
+            
+            // Only load the Places API when the user focuses on an address field
+            const addressFields = document.querySelectorAll('.address-field');
+            let placesLoaded = false;
+            
+            addressFields.forEach(field => {
+                field.addEventListener('focus', function() {
+                    if (!placesLoaded) {
+                        loadScript('https://cdn.jsdelivr.net/npm/places.js@1.19.0', function() {
+                            if (window.places) {
+                                initPlacesAutocomplete();
+                                placesLoaded = true;
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Initialize Algolia Places (works without Google Maps)
+            function initPlacesAutocomplete() {
+                const streetField = document.getElementById('street_address');
+                if (streetField && window.places) {
+                    const placesInstance = places({
+                        container: streetField,
+                        type: 'address',
+                        templates: {
+                            value: function(suggestion) {
+                                return suggestion.name;
+                            }
+                        }
+                    });
+                    
+                    placesInstance.on('change', function(e) {
+                        // Fill other address fields based on selection
+                        document.getElementById('city').value = e.suggestion.city || '';
+                        document.getElementById('state').value = e.suggestion.administrative || '';
+                        document.getElementById('postal_code').value = e.suggestion.postcode || '';
+                        document.getElementById('country').value = e.suggestion.country || '';
+                    });
+                }
+            }
+        });
+    </script>
+
+    <!-- Compile complete address from separate fields for submission -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    const streetAddress = document.getElementById('street_address').value;
+                    const city = document.getElementById('city').value;
+                    const state = document.getElementById('state').value;
+                    const postalCode = document.getElementById('postal_code').value;
+                    const country = document.getElementById('country').value;
+                    const notes = document.getElementById('address_notes').value.trim();
+                    
+                    // Compile full address
+                    let fullAddress = streetAddress;
+                    if (city) fullAddress += ', ' + city;
+                    if (state) fullAddress += ', ' + state;
+                    if (postalCode) fullAddress += ' ' + postalCode;
+                    if (country) fullAddress += ', ' + country;
+                    if (notes) fullAddress += '\n\nNotes: ' + notes;
+                    
+                    // Set the hidden input value for the full address
+                    document.getElementById('full_address').value = fullAddress;
+                });
+            }
+            
+            // Add simple autocomplete for country field
+            const countryInput = document.getElementById('country');
+            if (countryInput) {
+                const countries = [
+                    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
+                    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
+                    "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
+                    "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso",
+                    "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic",
+                    "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia",
+                    "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica",
+                    "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
+                    "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia",
+                    "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau",
+                    "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq",
+                    "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya",
+                    "Kiribati", "Korea, North", "Korea, South", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos",
+                    "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania",
+                    "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+                    "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova",
+                    "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia",
+                    "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
+                    "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama",
+                    "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar",
+                    "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
+                    "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+                    "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore",
+                    "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan",
+                    "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan",
+                    "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga",
+                    "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda",
+                    "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
+                    "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia",
+                    "Zimbabwe"
+                ];
+                
+                // Create suggestions dropdown
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.className = 'suggestion-dropdown';
+                countryInput.parentNode.style.position = 'relative';
+                countryInput.parentNode.appendChild(suggestionDiv);
+                
+                // Add input event
+                countryInput.addEventListener('input', function() {
+                    const value = this.value.toLowerCase();
+                    if (value.length < 1) {
+                        suggestionDiv.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Filter countries
+                    const matches = countries.filter(country => 
+                        country.toLowerCase().includes(value)
+                    ).slice(0, 10); // Limit to 10 results
+                    
+                    if (matches.length > 0) {
+                        suggestionDiv.innerHTML = '';
+                        matches.forEach(match => {
+                            const item = document.createElement('div');
+                            item.className = 'suggestion-item';
+                            item.textContent = match;
+                            item.addEventListener('click', function() {
+                                countryInput.value = match;
+                                suggestionDiv.style.display = 'none';
+                            });
+                            suggestionDiv.appendChild(item);
+                        });
+                        suggestionDiv.style.display = 'block';
+                    } else {
+                        suggestionDiv.style.display = 'none';
+                    }
+                });
+                
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (e.target !== countryInput) {
+                        suggestionDiv.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Compile complete address from separate fields for submission -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    // No need to recompile here, we're saving address on the "Add" button click
+                    // But make sure the full_address field is set if not already
+                    if (!document.getElementById('full_address').value && document.getElementById('street_address').value) {
+                        saveToAddressField();
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Save address form fields to the main address textarea -->
+    <script>
+        function saveToAddressField() {
+            const streetAddress = document.getElementById('street_address').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const postalCode = document.getElementById('postal_code').value;
+            const country = document.getElementById('country').value;
+            
+            if (!streetAddress) {
+                alert('Please enter at least a street address');
+                return;
+            }
+            
+            // Compile address
+            let fullAddress = streetAddress;
+            if (city) fullAddress += ', ' + city;
+            if (state) fullAddress += ', ' + state;
+            if (postalCode) fullAddress += ' ' + postalCode;
+            if (country) fullAddress += ', ' + country;
+            
+            // Set the address field and hidden input
+            const addressField = document.getElementById('address');
+            addressField.value = fullAddress;
+            document.getElementById('full_address').value = fullAddress;
+            
+            expandTextarea(addressField);
+            
+            // Optional: Clear the form fields
+            document.getElementById('street_address').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('postal_code').value = '';
+            document.getElementById('country').value = '';
+            
+            // Show confirmation
+            alert('Address has been added');
+        }
+    </script>
+
+    <!-- Add notes to the existing address -->
+    <script>
+        function addNotesToAddress() {
+            const notes = document.getElementById('address_notes').value.trim();
+            if (!notes) {
+                alert('Please enter address notes to add');
+                return;
+            }
+            
+            const addressField = document.getElementById('address');
+            let currentAddress = addressField.value;
+            
+            if (!currentAddress) {
+                alert('Please add an address first');
+                return;
+            }
+            
+            // Add notes to address
+            if (currentAddress.includes('Notes:')) {
+                // Replace existing notes
+                currentAddress = currentAddress.split('Notes:')[0].trim();
+            }
+            
+            const updatedAddress = currentAddress + '\n\nNotes: ' + notes;
+            
+            // Update fields
+            addressField.value = updatedAddress;
+            document.getElementById('full_address').value = updatedAddress;
+            
+            expandTextarea(addressField);
+            document.getElementById('address_notes').value = '';
+            
+            // Show confirmation
+            alert('Notes have been added to the address');
+        }
+    </script>
+
+    <!-- Save full address including notes with a single button -->
+    <script>
+        function saveFullAddressWithNotes() {
+            const streetAddress = document.getElementById('street_address').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const postalCode = document.getElementById('postal_code').value;
+            const country = document.getElementById('country').value;
+            const notes = document.getElementById('address_notes').value.trim();
+            
+            if (!streetAddress) {
+                alert('Please enter at least a street address');
+                return;
+            }
+            
+            // Compile address
+            let fullAddress = streetAddress;
+            if (city) fullAddress += ', ' + city;
+            if (state) fullAddress += ', ' + state;
+            if (postalCode) fullAddress += ' ' + postalCode;
+            if (country) fullAddress += ', ' + country;
+            
+            // Add notes if provided
+            if (notes) {
+                fullAddress += '\n\nNotes: ' + notes;
+            }
+            
+            // Set the address field and hidden input
+            const addressField = document.getElementById('address');
+            addressField.value = fullAddress;
+            document.getElementById('full_address').value = fullAddress;
+            
+            expandTextarea(addressField);
+            
+            // Clear the form fields
+            document.getElementById('street_address').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('postal_code').value = '';
+            document.getElementById('country').value = '';
+            document.getElementById('address_notes').value = '';
+            
+            // Show confirmation
+            alert('Address has been added');
         }
     </script>
 </body>
