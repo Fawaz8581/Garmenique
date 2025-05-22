@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminAuthController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Support\Facades\Auth;
@@ -51,8 +50,19 @@ Route::get('/women', function () {
 
 // Account routes
 Route::middleware(['auth'])->group(function () {
+    // Profile routes
     Route::get('/account/settings', [AccountController::class, 'showSettings'])->name('account.settings');
-    Route::post('/account/settings', [AccountController::class, 'updateProfile'])->name('account.update');
+    Route::post('/account/profile', [AccountController::class, 'updateProfile'])->name('account.update.profile');
+    
+    // Password routes
+    Route::get('/account/password', [AccountController::class, 'showPassword'])->name('account.password');
+    Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.update.password');
+    
+    // Contact routes
+    Route::get('/account/contact', [AccountController::class, 'showContact'])->name('account.contact');
+    Route::post('/account/contact', [AccountController::class, 'updateContact'])->name('account.update.contact');
+    
+    // Orders routes
     Route::get('/account/orders', [AccountController::class, 'showOrders'])->name('account.orders');
 });
 
@@ -92,7 +102,9 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
     Route::post('/admin/login', [AdminAuthController::class, 'login']);
 
     Route::middleware(['auth', 'admin'])->group(function () {
-        Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/admin/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
     });
 });
 

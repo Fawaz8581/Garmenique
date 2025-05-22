@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Garmenique - Your Orders</title>
+    <title>Garmenique - Change Password</title>
     <meta name="keyword" content="Garmenique">
     <meta name="description" content="Garmenique - Premium Clothing Brand">
 
@@ -24,6 +24,7 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
 </head>
 <body ng-app="garmeniqueApp">
     <!-- Header Section -->
@@ -101,24 +102,24 @@
         </div>
     </div>
 
-    <!-- Your Orders Section -->
+    <!-- Account Settings Section -->
     <section class="account-section mt-5 pt-5">
         <div class="account-container mt-5">
             <!-- Spacer -->
             <div class="spacer py-4"></div>
             
             <div class="account-header">
-                <h1>Your Orders</h1>
-                <p>View and track your orders</p>
+                <h1>Account Settings</h1>
+                <p>Manage your account information and preferences</p>
             </div>
             
             <div class="account-content">
                 <div class="account-sidebar">
                     <ul class="account-nav">
                         <li><a href="{{ route('account.settings') }}">Profile Settings</a></li>
-                        <li><a href="{{ route('account.password') }}">Password</a></li>
+                        <li><a href="{{ route('account.password') }}" class="active">Password</a></li>
                         <li><a href="{{ route('account.contact') }}">Contact Information</a></li>
-                        <li><a href="{{ route('account.orders') }}" class="active">Your Orders</a></li>
+                        <li><a href="{{ route('account.orders') }}">Your Orders</a></li>
                         <li><a href="javascript:void(0)" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();">Logout</a></li>
                     </ul>
                     <form id="sidebar-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -127,71 +128,44 @@
                 </div>
                 
                 <div class="account-main">
-                    <!-- If the user has no orders, show empty state -->
-                    <div class="empty-orders">
-                        <i class="fas fa-shopping-bag"></i>
-                        <h3>No orders yet</h3>
-                        <p>When you place an order, it will appear here.</p>
-                        <a href="/catalog" class="shop-now-btn">Start Shopping</a>
-                    </div>
+                    <h2>Change Password</h2>
                     
-                    <!-- Example orders (commented out for now) -->
-                    <!--
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div>
-                                <h3>Order #12345</h3>
-                                <span>Placed on May 15, 2023</span>
-                            </div>
-                            <div>
-                                <span class="badge" style="background-color: #28a745; color: white;">Delivered</span>
-                            </div>
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    <form method="POST" action="{{ route('account.update.password') }}">
+                        @csrf
+                        
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" id="current_password" name="current_password" class="form-control" required>
                         </div>
                         
-                        <div class="order-details">
-                            <div class="order-detail">
-                                <div class="order-label">Total</div>
-                                <div class="order-value">$249.99</div>
-                            </div>
-                            <div class="order-detail">
-                                <div class="order-label">Shipping Address</div>
-                                <div class="order-value">123 Main St, City</div>
-                            </div>
-                            <div class="order-detail">
-                                <div class="order-label">Payment Method</div>
-                                <div class="order-value">Credit Card</div>
-                            </div>
+                        <div class="form-group">
+                            <label for="password">New Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
                         </div>
                         
-                        <div class="order-items">
-                            <h4>Items (3)</h4>
-                            
-                            <div class="order-item">
-                                <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990" class="order-item-image" alt="Classic White Shirt">
-                                <div class="order-item-details">
-                                    <div class="order-item-title">Classic White Shirt</div>
-                                    <div class="order-item-meta">Size: M | Qty: 1 | $59.99</div>
-                                </div>
-                            </div>
-                            
-                            <div class="order-item">
-                                <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246" class="order-item-image" alt="Black Jeans">
-                                <div class="order-item-details">
-                                    <div class="order-item-title">Black Jeans</div>
-                                    <div class="order-item-meta">Size: 32 | Qty: 1 | $89.99</div>
-                                </div>
-                            </div>
-                            
-                            <div class="order-item">
-                                <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d" class="order-item-image" alt="Classic Sneakers">
-                                <div class="order-item-details">
-                                    <div class="order-item-title">Classic Sneakers</div>
-                                    <div class="order-item-meta">Size: 10 | Qty: 1 | $99.99</div>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label for="password_confirmation">Confirm New Password</label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required>
                         </div>
-                    </div>
-                    -->
+                        
+                        <button type="submit" class="btn-save">Update Password</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -260,4 +234,4 @@
     <!-- Scripts -->
     <script src="{{ asset('js/landingpage.js') }}"></script>
 </body>
-</html> 
+</html>

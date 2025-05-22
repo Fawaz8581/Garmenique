@@ -420,7 +420,7 @@
                 </div>
                 
                 <div class="account-main">
-                    <h2>Personal Information</h2>
+                    <h2>Profile Information</h2>
                     
                     @if (session('status'))
                         <div class="alert alert-success">
@@ -438,7 +438,7 @@
                         </div>
                     @endif
                     
-                    <form method="POST" action="{{ route('account.update.profile') }}">
+                    <form method="POST" action="{{ route('account.update') }}">
                         @csrf
                         <div class="form-group">
                             <label for="name">Name</label>
@@ -448,6 +448,90 @@
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input type="email" id="email" name="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <div class="phone-input-container">
+                                <div class="country-select">
+                                    <div class="selected-flag" onclick="toggleCountryDropdown()">
+                                        <div class="country-flag" id="selected-country-flag" style="background-image: url('https://flagcdn.com/w40/id.png')"></div>
+                                        <span class="selected-dial-code">{{ Auth::user()->country_code ?? '+62' }}</span>
+                                        <span class="arrow">▼</span>
+                                    </div>
+                                    <div class="country-dropdown" id="countryDropdown">
+                                        <div class="country-search">
+                                            <input type="text" placeholder="Search countries" id="country-search-input" onkeyup="filterCountries()">
+                                        </div>
+                                        <div class="country-list" id="country-list">
+                                            <!-- Countries will be loaded via JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="tel" id="phone" name="phone_number" class="phone-number-input" placeholder="Enter your phone number" value="{{ Auth::user()->phone_number ?? '' }}">
+                                <input type="hidden" id="country_code" name="country_code" value="{{ Auth::user()->country_code ?? '+62' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" name="address" class="form-control" placeholder="Enter your full address" rows="1" oninput="expandTextarea(this)">{{ Auth::user()->address ?? '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="address-field-container">
+                                <label for="street_address">Street Address</label>
+                                <input type="text" id="street_address" name="street_address" class="address-field address-full-width" placeholder="Enter your street address, building, house number">
+                            </div>
+                            
+                            <div class="address-grid">
+                                <div>
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" name="city" class="address-field" placeholder="City">
+                                </div>
+                                <div>
+                                    <label for="state">State/Province</label>
+                                    <input type="text" id="state" name="state" class="address-field" placeholder="State or province">
+                                </div>
+                            </div>
+                            
+                            <div class="address-grid">
+                                <div>
+                                    <label for="postal_code">Postal Code</label>
+                                    <input type="text" id="postal_code" name="postal_code" class="address-field" placeholder="Postal/ZIP code">
+                                </div>
+                                <div>
+                                    <label for="country">Country</label>
+                                    <input type="text" id="country" name="country" class="address-field" placeholder="Country">
+                                </div>
+                            </div>
+                            
+                            <div class="address-field-container">
+                                <label for="address_notes">Address Notes (Optional)</label>
+                                <textarea id="address_notes" name="address_notes" class="form-control" rows="2" placeholder="Landmark, delivery instructions, etc."></textarea>
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: 10px;">
+                                <button type="button" class="btn-save" onclick="saveFullAddressWithNotes()">Add</button>
+                            </div>
+                        </div>
+                        
+                        <h3>Change Password</h3>
+                        <p class="text-muted">Leave password fields empty if you don't want to change it.</p>
+                        
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" id="current_password" name="current_password" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">New Password</label>
+                            <input type="password" id="password" name="password" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password_confirmation">Confirm New Password</label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control">
                         </div>
                         
                         <button type="submit" class="btn-save">Save Changes</button>
