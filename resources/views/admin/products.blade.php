@@ -39,17 +39,9 @@
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </li>
-            <li class="menu-item">
-                <i class="fas fa-users"></i>
-                <span>Customers</span>
-            </li>
             <li class="menu-item active">
                 <i class="fas fa-box"></i>
                 <span>Products</span>
-            </li>
-            <li class="menu-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Analytics</span>
             </li>
             <li class="menu-item">
                 <i class="fas fa-envelope"></i>

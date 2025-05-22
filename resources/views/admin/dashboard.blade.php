@@ -18,17 +18,9 @@
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </li>
-            <li class="menu-item">
-                <i class="fas fa-users"></i>
-                <span>Customers</span>
-            </li>
             <li class="menu-item" id="products-link">
                 <i class="fas fa-box"></i>
                 <span>Products</span>
-            </li>
-            <li class="menu-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Analytics</span>
             </li>
             <li class="menu-item">
                 <i class="fas fa-envelope"></i>
@@ -72,7 +64,7 @@
         <!-- Dashboard Cards -->
         <div class="dashboard-cards">
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-6 mb-4">
                     <div class="dashboard-card">
                         <div class="d-flex align-items-start">
                             <div>
@@ -95,7 +87,7 @@
                     </div>
                 </div>
                 
-                <div class="col-md-4 mb-4">
+                <div class="col-md-6 mb-4">
                     <div class="dashboard-card">
                         <div class="d-flex align-items-start">
                             <div>
@@ -117,35 +109,12 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="col-md-4 mb-4">
-                    <div class="dashboard-card">
-                        <div class="d-flex align-items-start">
-                            <div>
-                                <div class="card-icon icon-revenue">
-                                    <i class="fas fa-chart-bar"></i>
-                                </div>
-                                <h3 class="card-title">Total Revenue</h3>
-                                <h2 class="card-value">$58,542</h2>
-                                <p class="card-period">Last 24 Hours</p>
-                            </div>
-                            <div class="progress-container">
-                                <svg class="progress-circle">
-                                    <circle cx="40" cy="40" r="35" fill="none" stroke="#eee" stroke-width="5"></circle>
-                                    <circle cx="40" cy="40" r="35" fill="none" stroke="#2a5298" stroke-width="5" 
-                                            stroke-dasharray="220" stroke-dashoffset="55" transform="rotate(-90 40 40)"></circle>
-                                </svg>
-                                <div class="progress-percentage">75%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         
         <div class="row">
             <!-- Recent Orders -->
-            <div class="col-lg-8 mb-4">
+            <div class="col-lg-12 mb-4">
                 <div class="updates-section">
                     <h2 class="section-title">Recent Orders</h2>
                     <div class="orders-table table-responsive">
@@ -197,109 +166,6 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Recent Updates -->
-            <div class="col-lg-4 mb-4">
-                <div class="updates-section">
-                    <h2 class="section-title">Recent Updates</h2>
-                    <div class="update-item">
-                        <div class="update-avatar">
-                            <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Emily Johnson">
-                        </div>
-                        <div class="update-content">
-                            <h4 class="update-name">Emily Johnson</h4>
-                            <p class="update-message">Just purchased the new summer collection items</p>
-                        </div>
-                    </div>
-                    <div class="update-item">
-                        <div class="update-avatar">
-                            <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="Alex Martinez">
-                        </div>
-                        <div class="update-content">
-                            <h4 class="update-name">Alex Martinez</h4>
-                            <p class="update-message">Left a 5-star review for Designer Jeans</p>
-                        </div>
-                    </div>
-                    <div class="update-item">
-                        <div class="update-avatar">
-                            <img src="https://randomuser.me/api/portraits/women/3.jpg" alt="Sophia Williams">
-                        </div>
-                        <div class="update-content">
-                            <h4 class="update-name">Sophia Williams</h4>
-                            <p class="update-message">Subscribed to the newsletter</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sales Analytics -->
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="analytics-section">
-                    <h2 class="section-title">Sales Analytics</h2>
-                    <div class="analytics-card mb-3">
-                        <div class="analytics-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="analytics-content">
-                            <h3 class="analytics-title">Online Orders</h3>
-                            <p class="analytics-subtitle">Last seen 2 Hours</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="analytics-value">3849</span>
-                                <span class="analytics-change change-negative">-17%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="analytics-card">
-                        <div class="analytics-icon" style="background-color: #1dd1a1;">
-                            <i class="fas fa-cart-plus"></i>
-                        </div>
-                        <div class="analytics-content">
-                            <h3 class="analytics-title">In-Store Orders</h3>
-                            <p class="analytics-subtitle">Last seen 2 Hours</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="analytics-value">5735</span>
-                                <span class="analytics-change change-positive">+23%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="analytics-section">
-                    <h2 class="section-title">Customer Analytics</h2>
-                    <div class="analytics-card mb-3">
-                        <div class="analytics-icon" style="background-color: #6c5ce7;">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="analytics-content">
-                            <h3 class="analytics-title">New Customers</h3>
-                            <p class="analytics-subtitle">Last seen 24 Hours</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="analytics-value">54</span>
-                                <span class="analytics-change change-positive">+12%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="analytics-card">
-                        <div class="analytics-icon" style="background-color: #fdcb6e;">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="analytics-content">
-                            <h3 class="analytics-title">Total Customers</h3>
-                            <p class="analytics-subtitle">All Time</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="analytics-value">4,287</span>
-                                <span class="analytics-change change-positive">+8%</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
