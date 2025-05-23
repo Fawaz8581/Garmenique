@@ -355,6 +355,9 @@
             
             console.log('Product image URL:', imageUrl); // Debug log to verify image URL
             
+            // Format price with Indonesian number format
+            const formattedPrice = new Intl.NumberFormat('id-ID').format(product.price);
+            
             col.innerHTML = `
                 <div class="product-card" data-id="${product.id}">
                     <div class="product-image">
@@ -363,7 +366,7 @@
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
                         <p class="product-category">${categoryName}</p>
-                        <p class="product-price">IDR ${parseFloat(product.price).toLocaleString('id-ID')}</p>
+                        <p class="product-price">IDR ${formattedPrice}</p>
                         <p class="product-stock">
                             <span class="stock-badge ${statusClass}">${product.status || statusText}</span>
                             <span class="ms-2">${product.stock} in stock</span>
@@ -476,9 +479,14 @@
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const formData = new FormData();
             
+            // Convert price from formatted string to number before sending
+            const price = productData.price.toString().replace(/\./g, '');
+            
             // Append all product data to FormData
             Object.keys(productData).forEach(key => {
-                if (key !== 'image') {
+                if (key === 'price') {
+                    formData.append(key, price);
+                } else if (key !== 'image') {
                     formData.append(key, productData[key]);
                 }
             });
@@ -534,9 +542,14 @@
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const formData = new FormData();
             
+            // Convert price from formatted string to number before sending
+            const price = productData.price.toString().replace(/\./g, '');
+            
             // Append all product data to FormData
             Object.keys(productData).forEach(key => {
-                if (key !== 'image') {
+                if (key === 'price') {
+                    formData.append(key, price);
+                } else if (key !== 'image') {
                     formData.append(key, productData[key]);
                 }
             });
@@ -632,7 +645,8 @@
                         document.getElementById('editProductId').value = product.id;
                         document.getElementById('editProductName').value = product.name;
                         document.getElementById('editProductCategory').value = product.category_id || '';
-                        document.getElementById('editProductPrice').value = product.price;
+                        // Format price in Indonesian format
+                        document.getElementById('editProductPrice').value = new Intl.NumberFormat('id-ID').format(product.price);
                         document.getElementById('editProductStock').value = product.stock;
                         document.getElementById('editProductDescription').value = product.description || '';
                         
@@ -666,9 +680,9 @@
             // Remove non-numeric characters
             let value = input.value.replace(/[^\d]/g, '');
             
-            // Format with thousand separators
+            // Format with thousand separators (Indonesian format)
             if (value.length > 0) {
-                value = parseInt(value).toLocaleString('id-ID');
+                value = new Intl.NumberFormat('id-ID').format(parseInt(value));
             }
             
             input.value = value;

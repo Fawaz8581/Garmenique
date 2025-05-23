@@ -29,12 +29,15 @@ class ProductController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'category_id' => 'required|string', // Validate as string instead of ID
-                'price' => 'required|numeric|min:0',
+                'category_id' => 'required|string',
+                'price' => 'required|string', // Changed to string to accept formatted numbers
                 'stock' => 'nullable|integer|min:0',
                 'image' => 'nullable|image|max:2048', 
                 'description' => 'nullable|string'
             ]);
+
+            // Convert formatted price to integer (remove dots and convert)
+            $price = (int) str_replace('.', '', $request->price);
 
             $status = $request->stock > 0 ? ($request->stock <= 20 ? 'Low Stock' : 'In Stock') : 'Out of Stock';
             
@@ -57,8 +60,8 @@ class ProductController extends Controller
             // Create the product with the category name as string
             $product = Product::create([
                 'name' => $request->name,
-                'category_id' => $request->category_id, // Store as string now
-                'price' => $request->price,
+                'category_id' => $request->category_id,
+                'price' => $price, // Use the converted price
                 'stock' => $request->stock ?? 0,
                 'status' => $status,
                 'description' => $request->description ?? '',
@@ -69,7 +72,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product created successfully',
-                'product' => $product // No need to load relationship
+                'product' => $product
             ]);
         } catch (\Exception $e) {
             Log::error('Error creating product: ' . $e->getMessage());
@@ -88,8 +91,8 @@ class ProductController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'category_id' => 'required|string', // Validate as string
-                'price' => 'required|numeric|min:0',
+                'category_id' => 'required|string',
+                'price' => 'required|string', // Changed to string to accept formatted numbers
                 'stock' => 'nullable|integer|min:0',
                 'image' => 'nullable|image|max:2048',
                 'description' => 'nullable|string'
@@ -97,12 +100,15 @@ class ProductController extends Controller
 
             $product = Product::findOrFail($id);
             
+            // Convert formatted price to integer (remove dots and convert)
+            $price = (int) str_replace('.', '', $request->price);
+            
             $status = $request->stock > 0 ? ($request->stock <= 20 ? 'Low Stock' : 'In Stock') : 'Out of Stock';
             
             $updateData = [
                 'name' => $request->name,
                 'category_id' => $request->category_id,
-                'price' => $request->price,
+                'price' => $price, // Use the converted price
                 'stock' => $request->stock ?? 0,
                 'status' => $status,
                 'description' => $request->description ?? $product->description,
@@ -128,7 +134,7 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product updated successfully',
-                'product' => $product // No need to load relationship
+                'product' => $product
             ]);
         } catch (\Exception $e) {
             Log::error('Error updating product: ' . $e->getMessage());
