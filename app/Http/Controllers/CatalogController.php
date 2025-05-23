@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CatalogController extends Controller
 {
     public function index()
     {
-        // Fetch products with pagination (6 products per page - 2 columns x 3 rows)
-        $products = Product::paginate(6);
+        // Fetch products with pagination and eager load categories
+        $products = Product::with('category')->paginate(6);
         
-        return view('catalog', compact('products'));
+        // Fetch categories with their product counts
+        $categories = Category::withCount('products')->get();
+        
+        return view('catalog', compact('products', 'categories'));
     }
 } 

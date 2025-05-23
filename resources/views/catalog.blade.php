@@ -430,6 +430,20 @@
                 color: #999;
                 background-color: #f8f8f8;
             }
+
+            .price-inputs {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .price-inputs .input-group {
+                width: 100%;
+            }
+
+            .price-inputs input {
+                text-align: right;
+            }
         </style>
     </head>
     <body>
@@ -541,40 +555,12 @@
                 <div class="col-md-3 filters-section">
                     <div class="filter-group">
                         <h3 class="filter-heading">Categories</h3>
+                        @foreach($categories as $category)
                         <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="tshirt"> 
-                            T-shirt (<span class="category-count" data-category="tshirt">0</span>)
+                            <input type="checkbox" class="category-filter" data-category="{{ $category->slug }}"> 
+                            {{ $category->name }} (<span class="category-count" data-category="{{ $category->slug }}">{{ $category->products_count }}</span>)
                         </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="shirt"> 
-                            Shirt (<span class="category-count" data-category="shirt">0</span>)
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="jackets"> 
-                            Jackets (<span class="category-count" data-category="jackets">0</span>)
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="pants"> 
-                            Pants (<span class="category-count" data-category="pants">0</span>)
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="category-filter" data-category="hoodie"> 
-                            Hoodie (<span class="category-count" data-category="hoodie">0</span>)
-                        </label>
-                    </div>
-
-                    <div class="filter-group">
-                        <h3 class="filter-heading">Color</h3>
-                        <div>
-                            <span class="color-swatch" style="background-color: #000000;" data-color="black" title="Black"></span>
-                            <span class="color-swatch" style="background-color: #003366;" data-color="navy" title="Navy"></span>
-                            <span class="color-swatch" style="background-color: #663300;" data-color="brown" title="Brown"></span>
-                            <span class="color-swatch" style="background-color: #999999;" data-color="grey" title="Grey"></span>
-                            <span class="color-swatch" style="background-color: #0066cc;" data-color="blue" title="Blue"></span>
-                            <span class="color-swatch" style="background-color: #ffffff; border: 1px solid #ddd;" data-color="white" title="White"></span>
-                            <span class="color-swatch" style="background-color: #cc3333;" data-color="red" title="Red"></span>
-                            <span class="color-swatch" style="background-color: #cc9966;" data-color="beige" title="Beige"></span>
-                        </div>
+                        @endforeach
                     </div>
 
                     <div class="filter-group">
@@ -592,11 +578,15 @@
                     <div class="filter-group">
                         <h3 class="filter-heading">Price Range</h3>
                         <div class="mb-3">
-                            <input type="range" class="form-range" id="priceRange" min="0" max="500000" value="250000">
-                            <div class="d-flex justify-content-between">
-                                <span>IDR 0</span>
-                                <span class="price-range-value">IDR {{ number_format(250000, 0, ',', '.') }}</span>
-                                <span>IDR {{ number_format(500000, 0, ',', '.') }}</span>
+                            <div class="price-inputs">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text">IDR</span>
+                                    <input type="text" class="form-control price-input" id="minPrice" placeholder="Min">
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text">IDR</span>
+                                    <input type="text" class="form-control price-input" id="maxPrice" placeholder="Max">
+                                </div>
                             </div>
                         </div>
                         
@@ -627,7 +617,7 @@
                     <div class="row mt-5 pt-3" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
-                            <div class="col-md-6 product-card mb-5" data-category="{{ $product->category_id ?? 'uncategorized' }}" data-price="{{ $product->price }}">
+                            <div class="col-md-6 product-card mb-5" data-category="{{ $product->category->slug ?? 'uncategorized' }}" data-price="{{ $product->price }}">
                                 <div class="product-container">
                                 <div class="product-image">
                                     <a href="/catalog/product/{{ $product->id }}">
@@ -642,15 +632,10 @@
                                     <h3 class="product-title">
                                         <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
                                             </h3>
-                                    <p class="product-brand">{{ $product->category_name ?? 'Uncategorized' }}</p>
+                                    <p class="product-brand">{{ $product->category->name ?? 'Uncategorized' }}</p>
                                             <div class="product-price">
                                             <span>IDR {{ number_format($product->price, 0, ',', '.') }}</span>
                                             </div>
-                                    <div class="color-dots">
-                                        <span class="color-dot" style="background-color: #000"></span>
-                                        <span class="color-dot" style="background-color: #663300"></span>
-                                        <span class="color-dot" style="background-color: #999"></span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -735,8 +720,8 @@
         <script>
             // Legacy non-angular code for filters
             document.addEventListener('DOMContentLoaded', function() {
-                // Define static categories and count products for each category
-                const categories = ['tshirt', 'shirt', 'jackets', 'pants', 'hoodie'];
+                // Get categories from PHP
+                const categories = @json($categories->pluck('slug'));
                 
                 // Count products per category
                 categories.forEach(category => {
@@ -745,15 +730,6 @@
                     if (categoryCountEl) {
                         categoryCountEl.textContent = productsInCategory;
                     }
-                });
-                
-                // Toggle color swatches
-                const colorSwatches = document.querySelectorAll('.color-swatch');
-                colorSwatches.forEach(swatch => {
-                    swatch.addEventListener('click', function() {
-                        swatch.classList.toggle('active');
-                        filterProducts();
-                    });
                 });
                 
                 // Toggle size buttons
@@ -779,27 +755,30 @@
                     });
                 }
                 
-                // Price range functionality
-                const priceRange = document.getElementById('priceRange');
-                const priceRangeValue = document.querySelector('.price-range-value');
-                
-                if (priceRange) {
-                    priceRange.addEventListener('input', function() {
-                        // Update displayed value
-                        if (priceRangeValue) {
-                            priceRangeValue.textContent = 'IDR ' + Number(this.value).toLocaleString('id-ID');
+                // Price input formatting
+                const priceInputs = document.querySelectorAll('.price-input');
+                priceInputs.forEach(input => {
+                    input.addEventListener('input', function(e) {
+                        // Remove non-numeric characters
+                        let value = this.value.replace(/\D/g, '');
+                        
+                        // Format with thousand separators
+                        if (value.length > 0) {
+                            value = parseInt(value).toLocaleString('id-ID');
                         }
+                        
+                        this.value = value;
                         filterProducts();
                     });
-                }
+                });
                 
                 // Product filtering function
                 function filterProducts() {
                     const products = document.querySelectorAll('.product-card');
                     const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.dataset.category);
-                    const selectedColors = Array.from(document.querySelectorAll('.color-swatch.active')).map(swatch => swatch.dataset.color);
                     const selectedSizes = Array.from(document.querySelectorAll('.size-btn.active')).map(btn => btn.textContent.trim());
-                    const maxPrice = parseInt(priceRange.value);
+                    const minPrice = parseInt(document.getElementById('minPrice').value.replace(/\D/g, '')) || 0;
+                    const maxPrice = parseInt(document.getElementById('maxPrice').value.replace(/\D/g, '')) || Infinity;
                     
                     let visibleCount = 0;
                     
@@ -810,25 +789,20 @@
                         // Apply filters
                         let showProduct = true;
                         
-                        // Category filter
+                        // Category filter - only apply if categories are selected
                         if (selectedCategories.length > 0 && !selectedCategories.includes(productCategory)) {
                             showProduct = false;
                         }
                         
-                        // Price filter
-                        if (productPrice > maxPrice) {
+                        // Price filter - only apply if price is outside range
+                        if (productPrice < minPrice || (maxPrice !== Infinity && productPrice > maxPrice)) {
                             showProduct = false;
                         }
                         
-                        // Color filter - would need product to have data-colors attribute
-                        // Size filter - would need product to have data-sizes attribute
-                        
                         // Show/hide based on filters
+                        product.style.display = showProduct ? '' : 'none';
                         if (showProduct) {
-                            product.style.display = '';
                             visibleCount++;
-                        } else {
-                            product.style.display = 'none';
                         }
                     });
                     
@@ -879,23 +853,15 @@
                             checkbox.checked = false;
                         });
                         
-                        // Reset color swatches
-                        colorSwatches.forEach(swatch => {
-                            swatch.classList.remove('active');
-                        });
-                        
                         // Reset size buttons
                         sizeButtons.forEach(btn => {
                             btn.classList.remove('active');
                         });
                         
-                        // Reset price range
-                        if (priceRange) {
-                            priceRange.value = 250000;
-                            if (priceRangeValue) {
-                                priceRangeValue.textContent = 'IDR ' + Number(250000).toLocaleString('id-ID');
-                            }
-                        }
+                        // Reset price inputs
+                        priceInputs.forEach(input => {
+                            input.value = '';
+                        });
                         
                         // Reset sort select
                         if (sortSelect) {
