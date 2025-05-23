@@ -267,23 +267,11 @@
                 .then(response => response.json())
                 .then(data => {
                     products = data;
-                    
-                    // Add category_name property to products for display
+                    console.log('Products received:', products); // Debug log
                     products.forEach(product => {
-                        if (product.category_id) {
-                            const categoryMap = {
-                                "tshirt": "T-shirt",
-                                "shirt": "Shirt",
-                                "jackets": "Jackets",
-                                "pants": "Pants",
-                                "hoodie": "Hoodie"
-                            };
-                            product.category_name = categoryMap[product.category_id] || 'Uncategorized';
-                        } else {
-                            product.category_name = 'Uncategorized';
-                        }
+                        console.log('Product category_id:', product.category_id); // Debug log
+                        console.log('Product category_name:', product.category_name); // Debug log
                     });
-                    
                     renderProducts(products);
                     loadingIndicator.classList.add('d-none');
                     
@@ -476,6 +464,7 @@
         
         // Create a new product
         function createProduct(productData) {
+            console.log('Creating product with data:', productData); // Debug log
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const formData = new FormData();
             
@@ -489,6 +478,7 @@
                 } else if (key !== 'image') {
                     formData.append(key, productData[key]);
                 }
+                console.log(`Appending ${key}:`, key === 'price' ? price : productData[key]); // Debug log
             });
             
             // Append the image file if exists
@@ -539,6 +529,7 @@
         
         // Update a product
         function updateProduct(id, productData) {
+            console.log('Updating product with data:', productData); // Debug log
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const formData = new FormData();
             
@@ -552,6 +543,7 @@
                 } else if (key !== 'image') {
                     formData.append(key, productData[key]);
                 }
+                console.log(`Appending ${key}:`, key === 'price' ? price : productData[key]); // Debug log
             });
             
             // Append the image file if exists

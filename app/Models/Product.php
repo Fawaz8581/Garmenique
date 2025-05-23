@@ -43,7 +43,7 @@ class Product extends Model
      *
      * @var array
      */
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'category_name'];
     
     /**
      * Get the image URL for display.

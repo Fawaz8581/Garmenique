@@ -164,8 +164,13 @@ class ProductController extends Controller
      */
     public function getProducts()
     {
-        // Get products without loading the category relationship
-        $products = Product::all();
+        // Get products and transform them to include category_name
+        $products = Product::all()->map(function($product) {
+            $data = $product->toArray();
+            $data['category_name'] = $product->category_name;
+            return $data;
+        });
+        
         return response()->json($products);
     }
 } 
