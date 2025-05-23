@@ -35,8 +35,7 @@ class Product extends Model
      */
     protected $casts = [
         'images' => 'array',
-        'featured' => 'boolean',
-        'price' => 'decimal:2'
+        'featured' => 'boolean'
     ];
 
     /**
@@ -59,6 +58,35 @@ class Product extends Model
         }
         
         return null;
+    }
+
+    /**
+     * Get the price for array/JSON serialization.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function getPriceAttribute($value)
+    {
+        // Return the raw value without decimal places
+        return (int) $value;
+    }
+
+    /**
+     * Set the price attribute.
+     *
+     * @param  mixed  $value
+     * @return void
+     */
+    public function setPriceAttribute($value)
+    {
+        // If the value is a string with dots (formatted), convert it
+        if (is_string($value) && str_contains($value, '.')) {
+            $value = (int) str_replace('.', '', $value);
+        }
+        
+        // Store as integer without decimal places
+        $this->attributes['price'] = $value;
     }
     
     /**
