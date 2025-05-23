@@ -38,7 +38,7 @@
                 <nav class="main-nav" ng-class="{'active': isNavActive}">
                     <ul>
                         <li><a href="/" class="nav-item">HOME</a></li>
-                        <li><a href="/catalog" class="nav-item">SHOP</a></li>
+                        <li><a href="/catalog" class="nav-item">CATALOG</a></li>
                         <li><a href="/blog" class="nav-item">BLOG</a></li>
                         <li><a href="/about" class="nav-item active">ABOUT</a></li>
                         <li><a href="/contact" class="nav-item">CONTACT</a></li>
