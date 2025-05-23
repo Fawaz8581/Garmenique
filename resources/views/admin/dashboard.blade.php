@@ -18,9 +18,13 @@
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </li>
-            <li class="menu-item" id="products-link">
+            <li class="menu-item">
                 <i class="fas fa-box"></i>
                 <span>Products</span>
+            </li>
+            <li class="menu-item">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
             </li>
             <li class="menu-item">
                 <i class="fas fa-envelope"></i>
@@ -184,19 +188,28 @@
             document.getElementById('sidebar').classList.toggle('active');
         });
         
-        // Products link click
-        document.getElementById('products-link').addEventListener('click', function() {
-            window.location.href = '/admin/products';
-        });
-        
-        // Menu item click
-        const menuItems = document.querySelectorAll('.menu-item');
-        menuItems.forEach(item => {
+        // Menu items click
+        document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function() {
+                const menuText = this.querySelector('span').textContent;
+                
                 // Remove active class from all items
-                menuItems.forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 // Add active class to clicked item
                 this.classList.add('active');
+                
+                // Handle navigation
+                switch(menuText) {
+                    case 'Dashboard':
+                        window.location.href = '/admin';
+                        break;
+                    case 'Products':
+                        window.location.href = '/admin/products';
+                        break;
+                    case 'Categories':
+                        window.location.href = '/admin/categories';
+                        break;
+                }
                 
                 // Close sidebar on mobile after navigation
                 if (window.innerWidth < 992) {

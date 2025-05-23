@@ -19,7 +19,6 @@ class Product extends Model
         'name',
         'description',
         'price',
-        'stock',
         'category_id',
         'status',
         'featured',
@@ -43,7 +42,7 @@ class Product extends Model
      *
      * @var array
      */
-    protected $appends = ['image_url', 'category_name'];
+    protected $appends = ['image_url', 'category_name', 'total_stock', 'sizes', 'available_sizes'];
     
     /**
      * Get the image URL for display.
@@ -109,5 +108,70 @@ class Product extends Model
         ];
         
         return $categoryMap[$this->category_id] ?? ucfirst($this->category_id);
+    }
+
+    /**
+     * Get the total stock across all sizes
+     */
+    public function getTotalStockAttribute()
+    {
+        return $this->sizes()->sum('stock');
+    }
+
+    /**
+     * Get the sizes relationship
+     */
+    public function sizes()
+    {
+        return $this->hasMany(ProductSize::class);
+    }
+
+    /**
+     * Get available sizes for the current category
+     */
+    public function getAvailableSizesAttribute()
+    {
+        return ProductSize::getAvailableSizes($this->category_id);
+    }
+
+    /**
+     * Get sizes with stock information
+     */
+    public function getSizesAttribute()
+    {
+        // Get all sizes for this product
+        $sizes = $this->sizes()->get();
+        \Log::info("Getting sizes for product {$this->id}:", [
+            'raw_sizes' => $sizes->toArray()
+        ]);
+        
+        $sizeData = [];
+        
+        // Get available sizes based on category
+        $availableSizes = $this->category_id === 'pants' ? 
+            array_map('strval', range(29, 35)) : 
+            ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+            
+        \Log::info("Available sizes for product {$this->id}:", [
+            'category' => $this->category_id,
+            'available_sizes' => $availableSizes
+        ]);
+        
+        // Initialize all available sizes with 0 stock
+        foreach ($availableSizes as $size) {
+            $sizeData[$size] = 0;
+        }
+        
+        // Update stock for existing sizes
+        foreach ($sizes as $size) {
+            $sizeData[$size->size] = (int)$size->stock;
+            \Log::info("Setting size {$size->size} stock to {$size->stock} for product {$this->id}");
+        }
+        
+        \Log::info("Final size data for product {$this->id}:", [
+            'size_data' => $sizeData
+        ]);
+        
+        return $sizeData;
     }
 } 

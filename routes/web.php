@@ -88,6 +88,7 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
     })->name('admin.dashboard');
 
     Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products');
+    Route::get('/admin/categories', [CategoryController::class, 'showCategories'])->name('admin.categories');
     
     // Product Management API Routes
     Route::get('/admin/api/products', [ProductController::class, 'getProducts']);
@@ -97,6 +98,9 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
     
     // Category API Routes
     Route::get('/admin/api/categories', [CategoryController::class, 'index']);
+    Route::post('/admin/api/categories', [CategoryController::class, 'store']);
+    Route::put('/admin/api/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/admin/api/categories/{id}', [CategoryController::class, 'destroy']);
 
     Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/admin/login', [AdminAuthController::class, 'login']);
