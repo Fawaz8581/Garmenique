@@ -57,10 +57,6 @@
                 <span class="notification-badge">14</span>
             </li>
             <li class="menu-item">
-                <i class="fas fa-file-alt"></i>
-                <span>Reports</span>
-            </li>
-            <li class="menu-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </li>
