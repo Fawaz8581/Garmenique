@@ -12,7 +12,7 @@ class CategoryController extends Controller
     /**
      * Show the categories management page.
      */
-    public function showCategories()
+    public function show()
     {
         return view('admin.categories');
     }

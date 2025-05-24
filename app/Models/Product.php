@@ -34,7 +34,8 @@ class Product extends Model
      */
     protected $casts = [
         'images' => 'array',
-        'featured' => 'boolean'
+        'featured' => 'boolean',
+        'price' => 'integer'
     ];
 
     /**
@@ -51,11 +52,9 @@ class Product extends Model
      */
     public function getImageUrlAttribute()
     {
-        // Use images array - for file path approach
         if (!empty($this->images) && is_array($this->images)) {
             return asset($this->images[0]);
         }
-        
         return null;
     }
 
@@ -103,11 +102,7 @@ class Product extends Model
      */
     public function getCategoryNameAttribute()
     {
-        if (!$this->category) {
-            return 'Uncategorized';
-        }
-        
-        return $this->category->name;
+        return $this->category ? $this->category->name : 'Uncategorized';
     }
 
     /**
@@ -123,7 +118,9 @@ class Product extends Model
      */
     public function sizes()
     {
-        return $this->hasMany(ProductSize::class);
+        return $this->belongsToMany(Size::class, 'product_sizes')
+                    ->withPivot('stock')
+                    ->withTimestamps();
     }
 
     /**
@@ -139,33 +136,23 @@ class Product extends Model
      */
     public function getSizesAttribute()
     {
-        // Get all sizes for this product
-        $sizes = $this->sizes()->get();
+        // Get all sizes for this product with their pivot data
+        $productSizes = $this->sizes()->withPivot('stock')->get();
+        
         \Log::info("Getting sizes for product {$this->id}:", [
-            'raw_sizes' => $sizes->toArray()
+            'raw_sizes' => $productSizes->toArray()
         ]);
         
         $sizeData = [];
         
-        // Get available sizes based on category
-        $availableSizes = $this->category_id === 'pants' ? 
-            array_map('strval', range(29, 35)) : 
-            ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-            
-        \Log::info("Available sizes for product {$this->id}:", [
-            'category' => $this->category_id,
-            'available_sizes' => $availableSizes
-        ]);
-        
-        // Initialize all available sizes with 0 stock
-        foreach ($availableSizes as $size) {
-            $sizeData[$size] = 0;
-        }
-        
-        // Update stock for existing sizes
-        foreach ($sizes as $size) {
-            $sizeData[$size->size] = (int)$size->stock;
-            \Log::info("Setting size {$size->size} stock to {$size->stock} for product {$this->id}");
+        // Map each size to its stock value
+        foreach ($productSizes as $size) {
+            $sizeData[$size->name] = [
+                'id' => $size->id,
+                'name' => $size->name,
+                'type' => $size->type,
+                'stock' => (int)$size->pivot->stock
+            ];
         }
         
         \Log::info("Final size data for product {$this->id}:", [

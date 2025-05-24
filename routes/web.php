@@ -6,6 +6,8 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SizeController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -83,33 +85,38 @@ Route::get('/product/{id}', function ($id) {
 
 // Admin Dashboard routes
 Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    // Admin Dashboard
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products');
-    Route::get('/admin/categories', [CategoryController::class, 'showCategories'])->name('admin.categories');
+    // Admin Pages
+    Route::get('/admin/products', [ProductController::class, 'show'])->name('admin.products');
+    Route::get('/admin/categories', [CategoryController::class, 'show'])->name('admin.categories');
+    Route::get('/admin/sizes', [SizeController::class, 'show'])->name('admin.sizes');
     
     // Product Management API Routes
-    Route::get('/admin/api/products', [ProductController::class, 'getProducts']);
-    Route::post('/admin/api/products', [ProductController::class, 'store']);
-    Route::put('/admin/api/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/admin/api/products/{id}', [ProductController::class, 'destroy']);
-    
-    // Category API Routes
-    Route::get('/admin/api/categories', [CategoryController::class, 'index']);
-    Route::post('/admin/api/categories', [CategoryController::class, 'store']);
-    Route::put('/admin/api/categories/{id}', [CategoryController::class, 'update']);
-    Route::delete('/admin/api/categories/{id}', [CategoryController::class, 'destroy']);
+    Route::prefix('admin/api')->group(function () {
+        // Products
+        Route::get('/products', [ProductController::class, 'index']);
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+        
+        // Categories
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::put('/categories/{id}', [CategoryController::class, 'update']);
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
+        // Sizes
+        Route::get('/sizes', [SizeController::class, 'index']);
+        Route::post('/sizes', [SizeController::class, 'store']);
+        Route::put('/sizes/{id}', [SizeController::class, 'update']);
+        Route::delete('/sizes/{id}', [SizeController::class, 'destroy']);
+    });
+
+    // Admin Authentication
     Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/admin/login', [AdminAuthController::class, 'login']);
-
-    Route::middleware(['auth', 'admin'])->group(function () {
-        Route::get('/admin/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
-    });
 });
 
 // Cart data management routes

@@ -23,5 +23,9 @@ class DatabaseSeeder extends Seeder
 
         // Seed categories
         $this->call(CategorySeeder::class);
+
+        $this->call([
+            SizeSeeder::class,
+        ]);
     }
 }

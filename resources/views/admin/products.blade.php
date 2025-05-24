@@ -48,6 +48,10 @@
                 <span>Categories</span>
             </li>
             <li class="menu-item">
+                <i class="fas fa-ruler"></i>
+                <span>Sizes</span>
+            </li>
+            <li class="menu-item">
                 <i class="fas fa-envelope"></i>
                 <span>Messages</span>
                 <span class="notification-badge">14</span>
@@ -144,92 +148,36 @@
                                 <label class="form-label">Stock by Size</label>
                                 <div class="mb-2">
                                     <select class="form-select" id="sizeType">
-                                        <option value="letter">Letter Size (XS-XXL)</option>
-                                        <option value="number">Number Size (29-35)</option>
+                                        <option value="clothing">Clothing Size</option>
+                                        <option value="number">Number Size</option>
                                     </select>
+                                    <div class="size-type-info mt-1">
+                                        <small class="text-muted clothing-size-info">Clothing Size example (XXS, XS, S, M, L, XL, XXL)</small>
+                                        <small class="text-muted number-size-info" style="display: none;">Number Size example (30, 31, 32, 33, 34, 35)</small>
+                                    </div>
                                 </div>
-                                <div id="sizeInputs" class="size-inputs">
-                                    <div class="row g-2">
-                                        <!-- Letter Sizes -->
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">XS</span>
-                                                <input type="number" class="form-control size-stock" data-size="XS" min="0" value="0">
-                                            </div>
+                                <div class="size-stock-container">
+                                    <div class="clothing-size">
+                                        @foreach($sizes->where('type', 'clothing') as $size)
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input size-checkbox" type="checkbox" value="{{ $size->id }}" id="size_{{ $size->id }}" data-size-type="clothing">
+                                            <label class="form-check-label" for="size_{{ $size->id }}">
+                                                {{ $size->name }}
+                                            </label>
+                                            <input type="number" class="form-control size-stock" data-size-id="{{ $size->id }}" placeholder="Stock" disabled min="0">
                                         </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">S</span>
-                                                <input type="number" class="form-control size-stock" data-size="S" min="0" value="0">
-                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="number-size" style="display: none;">
+                                        @foreach($sizes->where('type', 'number') as $size)
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input size-checkbox" type="checkbox" value="{{ $size->id }}" id="size_{{ $size->id }}" data-size-type="number">
+                                            <label class="form-check-label" for="size_{{ $size->id }}">
+                                                {{ $size->name }}
+                                            </label>
+                                            <input type="number" class="form-control size-stock" data-size-id="{{ $size->id }}" placeholder="Stock" disabled min="0">
                                         </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">M</span>
-                                                <input type="number" class="form-control size-stock" data-size="M" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">L</span>
-                                                <input type="number" class="form-control size-stock" data-size="L" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">XL</span>
-                                                <input type="number" class="form-control size-stock" data-size="XL" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">XXL</span>
-                                                <input type="number" class="form-control size-stock" data-size="XXL" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <!-- Number Sizes -->
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">29</span>
-                                                <input type="number" class="form-control size-stock" data-size="29" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">30</span>
-                                                <input type="number" class="form-control size-stock" data-size="30" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">31</span>
-                                                <input type="number" class="form-control size-stock" data-size="31" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">32</span>
-                                                <input type="number" class="form-control size-stock" data-size="32" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">33</span>
-                                                <input type="number" class="form-control size-stock" data-size="33" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">34</span>
-                                                <input type="number" class="form-control size-stock" data-size="34" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">35</span>
-                                                <input type="number" class="form-control size-stock" data-size="35" min="0" value="0">
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -285,92 +233,36 @@
                                 <label class="form-label">Stock by Size</label>
                                 <div class="mb-2">
                                     <select class="form-select" id="editSizeType">
-                                        <option value="letter">Letter Size (XS-XXL)</option>
-                                        <option value="number">Number Size (29-35)</option>
+                                        <option value="clothing">Clothing Size</option>
+                                        <option value="number">Number Size</option>
                                     </select>
+                                    <div class="size-type-info mt-1">
+                                        <small class="text-muted clothing-size-info">Clothing Size example (XXS, XS, S, M, L, XL, XXL)</small>
+                                        <small class="text-muted number-size-info" style="display: none;">Number Size example (30, 31, 32, 33, 34, 35)</small>
+                                    </div>
                                 </div>
-                                <div id="edit-sizeInputs" class="size-inputs">
-                                    <div class="row g-2">
-                                        <!-- Letter Sizes -->
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">XS</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="XS" min="0" value="0">
-                                            </div>
+                                <div class="size-stock-container">
+                                    <div class="clothing-size">
+                                        @foreach($sizes->where('type', 'clothing') as $size)
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input size-checkbox" type="checkbox" value="{{ $size->id }}" id="editSize_{{ $size->id }}" data-size-type="clothing">
+                                            <label class="form-check-label" for="editSize_{{ $size->id }}">
+                                                {{ $size->name }}
+                                            </label>
+                                            <input type="number" class="form-control size-stock" data-size-id="{{ $size->id }}" placeholder="Stock" disabled min="0">
                                         </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">S</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="S" min="0" value="0">
-                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="number-size" style="display: none;">
+                                        @foreach($sizes->where('type', 'number') as $size)
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input size-checkbox" type="checkbox" value="{{ $size->id }}" id="editSize_{{ $size->id }}" data-size-type="number">
+                                            <label class="form-check-label" for="editSize_{{ $size->id }}">
+                                                {{ $size->name }}
+                                            </label>
+                                            <input type="number" class="form-control size-stock" data-size-id="{{ $size->id }}" placeholder="Stock" disabled min="0">
                                         </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">M</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="M" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">L</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="L" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">XL</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="XL" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 letter-size">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">XXL</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="XXL" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <!-- Number Sizes -->
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">29</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="29" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">30</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="30" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">31</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="31" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">32</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="32" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">33</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="33" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">34</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="34" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-4 number-size" style="display: none;">
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text">35</span>
-                                                <input type="number" class="form-control edit-size-stock" data-size="35" min="0" value="0">
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -728,6 +620,12 @@
                         case 'Categories':
                             window.location.href = '/admin/categories';
                             break;
+                        case 'Sizes':
+                            window.location.href = '/admin/sizes';
+                            break;
+                        case 'Messages':
+                            window.location.href = '/admin/messages';
+                            break;
                     }
                     
                     // Close sidebar on mobile after navigation
@@ -754,53 +652,76 @@
                 // Basic product data
                 formData.append('name', document.getElementById('productName').value);
                 formData.append('category_id', document.getElementById('productCategory').value);
-                formData.append('price', document.getElementById('productPrice').value);
+                formData.append('price', document.getElementById('productPrice').value.replace(/\./g, ''));
                 formData.append('description', document.getElementById('productDescription').value);
                 
-                // Handle sizes
-                const sizes = {};
-                const sizeInputs = document.querySelectorAll('#sizeInputs input[type="number"]:not([style*="display: none"])');
-                sizeInputs.forEach(input => {
-                    const stock = parseInt(input.value) || 0;
-                    if (stock > 0) {
-                        sizes[input.dataset.size] = stock;
+                // Handle image
+                const imageFile = document.getElementById('productImage').files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                // Get selected sizes
+                const selectedSizes = [];
+                document.querySelectorAll('#addProductModal .size-checkbox:checked').forEach(checkbox => {
+                    const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                    if (stockInput && stockInput.value && parseInt(stockInput.value) > 0) {
+                        selectedSizes.push({
+                            id: parseInt(checkbox.value),
+                            stock: parseInt(stockInput.value)
+                        });
                     }
                 });
-                formData.append('sizes', JSON.stringify(sizes));
-            
-                // Handle image
-            const imageFile = document.getElementById('productImage').files[0];
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
-            
+
+                // Log the sizes data for debugging
+                console.log('Selected sizes:', selectedSizes);
+                console.log('Sizes JSON:', JSON.stringify(selectedSizes));
+                
+                // Append sizes as JSON string
+                formData.append('sizes', JSON.stringify(selectedSizes));
+
                 // Send request
                 fetch('/admin/api/products', {
-                method: 'POST',
-                headers: {
+                    method: 'POST',
+                    headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: formData
-            })
+                    },
+                    body: formData
+                })
                 .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                        location.reload();
-                } else {
-                        alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
+                .then(data => {
+                    if (data.success) {
+                        // Add new product to array
+                        products.push(data.product);
+                        
+                        // Re-render products
+                        renderProducts(products);
+                        
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+                        modal.hide();
+                        
+                        // Reset form
+                        document.getElementById('addProductForm').reset();
+                        
+                        // Show success notification
+                        showNotification('Success', 'Product added successfully!', 'success');
+                    } else {
+                        console.error('Add failed:', data.message);
+                        showNotification('Error', data.message || 'Failed to add product', 'error');
+                    }
+                })
+                .catch(error => {
                     console.error('Error:', error);
-                    alert('Error adding product');
-            });
+                    showNotification('Error', 'An error occurred while adding the product', 'error');
+                });
             });
         
             // Save edited product
             saveEditBtn.addEventListener('click', function() {
                 const id = document.getElementById('editProductId').value;
-            const formData = new FormData();
-            
+                const formData = new FormData();
+                
                 // Basic product data
                 formData.append('_method', 'PUT');
                 formData.append('name', document.getElementById('editProductName').value);
@@ -808,64 +729,63 @@
                 formData.append('price', document.getElementById('editProductPrice').value.replace(/\./g, ''));
                 formData.append('description', document.getElementById('editProductDescription').value);
                 
-                // Handle sizes with detailed logging
-                const sizes = {};
-                const sizeInputs = document.querySelectorAll('#edit-sizeInputs input[type="number"]:not([style*="display: none"])');
-                console.log('Found size inputs:', sizeInputs.length);
-                
-                sizeInputs.forEach(input => {
-                    const size = input.dataset.size;
-                    const stock = parseInt(input.value) || 0;
-                    sizes[size] = stock;
-                    console.log(`Processing size ${size} with stock ${stock} from input:`, input);
-                });
-                
-                console.log('Final sizes object:', sizes);
-                formData.append('sizes', JSON.stringify(sizes));
-                
                 // Handle image
-            const imageFile = document.getElementById('editProductImage').files[0];
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
-            
-                // Send request with detailed response logging
+                const imageFile = document.getElementById('editProductImage').files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                // Get selected sizes
+                const selectedSizes = [];
+                document.querySelectorAll('#editProductModal .size-checkbox:checked').forEach(checkbox => {
+                    const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                    if (stockInput && stockInput.value && parseInt(stockInput.value) > 0) {
+                        selectedSizes.push({
+                            id: parseInt(checkbox.value),
+                            stock: parseInt(stockInput.value)
+                        });
+                    }
+                });
+
+                // Log the sizes data for debugging
+                console.log('Selected sizes for edit:', selectedSizes);
+                console.log('Sizes JSON for edit:', JSON.stringify(selectedSizes));
+                
+                // Append sizes as JSON string
+                formData.append('sizes', JSON.stringify(selectedSizes));
+
+                // Send request
                 fetch(`/admin/api/products/${id}`, {
                     method: 'POST',
-                headers: {
+                    headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: formData
-            })
+                    },
+                    body: formData
+                })
                 .then(response => response.json())
-            .then(data => {
-                console.log('Server response:', data);
-                if (data.success) {
-                        // Log the received product data
-                        console.log('Received updated product:', data.product);
-                        console.log('Product sizes:', data.product.sizes);
-                        
+                .then(data => {
+                    if (data.success) {
                         // Update the product in the products array
-                    const index = products.findIndex(p => p.id == id);
-                    if (index !== -1) {
-                        products[index] = data.product;
-                    }
+                        const index = products.findIndex(p => p.id == id);
+                        if (index !== -1) {
+                            products[index] = data.product;
+                        }
                         
                         // Re-render the products
-                    renderProducts(products);
-                    
+                        renderProducts(products);
+                        
                         // Close the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
-                    modal.hide();
-                    
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+                        modal.hide();
+                        
                         // Show success notification
                         showNotification('Success', 'Product updated successfully!', 'success');
-                } else {
+                    } else {
                         console.error('Update failed:', data.message);
                         showNotification('Error', data.message || 'Failed to update product', 'error');
-                }
-            })
-            .catch(error => {
+                    }
+                })
+                .catch(error => {
                     console.error('Error:', error);
                     showNotification('Error', 'An error occurred while updating the product', 'error');
                 });
@@ -873,19 +793,41 @@
             
             // Size type change handlers
             document.getElementById('sizeType').addEventListener('change', function() {
-                const letterSizes = document.querySelectorAll('#sizeInputs .letter-size');
-                const numberSizes = document.querySelectorAll('#sizeInputs .number-size');
+                const clothingSizes = document.querySelector('#addProductModal .clothing-size');
+                const numberSizes = document.querySelector('#addProductModal .number-size');
+                const clothingSizeInfo = document.querySelector('#addProductModal .clothing-size-info');
+                const numberSizeInfo = document.querySelector('#addProductModal .number-size-info');
                 
-                letterSizes.forEach(el => el.style.display = this.value === 'letter' ? '' : 'none');
-                numberSizes.forEach(el => el.style.display = this.value === 'number' ? '' : 'none');
+                if (this.value === 'clothing') {
+                    clothingSizes.style.display = '';
+                    numberSizes.style.display = 'none';
+                    clothingSizeInfo.style.display = '';
+                    numberSizeInfo.style.display = 'none';
+                } else {
+                    clothingSizes.style.display = 'none';
+                    numberSizes.style.display = '';
+                    clothingSizeInfo.style.display = 'none';
+                    numberSizeInfo.style.display = '';
+                }
             });
 
             document.getElementById('editSizeType').addEventListener('change', function() {
-                const letterSizes = document.querySelectorAll('#edit-sizeInputs .letter-size');
-                const numberSizes = document.querySelectorAll('#edit-sizeInputs .number-size');
+                const clothingSizes = document.querySelector('#editProductModal .clothing-size');
+                const numberSizes = document.querySelector('#editProductModal .number-size');
+                const clothingSizeInfo = document.querySelector('#editProductModal .clothing-size-info');
+                const numberSizeInfo = document.querySelector('#editProductModal .number-size-info');
                 
-                letterSizes.forEach(el => el.style.display = this.value === 'letter' ? '' : 'none');
-                numberSizes.forEach(el => el.style.display = this.value === 'number' ? '' : 'none');
+                if (this.value === 'clothing') {
+                    clothingSizes.style.display = '';
+                    numberSizes.style.display = 'none';
+                    clothingSizeInfo.style.display = '';
+                    numberSizeInfo.style.display = 'none';
+                } else {
+                    clothingSizes.style.display = 'none';
+                    numberSizes.style.display = '';
+                    clothingSizeInfo.style.display = 'none';
+                    numberSizeInfo.style.display = '';
+                }
             });
 
             // Category change handlers
@@ -960,31 +902,57 @@
         
         // Populate edit form
         function populateEditForm(product) {
-            console.log('Populating form with product:', product);
-            console.log('Product sizes:', product.sizes);
-                    
-                        document.getElementById('editProductId').value = product.id;
-                        document.getElementById('editProductName').value = product.name;
-                        document.getElementById('editProductCategory').value = product.category_id || '';
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductCategory').value = product.category_id || '';
             document.getElementById('editProductPrice').value = new Intl.NumberFormat('id-ID').format(product.price);
-                        document.getElementById('editProductDescription').value = product.description || '';
-            
+            document.getElementById('editProductDescription').value = product.description || '';
+
+            // Reset all checkboxes and stock inputs
+            document.querySelectorAll('#editProductModal .size-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+                const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                stockInput.disabled = true;
+                stockInput.value = '';
+            });
+
             // Set size type based on category
-            const editSizeType = document.getElementById('editSizeType');
-            editSizeType.value = product.category_id === 'pants' ? 'number' : 'letter';
+            const sizeType = product.category_id === 'pants' ? 'number' : 'clothing';
+            document.getElementById('editSizeType').value = sizeType;
             
-            // Update size inputs visibility with existing sizes
-            toggleSizeInputs('edit-sizeInputs', editSizeType.value, product.sizes);
-                        
-                        // Display current image if available
-                        const currentImagePreview = document.getElementById('currentImagePreview');
-                        const currentImage = document.getElementById('currentImage');
-                        if (product.image_url) {
-                            currentImage.src = product.image_url;
-                            currentImagePreview.style.display = 'block';
-                        } else {
-                            currentImagePreview.style.display = 'none';
-                        }
+            // Show/hide appropriate size sections
+            const clothingSizes = document.querySelector('#editProductModal .clothing-size');
+            const numberSizes = document.querySelector('#editProductModal .number-size');
+            if (sizeType === 'clothing') {
+                clothingSizes.style.display = '';
+                numberSizes.style.display = 'none';
+            } else {
+                clothingSizes.style.display = 'none';
+                numberSizes.style.display = '';
+            }
+
+            // Set existing sizes and stock
+            if (product.sizes) {
+                Object.values(product.sizes).forEach(sizeData => {
+                    const checkbox = document.querySelector(`#editProductModal .size-checkbox[value="${sizeData.id}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                        stockInput.disabled = false;
+                        stockInput.value = sizeData.stock;
+                    }
+                });
+            }
+
+            // Display current image if available
+            const currentImagePreview = document.getElementById('currentImagePreview');
+            const currentImage = document.getElementById('currentImage');
+            if (product.image_url) {
+                currentImage.src = product.image_url;
+                currentImagePreview.style.display = 'block';
+            } else {
+                currentImagePreview.style.display = 'none';
+            }
         }
         
         // Format price input
@@ -1046,9 +1014,6 @@
             const product = products.find(p => p.id == productId);
             if (!product) return;
 
-            console.log('Showing details for product:', product);
-            console.log('Product sizes:', product.sizes);
-
             // Set basic details
             document.getElementById('detailProductName').textContent = product.name;
             document.getElementById('detailProductCategory').textContent = product.category_name;
@@ -1069,22 +1034,17 @@
             const sizeGrid = document.getElementById('detailSizeGrid');
             sizeGrid.innerHTML = '';
             
-            const isNumberSize = product.category_id === 'pants';
-            const sizes = isNumberSize ? 
-                Array.from({length: 7}, (_, i) => (i + 29).toString()) : 
-                ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-
-            sizes.forEach(size => {
-                const stock = parseInt(product.sizes[size]) || 0;
-                console.log(`Size ${size} stock:`, stock); // Debug log
-                const sizeBox = document.createElement('div');
-                sizeBox.className = 'size-stock';
-                sizeBox.innerHTML = `
-                    <span class="size-label">${size}</span>
-                    <span class="size-quantity">${stock}</span>
-                `;
-                sizeGrid.appendChild(sizeBox);
-            });
+            if (product.sizes) {
+                Object.values(product.sizes).forEach(sizeData => {
+                    const sizeBox = document.createElement('div');
+                    sizeBox.className = 'size-stock';
+                    sizeBox.innerHTML = `
+                        <span class="size-label">${sizeData.name}</span>
+                        <span class="size-quantity">${sizeData.stock}</span>
+                    `;
+                    sizeGrid.appendChild(sizeBox);
+                });
+            }
 
             // Show modal
             const detailsModal = new bootstrap.Modal(document.getElementById('detailsProductModal'));
@@ -1108,6 +1068,42 @@
             
             const bsToast = new bootstrap.Toast(toast);
             bsToast.show();
+        }
+        
+        // Handle size type selection
+        document.getElementById('sizeType').addEventListener('change', function() {
+            // Hide all size groups
+            document.querySelectorAll('.size-group').forEach(group => {
+                group.style.display = 'none';
+            });
+            
+            // Show selected size group
+            const selectedType = this.value;
+            document.querySelector(`.${selectedType}-size`).style.display = 'block';
+        });
+
+        // Handle checkbox changes
+        document.querySelectorAll('.form-check-input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const stockInput = this.parentElement.querySelector('.size-stock');
+                stockInput.disabled = !this.checked;
+                if (!this.checked) {
+                    stockInput.value = 0;
+                }
+            });
+        });
+
+        // Function to get selected sizes and their stock
+        function getSelectedSizes() {
+            const sizes = [];
+            document.querySelectorAll('.form-check-input:checked').forEach(checkbox => {
+                const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                sizes.push({
+                    id: parseInt(checkbox.value),
+                    stock: parseInt(stockInput.value) || 0
+                });
+            });
+            return sizes;
         }
         
         // Initialize when page loads

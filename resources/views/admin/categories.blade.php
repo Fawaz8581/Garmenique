@@ -48,6 +48,10 @@
                 <span>Categories</span>
             </li>
             <li class="menu-item">
+                <i class="fas fa-ruler"></i>
+                <span>Sizes</span>
+            </li>
+            <li class="menu-item">
                 <i class="fas fa-envelope"></i>
                 <span>Messages</span>
                 <span class="notification-badge">14</span>
@@ -270,6 +274,12 @@
                             break;
                         case 'Categories':
                             window.location.href = '/admin/categories';
+                            break;
+                        case 'Sizes':
+                            window.location.href = '/admin/sizes';
+                            break;
+                        case 'Messages':
+                            window.location.href = '/admin/messages';
                             break;
                     }
                     
