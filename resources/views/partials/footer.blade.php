@@ -34,7 +34,6 @@
                         <li><a href="/login">Login / Register</a></li>
                         <li><a href="/account/settings">My Account</a></li>
                         <li><a href="/account/orders">Order History</a></li>
-                        <li><a href="/wishlist">Wishlist</a></li>
                         <li><a href="/cart">Shopping Cart</a></li>
                     </ul>
                 </div>

@@ -10,7 +10,6 @@
             </div>
             <a href="/account/settings" class="dropdown-item">My Account</a>
             <a href="/account/orders" class="dropdown-item">My Orders</a>
-            <a href="/wishlist" class="dropdown-item">Wishlist</a>
             <div class="dropdown-divider"></div>
             <form action="{{ route('logout') }}" method="POST" class="dropdown-item-form">
                 @csrf
