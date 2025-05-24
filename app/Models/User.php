@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -48,5 +49,30 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get messages sent by the user
+     */
+    public function messagesSent()
+    {
+        return $this->hasMany(Message::class, 'from_user_id');
+    }
+
+    /**
+     * Get messages received by the user
+     */
+    public function messagesReceived()
+    {
+        return $this->hasMany(Message::class, 'to_user_id');
+    }
+
+    /**
+     * Get all messages (sent and received)
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'from_user_id')
+                    ->orWhere('to_user_id', $this->id);
     }
 }

@@ -1,0 +1,282 @@
+/* Messages Page Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    color: #333;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header styles */
+.header {
+    background-color: white;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 15px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.logo-container {
+    flex: 1;
+    max-width: 200px;
+}
+
+.logo {
+    font-weight: 600;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000;
+    text-decoration: none;
+}
+
+.main-nav {
+    display: flex;
+    justify-content: center;
+    flex: 2;
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+}
+
+.main-nav li {
+    margin: 0 15px;
+}
+
+.nav-item {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+    position: relative;
+    padding: 0 5px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: #000;
+}
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #000;
+    transition: width 0.2s ease;
+}
+
+.nav-item:hover::after,
+.nav-item.active::after {
+    width: 100%;
+}
+
+.nav-icons {
+    flex: 1;
+    max-width: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-icon {
+    font-size: 1rem;
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-icon:hover,
+.nav-icon.active {
+    color: #000;
+}
+
+/* Messages Container */
+.messages-container {
+    min-height: calc(100vh - 160px);
+    padding-top: 80px;
+    background-color: #f8f9fa;
+}
+
+/* Chat Sidebar */
+.chat-sidebar {
+    height: calc(100vh - 220px);
+    background-color: #fff;
+    border-right: 1px solid #dee2e6;
+}
+
+.chat-list {
+    overflow-y: auto;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state h4 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #6c757d;
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #f8f9fa;
+    padding: 60px 0 0;
+    margin-top: auto;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-col h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    color: #000;
+}
+
+.social-email-section {
+    margin-top: 20px;
+}
+
+.social-icons {
+    margin-bottom: 20px;
+}
+
+.social-icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    color: #333;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.social-icon-circle:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.email-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.email-form {
+    display: flex;
+    gap: 10px;
+}
+
+.email-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.submit-btn {
+    padding: 8px 16px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #000;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 20px;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .messages-container {
+        padding-top: 60px;
+    }
+    
+    .chat-sidebar {
+        height: auto;
+        max-height: 50vh;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .email-form {
+        flex-direction: column;
+    }
+} 
