@@ -63,4 +63,29 @@ class CatalogController extends Controller
         
         return view('catalog', compact('products', 'categories', 'availableSizes'));
     }
+
+    public function show($id)
+    {
+        try {
+            // Fetch product with its relationships including images
+            $product = Product::with(['category', 'sizes' => function($query) {
+                $query->select(['sizes.id', 'sizes.name', 'sizes.type'])
+                      ->withPivot('stock');
+            }])->findOrFail($id);
+
+            // Debug log to check product data
+            \Log::info('Product detail data:', [
+                'product' => $product,
+                'image_path' => $product->image
+            ]);
+
+            return view('product_detail', compact('product'));
+        } catch (\Exception $e) {
+            \Log::error('Error loading product:', [
+                'error' => $e->getMessage(),
+                'id' => $id
+            ]);
+            return redirect()->route('catalog')->with('error', 'Product not found');
+        }
+    }
 } 

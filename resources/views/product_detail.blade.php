@@ -182,56 +182,72 @@
         </div>
         
         <!-- Product Detail Section -->
-        <section class="product-detail-section" ng-controller="ProductDetailController">
+        <section class="product-detail-section">
             <div class="container">
                 <div class="breadcrumb-container">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="/">HOME</a></li>
                             <li class="breadcrumb-item"><a href="/catalog">CATALOG</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">@{{ product.name }}</li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ $product->name }}</li>
                         </ol>
                     </nav>
                 </div>
                 
-                <div class="row" ng-if="product">
+                <div class="row">
                     <!-- Product Image on Left -->
                     <div class="col-md-7">
                         <div class="main-product-image">
-                            <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }} - Full View" class="img-fluid">
+                            @if(!empty($product->images) && count($product->images) > 0)
+                                <img src="{{ asset($product->images[0]) }}" alt="{{ $product->name }}" class="img-fluid">
+                            @else
+                                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}" class="img-fluid">
+                            @endif
                         </div>
                     </div>
                     
                     <!-- Product Info on Right -->
                     <div class="col-md-5">
                         <div class="product-info">
-                            <h1 class="product-title">@{{ product.name }}</h1>
+                            <h1 class="product-title">{{ $product->name }}</h1>
                             
                             <!-- Product Reference ID -->
                             <div class="product-ref-id mb-3">
-                                <span class="text-muted">REF: @{{ product.id }}</span>
+                                <span class="text-muted">REF: {{ $product->id }}</span>
                             </div>
                             
                             <!-- Product Price -->
                             <div class="product-price mb-4">
-                                <span class="current-price" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
-                                <span class="old-price" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
-                                <span class="discount-badge" ng-if="product.discount">-@{{ product.discount }}%</span>
+                                <span class="current-price">IDR {{ number_format($product->price, 0, ',', '.') }}</span>
                             </div>
                             
                             <!-- Product Sizes -->
                             <div class="product-sizes mb-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5>Size: <span>@{{ selectedSize || 'Select size' }}</span></h5>
+                                    <h5>Size: <span id="selected-size">Select size</span></h5>
                                     <a href="#" class="size-guide">Size Guide</a>
                                 </div>
-                                <div class="size-options">
-                                    <button ng-repeat="size in product.sizes" 
-                                            ng-click="selectSize(size)" 
-                                            ng-class="{'active': selectedSize === size}" 
-                                            class="size-btn">
-                                        @{{ size }}
-                                    </button>
+                                <div class="size-stock-grid">
+                                    @if($product->sizes && count($product->sizes) > 0)
+                                        @foreach($product->sizes as $size)
+                                            @if($size['stock'] > 0)
+                                                <div class="size-stock">
+                                                    <button onclick="selectSize('{{ $size['name'] }}')" 
+                                                            class="size-btn" 
+                                                            data-size="{{ $size['name'] }}">
+                                                        {{ $size['name'] }}
+                                                    </button>
+                                                    <span class="size-quantity">Stock: {{ $size['stock'] }}</span>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <p>No sizes available</p>
+                                    @endif
+                                </div>
+                                <!-- Total Stock Display -->
+                                <div class="total-stock mt-3">
+                                    <p class="text-muted mb-0">Total Stock: {{ $product->total_stock }}</p>
                                 </div>
                             </div>
                             
@@ -239,24 +255,24 @@
                             <div class="quantity-selector mb-4">
                                 <h5>Quantity:</h5>
                                 <div class="quantity-input">
-                                    <button class="quantity-btn" ng-click="decreaseQuantity()">-</button>
-                                    <input type="text" ng-model="quantity" readonly>
-                                    <button class="quantity-btn" ng-click="increaseQuantity()">+</button>
+                                    <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                                    <input type="text" id="quantity" value="1" readonly>
+                                    <button class="quantity-btn" onclick="increaseQuantity()">+</button>
                                 </div>
                                 
                                 <!-- User Selection Summary -->
-                                <div class="user-selection-summary mt-3 mb-2" ng-if="selectedSize">
+                                <div class="user-selection-summary mt-3 mb-2" id="selection-summary" style="display: none;">
                                     <p class="text-muted mb-1">You selected: 
-                                        <span ng-if="selectedSize">Size <strong>@{{ selectedSize }}</strong></span>
+                                        <span>Size <strong id="summary-size"></strong></span>
                                     </p>
                                 </div>
                                 
-                                <!-- Shopping Cart Icon aligned left with text -->
-                                <div class="mt-3 text-left">
-                                    <a href="javascript:void(0)" class="nav-icon d-inline-flex align-items-center" ng-click="addToCart()">
-                                        <i class="fas fa-shopping-cart" style="font-size: 24px;"></i>
-                                        <span class="ml-2" style="margin-left: 10px; font-size: 16px;">Add to Cart</span>
-                                    </a>
+                                <!-- Add to Cart Button -->
+                                <div class="mt-3">
+                                    <button class="btn btn-dark w-100 d-flex align-items-center justify-content-center" onclick="addToCart()">
+                                        <i class="fas fa-shopping-cart me-2"></i>
+                                        Add to Cart
+                                    </button>
                                 </div>
                             </div>
                             
@@ -283,58 +299,7 @@
                 <div class="product-description mt-5">
                     <h3>Description</h3>
                     <div class="description-content mt-4">
-                        <p>@{{ product.description }}</p>
-                        <ul>
-                            <li>Made from premium materials</li>
-                            <li>Designed for comfort and style</li>
-                            <li>Perfect for everyday wear</li>
-                            <li>Machine washable</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- You May Also Like -->
-                <div class="related-products mt-5">
-                    <h3>You May Also Like</h3>
-                    <div class="row row-cols-2 row-cols-md-4 g-4">
-                        <div class="col" ng-repeat="relatedProduct in relatedProducts">
-                            <div class="product-card" ng-mouseenter="hover(relatedProduct)" ng-mouseleave="unhover(relatedProduct)">
-                                <div class="product-card-img">
-                                    <a href="/catalog/product/@{{ relatedProduct.id }}">
-                                        <img ng-src="@{{ relatedProduct.isHovered ? relatedProduct.hoverImage : relatedProduct.primaryImage }}" alt="@{{ relatedProduct.name }}" class="img-fluid">
-                                    </a>
-                                    <div class="product-actions" ng-if="relatedProduct.isHovered">
-                                        <button class="action-btn" ng-click="quickView(relatedProduct)" title="Quick View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn" ng-click="addToWishlist(relatedProduct)" title="Add to Wishlist">
-                                            <i class="far fa-heart"></i>
-                                        </button>
-                                        <button class="action-btn" ng-click="addToCompare(relatedProduct)" title="Compare">
-                                            <i class="fas fa-exchange-alt"></i>
-                                        </button>
-                                    </div>
-                                    <span class="product-badge new" ng-if="relatedProduct.isNew">New</span>
-                                    <span class="product-badge discount" ng-if="relatedProduct.discount">-@{{ relatedProduct.discount }}%</span>
-                                </div>
-                                <div class="product-card-info">
-                                    <h3 class="product-title">
-                                        <a href="/catalog/product/@{{ relatedProduct.id }}">@{{ relatedProduct.name }}</a>
-                                    </h3>
-                                    <div class="product-price">
-                                        <span class="current-price" ng-class="{'has-discount': relatedProduct.discount}">IDR @{{ (relatedProduct.price * 15500).toLocaleString('id-ID') }}</span>
-                                        <span class="old-price" ng-if="relatedProduct.oldPrice">IDR @{{ (relatedProduct.oldPrice * 15500).toLocaleString('id-ID') }}</span>
-                                    </div>
-                                    <div class="product-rating">
-                                        <div class="stars">
-                                            <i class="fas fa-star" ng-repeat="i in getStars(relatedProduct.rating) track by $index"></i>
-                                            <i class="far fa-star" ng-repeat="i in getEmptyStars(relatedProduct.rating) track by $index"></i>
-                                        </div>
-                                        <span class="review-count">(@{{ relatedProduct.reviewCount }})</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <p>{{ $product->description }}</p>
                     </div>
                 </div>
             </div>
@@ -410,5 +375,57 @@
         <script src="{{ asset('js/catalog.js') }}"></script>
         <script src="{{ asset('js/product_detail.js') }}"></script>
         <script src="{{ asset('js/cart.js') }}"></script>
+
+        <!-- JavaScript for Product Detail Functionality -->
+        <script>
+            let selectedSize = '';
+            let quantity = 1;
+
+            function selectSize(size) {
+                selectedSize = size;
+                document.getElementById('selected-size').textContent = size;
+                document.getElementById('summary-size').textContent = size;
+                document.getElementById('selection-summary').style.display = 'block';
+                
+                // Remove active class from all size buttons
+                document.querySelectorAll('.size-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to selected size button
+                document.querySelector(`.size-btn[data-size="${size}"]`).classList.add('active');
+            }
+
+            function increaseQuantity() {
+                quantity++;
+                document.getElementById('quantity').value = quantity;
+            }
+
+            function decreaseQuantity() {
+                if (quantity > 1) {
+                    quantity--;
+                    document.getElementById('quantity').value = quantity;
+                }
+            }
+
+            function addToCart() {
+                if (!selectedSize) {
+                    alert('Please select a size');
+                    return;
+                }
+
+                // Add to cart logic here
+                const productData = {
+                    id: {{ $product->id }},
+                    name: '{{ $product->name }}',
+                    price: {{ $product->price }},
+                    size: selectedSize,
+                    quantity: quantity
+                };
+
+                // You can implement your cart logic here
+                console.log('Adding to cart:', productData);
+            }
+        </script>
     </body>
 </html>
