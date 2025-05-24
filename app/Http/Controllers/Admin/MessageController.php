@@ -78,7 +78,7 @@ class MessageController extends Controller
                     'id' => $message->id,
                     'content' => $message->message,
                     'is_admin' => $message->is_admin,
-                    'created_at' => $message->created_at->format('M d, Y H:i')
+                    'created_at' => $message->created_at->setTimezone('Asia/Jakarta')->format('M d, Y H:i').' WIB'
                 ];
             });
 
@@ -120,7 +120,7 @@ class MessageController extends Controller
         return response()->json([
             'id' => $message->id,
             'content' => $message->message,
-            'created_at' => $message->created_at->format('M d, Y H:i')
+            'created_at' => $message->created_at->setTimezone('Asia/Jakarta')->format('M d, Y H:i').' WIB'
         ]);
     }
 } 

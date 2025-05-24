@@ -25,13 +25,14 @@
         <style>
             /* Add space for fixed header */
             body {
-                padding-top: 80px; /* This should match the header height */
+                padding-top: 60px; /* Reduced from 80px to match other pages */
+                background-color: #f5f5f5; /* Match admin background */
             }
             
             .messages-container {
-                padding: 2rem 0; /* Revert to original padding */
-                min-height: calc(100vh - 160px);
-                background-color: #f8f9fa;
+                padding: 20px; /* Match admin padding */
+                min-height: calc(100vh - 140px); /* Adjusted to account for smaller header */
+                background-color: #f5f5f5; /* Match admin background */
             }
 
             .chat-container {
@@ -39,7 +40,7 @@
                 margin: 0 auto;
                 background: white;
                 border-radius: 10px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Match admin box-shadow */
             }
 
             .header {
@@ -49,8 +50,9 @@
                 width: 100%;
                 z-index: 1000;
                 background-color: #fff;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                height: 80px; /* Set explicit height to match padding-top on body */
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Match admin shadow */
+                padding: 15px 0; /* Standard padding instead of fixed height */
+                height: auto; /* Remove fixed height */
             }
 
             .chat-header {
@@ -200,8 +202,12 @@
             }
 
             @media (max-width: 768px) {
+                body {
+                    padding-top: 50px; /* Smaller padding for mobile */
+                }
+                
                 .messages-container {
-                    padding: 1rem; /* Revert to original padding */
+                    padding: 10px; /* Smaller padding for mobile */
                 }
                 
                 .chat-container {
@@ -209,13 +215,20 @@
                 }
 
                 .chat-area {
-                    height: calc(100vh - 400px);
+                    height: calc(100vh - 360px);
+                }
+                
+                .container.nav-container {
+                    padding: 0 20px; /* Reduced side padding for mobile */
                 }
             }
 
             /* Make sure container has proper spacing */
             .container.nav-container {
-                padding: 15px;
+                padding: 0 40px; /* Match admin pages padding */
+                height: auto; /* Remove fixed height */
+                display: flex;
+                align-items: center;
             }
         </style>
     </head>
