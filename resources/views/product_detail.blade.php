@@ -195,29 +195,10 @@
                 </div>
                 
                 <div class="row" ng-if="product">
-                    <!-- Product Images Grid on Left -->
+                    <!-- Product Image on Left -->
                     <div class="col-md-7">
-                        <div class="product-images-grid">
-                            <!-- Main large image -->
-                            <div class="main-product-image">
-                                <img ng-src="@{{ selectedImage || product.primaryImage }}" alt="@{{ product.name }} - Full View" class="img-fluid">
-                            </div>
-                            
-                            <!-- Thumbnails Grid -->
-                            <div class="product-thumbnails">
-                                <div class="thumbnail-item" ng-class="{'active': selectedImage === product.primaryImage || !selectedImage}" ng-click="selectImage(product.primaryImage)">
-                                    <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }} Thumbnail 1" class="img-fluid">
-                                </div>
-                                <div class="thumbnail-item" ng-class="{'active': selectedImage === product.hoverImage}" ng-click="selectImage(product.hoverImage)">
-                                    <img ng-src="@{{ product.hoverImage }}" alt="@{{ product.name }} Thumbnail 2" class="img-fluid">
-                                </div>
-                                <div class="thumbnail-item" ng-class="{'active': selectedImage === product.additionalImage1}" ng-click="selectImage(product.additionalImage1)" ng-if="product.additionalImage1">
-                                    <img ng-src="@{{ product.additionalImage1 }}" alt="@{{ product.name }} Thumbnail 3" class="img-fluid">
-                                </div>
-                                <div class="thumbnail-item" ng-class="{'active': selectedImage === product.additionalImage2}" ng-click="selectImage(product.additionalImage2)" ng-if="product.additionalImage2">
-                                    <img ng-src="@{{ product.additionalImage2 }}" alt="@{{ product.name }} Thumbnail 4" class="img-fluid">
-                                </div>
-                            </div>
+                        <div class="main-product-image">
+                            <img ng-src="@{{ product.primaryImage }}" alt="@{{ product.name }} - Full View" class="img-fluid">
                         </div>
                     </div>
                     
@@ -231,39 +212,11 @@
                                 <span class="text-muted">REF: @{{ product.id }}</span>
                             </div>
                             
-                            <!-- Product Rating Stars -->
-                            <div class="product-rating mb-3">
-                                <div class="stars">
-                                    <i class="fas fa-star" ng-repeat="i in getStars(product.rating) track by $index"></i>
-                                    <i class="far fa-star" ng-repeat="i in getEmptyStars(product.rating) track by $index"></i>
-                                </div>
-                                <span class="review-count">(@{{ product.reviewCount }} Reviews)</span>
-                            </div>
-                            
                             <!-- Product Price -->
                             <div class="product-price mb-4">
                                 <span class="current-price" ng-class="{'has-discount': product.discount}">IDR @{{ (product.price * 15500).toLocaleString('id-ID') }}</span>
                                 <span class="old-price" ng-if="product.oldPrice">IDR @{{ (product.oldPrice * 15500).toLocaleString('id-ID') }}</span>
                                 <span class="discount-badge" ng-if="product.discount">-@{{ product.discount }}%</span>
-                            </div>
-                            
-                            <!-- Short Product Description -->
-                            <div class="product-short-desc mb-4">
-                                <p>@{{ product.description }}</p>
-                            </div>
-                            
-                            <!-- Product Colors -->
-                            <div class="product-colors mb-4">
-                                <h5>Color: <span>@{{ selectedColor.name }}</span></h5>
-                                <div class="color-options" style="padding-left: 30px;">
-                                    <button ng-repeat="color in product.colors" 
-                                            ng-click="selectColor(color)" 
-                                            ng-class="{'active': selectedColor.name === color.name}" 
-                                            class="color-btn" 
-                                            style="background-color: @{{ color.code }};" 
-                                            title="@{{ color.name }}">
-                                    </button>
-                                </div>
                             </div>
                             
                             <!-- Product Sizes -->
@@ -292,11 +245,9 @@
                                 </div>
                                 
                                 <!-- User Selection Summary -->
-                                <div class="user-selection-summary mt-3 mb-2" ng-if="selectedSize || selectedColor">
+                                <div class="user-selection-summary mt-3 mb-2" ng-if="selectedSize">
                                     <p class="text-muted mb-1">You selected: 
                                         <span ng-if="selectedSize">Size <strong>@{{ selectedSize }}</strong></span>
-                                        <span ng-if="selectedSize && selectedColor.name">, </span>
-                                        <span ng-if="selectedColor.name">Color <strong>@{{ selectedColor.name }}</strong></span>
                                     </p>
                                 </div>
                                 
@@ -307,13 +258,6 @@
                                         <span class="ml-2" style="margin-left: 10px; font-size: 16px;">Add to Cart</span>
                                     </a>
                                 </div>
-                            </div>
-                            
-                            <!-- Action Buttons -->
-                            <div class="product-actions mb-4">
-                                <button class="btn btn-outline-secondary wishlist-btn" ng-click="addToWishlist()">
-                                    <i class="far fa-heart"></i>
-                                </button>
                             </div>
                             
                             <!-- Product Meta Info -->
@@ -331,152 +275,24 @@
                                     <span>2-year warranty</span>
                                 </div>
                             </div>
-                            
-                            <!-- Social Sharing -->
-                            <div class="social-sharing">
-                                <span>Share:</span>
-                                <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="social-icon"><i class="fab fa-pinterest-p"></i></a>
-                                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Product Details Tabs -->
-                <div class="product-tabs mt-5">
-                    <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="additional-info-tab" data-bs-toggle="tab" data-bs-target="#additional-info" type="button" role="tab" aria-controls="additional-info" aria-selected="false">Additional Information</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews (@{{ product.reviewCount }})</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="productTabsContent">
-                        <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
-                            <p>@{{ product.description }}</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum consequat elit vel volutpat hendrerit. Donec euismod, justo eget congue convallis, nisl nunc dapibus ipsum, a faucibus dui ex quis sapien. Proin eget semper enim. Mauris vel felis vel augue aliquam sodales.</p>
-                            <ul>
-                                <li>Made from premium materials</li>
-                                <li>Designed for comfort and style</li>
-                                <li>Perfect for everyday wear</li>
-                                <li>Machine washable</li>
-                            </ul>
-                        </div>
-                        <div class="tab-pane fade" id="additional-info" role="tabpanel" aria-labelledby="additional-info-tab">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th>Material</th>
-                                        <td>100% Cotton</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Colors</th>
-                                        <td>
-                                            <span ng-repeat="color in product.colors">
-                                                @{{ color.name }}@{{ $last ? '' : ', ' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Sizes</th>
-                                        <td>
-                                            <span ng-repeat="size in product.sizes">
-                                                @{{ size }}@{{ $last ? '' : ', ' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Care Instructions</th>
-                                        <td>Machine wash cold, tumble dry low</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
-                            <div class="reviews-summary">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="overall-rating">
-                                            <h3>@{{ product.rating }}.0</h3>
-                                            <div class="stars">
-                                                <i class="fas fa-star" ng-repeat="i in getStars(product.rating) track by $index"></i>
-                                                <i class="far fa-star" ng-repeat="i in getEmptyStars(product.rating) track by $index"></i>
-                                            </div>
-                                            <p>Based on @{{ product.reviewCount }} reviews</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="rating-bars">
-                                            <div class="rating-bar" ng-repeat="i in [5, 4, 3, 2, 1]">
-                                                <span class="rating-level">@{{ i }} stars</span>
-                                                <div class="progress">
-                                                    <div class="progress-bar" ng-style="getRandomRatingPercentage(i)"></div>
-                                                </div>
-                                                <span class="rating-count">@{{ getRandomRatingCount(i) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Reviews List -->
-                            <div class="reviews-list">
-                                <div class="review" ng-repeat="review in reviews">
-                                    <div class="review-header">
-                                        <div class="reviewer-info">
-                                            <h5>@{{ review.name }}</h5>
-                                            <div class="review-meta">
-                                                <span class="review-date">@{{ review.date }}</span>
-                                            </div>
-                                        </div>
-                                        <div class="review-rating">
-                                            <div class="stars">
-                                                <i class="fas fa-star" ng-repeat="i in getStars(review.rating) track by $index"></i>
-                                                <i class="far fa-star" ng-repeat="i in getEmptyStars(review.rating) track by $index"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="review-content">
-                                        <p>@{{ review.comment }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Write a Review Form -->
-                            <div class="write-review">
-                                <h4>Write a Review</h4>
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="reviewerName" class="form-label">Your Name</label>
-                                        <input type="text" class="form-control" id="reviewerName" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="reviewerEmail" class="form-label">Your Email</label>
-                                        <input type="email" class="form-control" id="reviewerEmail" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Your Rating</label>
-                                        <div class="rating-input">
-                                            <i class="far fa-star" ng-repeat="i in [1, 2, 3, 4, 5]" ng-click="setReviewRating(i)" ng-class="{'fas': reviewRating >= i}"></i>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="reviewContent" class="form-label">Your Review</label>
-                                        <textarea class="form-control" id="reviewContent" rows="5" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                                </form>
-                            </div>
-                        </div>
+                <!-- Product Description -->
+                <div class="product-description mt-5">
+                    <h3>Description</h3>
+                    <div class="description-content mt-4">
+                        <p>@{{ product.description }}</p>
+                        <ul>
+                            <li>Made from premium materials</li>
+                            <li>Designed for comfort and style</li>
+                            <li>Perfect for everyday wear</li>
+                            <li>Machine washable</li>
+                        </ul>
                     </div>
                 </div>
-                
+
                 <!-- You May Also Like -->
                 <div class="related-products mt-5">
                     <h3>You May Also Like</h3>
