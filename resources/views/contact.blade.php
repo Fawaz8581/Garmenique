@@ -26,6 +26,32 @@
         
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
+        <style>
+            .error-message {
+                color: #d9534f;
+                font-size: 12px;
+                margin-top: 5px;
+                text-align: left;
+            }
+            
+            input.ng-touched.ng-invalid, textarea.ng-touched.ng-invalid {
+                border-color: #d9534f;
+            }
+            
+            .alert {
+                padding: 15px;
+                margin-bottom: 20px;
+                border: 1px solid transparent;
+                border-radius: 4px;
+            }
+            
+            .alert-success {
+                color: #3c763d;
+                background-color: #dff0d8;
+                border-color: #d6e9c6;
+            }
+        </style>
     </head>
     <body ng-app="garmeniqueApp">
         <!-- Header Section -->
@@ -114,34 +140,37 @@
                                     <h1 class="contact-title">Let's talk about<br>your question</h1>
                                     <p class="contact-description">Drop us a line through the form below and we'll get back to you</p>
                                 </div>
+                                
+                                @if (session('status'))
+                                <div class="alert alert-success">
+                                    {{ session('status') }}
+                                </div>
+                                @endif
+                                
                                 <div class="contact-form-container">
-                                    <form class="contact-form" ng-controller="ContactFormController" ng-submit="submitForm()">
+                                    <form name="contactForm" class="contact-form" ng-controller="ContactFormController" ng-submit="submitForm()" novalidate>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <input type="text" id="firstName" placeholder="First name*" ng-model="formData.firstName" required>
+                                                <input type="text" id="firstName" name="firstName" placeholder="First name*" ng-model="formData.firstName" required>
+                                                <div ng-show="contactForm.firstName.$touched && contactForm.firstName.$invalid" class="error-message">First name is required</div>
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" id="lastName" placeholder="Last name*" ng-model="formData.lastName" required>
-                                            </div>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <input type="email" id="email" placeholder="Email address*" ng-model="formData.email" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" id="jobRole" placeholder="Job role" ng-model="formData.jobRole">
+                                                <input type="text" id="lastName" name="lastName" placeholder="Last name*" ng-model="formData.lastName" required>
+                                                <div ng-show="contactForm.lastName.$touched && contactForm.lastName.$invalid" class="error-message">Last name is required</div>
                                             </div>
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group full-width">
-                                                <input type="text" id="companyDomain" placeholder="Company domain" ng-model="formData.companyDomain">
+                                                <input type="email" id="email" name="email" placeholder="Email address*" ng-model="formData.email" required>
+                                                <div ng-show="contactForm.email.$touched && contactForm.email.$invalid" class="error-message">Valid email is required</div>
                                             </div>
                                         </div>
                                         <div class="form-group full-width">
-                                            <textarea id="message" placeholder="Tell us what you're hoping to achieve with Garmenique. We're here to help bring your fashion needs to life!" ng-model="formData.message" rows="5" required></textarea>
+                                            <textarea id="message" name="message" placeholder="Tell us what you're hoping to achieve with Garmenique. We're here to help bring your fashion needs to life!" ng-model="formData.message" rows="5" required></textarea>
+                                            <div ng-show="contactForm.message.$touched && contactForm.message.$invalid" class="error-message">Message is required</div>
                                         </div>
                                         <div class="form-actions">
-                                            <button type="submit" class="btn-submit">SEND MESSAGE</button>
+                                            <button type="submit" class="btn-submit" ng-disabled="contactForm.$invalid">SEND MESSAGE</button>
                                         </div>
                                     </form>
                                 </div>

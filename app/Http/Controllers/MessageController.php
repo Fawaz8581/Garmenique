@@ -16,60 +16,44 @@ class MessageController extends Controller
      */
     public function userMessages()
     {
-        // Get all users who have messages with the current user
-        $users = User::whereHas('messages', function($query) {
-            $query->where('from_user_id', Auth::id())
-                  ->orWhere('to_user_id', Auth::id());
-        })
-        ->withCount(['messages as unread_count' => function($query) {
-            $query->where('is_read', false)
-                  ->where('to_user_id', Auth::id());
-        }])
-        ->with(['messages' => function($query) {
-            $query->latest()->first();
-        }])
-        ->get()
-        ->map(function($user) {
-            // Get the last message for each user
-            $lastMessage = Message::where(function($query) use ($user) {
-                $query->where(function($q) use ($user) {
-                    $q->where('from_user_id', Auth::id())
-                      ->where('to_user_id', $user->id);
-                })->orWhere(function($q) use ($user) {
-                    $q->where('from_user_id', $user->id)
-                      ->where('to_user_id', Auth::id());
-                });
-            })
-            ->latest()
-            ->first();
-
-            $user->last_message = $lastMessage ? Str::limit($lastMessage->message, 30) : null;
-            return $user;
-        });
-
-        return view('messages.message_users', compact('users'));
+        return view('messages.message_users');
     }
 
     /**
      * Get messages for AJAX requests
      */
-    public function getMessages($userId)
+    public function getMessages()
     {
-        $messages = Message::where(function($query) use ($userId) {
-            $query->where(function($q) use ($userId) {
-                $q->where('from_user_id', Auth::id())
-                  ->where('to_user_id', $userId);
-            })->orWhere(function($q) use ($userId) {
-                $q->where('from_user_id', $userId)
-                  ->where('to_user_id', Auth::id());
+        // Get admin user
+        $admin = User::where('role', 'admin')->first();
+        
+        if (!$admin) {
+            return response()->json([]);
+        }
+
+        // Get messages between current user and admin
+        $messages = Message::where(function($query) use ($admin) {
+                $query->where(function($q) use ($admin) {
+                    $q->where('from_user_id', Auth::id())
+                      ->where('to_user_id', $admin->id);
+                })->orWhere(function($q) use ($admin) {
+                    $q->where('from_user_id', $admin->id)
+                      ->where('to_user_id', Auth::id());
+                });
+            })
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(function($message) {
+                return [
+                    'id' => $message->id,
+                    'content' => $message->message,
+                    'is_admin' => $message->is_admin,
+                    'created_at' => $message->created_at->format('M d, Y H:i')
+                ];
             });
-        })
-        ->orderBy('created_at', 'asc')
-        ->get();
 
         // Mark messages as read
         Message::where('to_user_id', Auth::id())
-              ->where('from_user_id', $userId)
               ->where('is_read', false)
               ->update(['is_read' => true]);
 
@@ -82,20 +66,28 @@ class MessageController extends Controller
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'to_user_id' => 'required|exists:users,id',
             'message' => 'required|string|max:1000',
         ]);
 
+        // Get admin user
+        $admin = User::where('role', 'admin')->first();
+        
+        if (!$admin) {
+            return response()->json(['error' => 'Admin user not found'], 500);
+        }
+
         $message = new Message();
         $message->from_user_id = Auth::id();
-        $message->to_user_id = $request->to_user_id;
+        $message->to_user_id = $admin->id;
         $message->message = $request->message;
         $message->is_read = false;
+        $message->is_admin = false;
         $message->save();
 
         return response()->json([
-            'success' => true,
-            'message' => $message
+            'id' => $message->id,
+            'content' => $message->message,
+            'created_at' => $message->created_at->format('M d, Y H:i')
         ]);
     }
 } 

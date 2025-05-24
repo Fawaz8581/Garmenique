@@ -35,9 +35,8 @@ Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('/contact', function () {
-    return view('contact');
-});
+Route::get('/contact', [App\Http\Controllers\ContactController::class, 'showContactForm']);
+Route::post('/contact/submit', [App\Http\Controllers\ContactController::class, 'submitContactForm']);
 
 Route::get('/catalog', [\App\Http\Controllers\CatalogController::class, 'index']);
 
@@ -70,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     // User Messages routes
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'userMessages'])->name('user.messages');
     Route::post('/messages/send', [\App\Http\Controllers\MessageController::class, 'sendMessage'])->name('messages.send');
-    Route::get('/messages/data', [\App\Http\Controllers\MessageController::class, 'getMessages'])->name('messages.data');
+    Route::get('/messages/admin', [\App\Http\Controllers\MessageController::class, 'getMessages'])->name('messages.data');
 });
 
 Route::get('/cart', function () {

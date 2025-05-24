@@ -23,8 +23,13 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <style>
+            /* Add space for fixed header */
+            body {
+                padding-top: 80px; /* This should match the header height */
+            }
+            
             .messages-container {
-                padding: 2rem 0;
+                padding: 2rem 0; /* Revert to original padding */
                 min-height: calc(100vh - 160px);
                 background-color: #f8f9fa;
             }
@@ -35,6 +40,17 @@
                 background: white;
                 border-radius: 10px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1000;
+                background-color: #fff;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                height: 80px; /* Set explicit height to match padding-top on body */
             }
 
             .chat-header {
@@ -185,7 +201,7 @@
 
             @media (max-width: 768px) {
                 .messages-container {
-                    padding: 1rem;
+                    padding: 1rem; /* Revert to original padding */
                 }
                 
                 .chat-container {
@@ -195,6 +211,11 @@
                 .chat-area {
                     height: calc(100vh - 400px);
                 }
+            }
+
+            /* Make sure container has proper spacing */
+            .container.nav-container {
+                padding: 15px;
             }
         </style>
     </head>
@@ -348,6 +369,9 @@
                                 chatMessages.appendChild(messageElement);
                             });
                             scrollToBottom();
+                        })
+                        .catch(error => {
+                            console.error('Error loading messages:', error);
                         });
                 }
 
@@ -384,14 +408,22 @@
                     .then(response => response.json())
                     .then(message => {
                         const messageElement = createMessageElement({
-                            ...message,
-                            is_admin: false
+                            id: message.id,
+                            content: message.content,
+                            is_admin: false,
+                            created_at: message.created_at
                         });
                         chatMessages.appendChild(messageElement);
                         scrollToBottom();
                         messageInput.value = '';
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
                     });
                 });
+
+                // Poll for new messages every 3 seconds
+                setInterval(loadMessages, 3000);
             });
         </script>
     </body>

@@ -44,6 +44,7 @@
         .user-item {
             cursor: pointer;
             transition: background-color 0.2s;
+            position: relative;
         }
 
         .user-item:hover {
@@ -52,6 +53,27 @@
 
         .user-item.active {
             background-color: #e9ecef;
+        }
+        
+        /* User info styles - align text to left */
+        .user-info {
+            width: 100%;
+            text-align: left;
+        }
+        
+        .user-info h6 {
+            text-align: left;
+        }
+        
+        .user-info p {
+            text-align: left;
+        }
+        
+        /* Badge positioning */
+        .badge {
+            position: absolute;
+            right: 15px;
+            margin-top: 0;
         }
 
         /* Chat Area Styles */
@@ -158,6 +180,36 @@
         .chat-area::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        /* User list styling */
+        .users-list {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        
+        /* Force text to be left-aligned */
+        .text-left {
+            text-align: left !important;
+        }
+        
+        /* Make sure flex doesn't center content */
+        .d-flex.align-items-center.p-3 {
+            justify-content: flex-start;
+        }
+        
+        /* Give user info proper width */
+        .user-info.ms-3 {
+            max-width: calc(100% - 55px); /* 40px avatar + 15px margin */
+            overflow: hidden;
+        }
+        
+        /* Ensure text doesn't overflow */
+        .user-info h6, 
+        .user-info p {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
@@ -195,7 +247,6 @@
             <li class="menu-item active">
                 <i class="fas fa-envelope"></i>
                 <span>Messages</span>
-                <span class="notification-badge">14</span>
             </li>
             <li class="menu-item">
                 <i class="fas fa-cog"></i>
@@ -249,9 +300,6 @@
                                             <p class="small text-muted mb-0">
                                                 {{ $user->email }}
                                             </p>
-                                            @if($user->unread_count > 0)
-                                                <span class="badge bg-danger rounded-pill">{{ $user->unread_count }}</span>
-                                            @endif
                                         </div>
                                     </div>
                                     @endforeach
@@ -366,6 +414,9 @@
                             chatMessages.appendChild(messageElement);
                         });
                         scrollToBottom();
+                    })
+                    .catch(error => {
+                        console.error('Error loading messages:', error);
                     });
             }
 
@@ -423,24 +474,26 @@
                 .then(response => response.json())
                 .then(message => {
                     const messageElement = createMessageElement({
-                        ...message,
-                        is_admin: true
+                        id: message.id,
+                        content: message.content,
+                        is_admin: true,
+                        created_at: message.created_at
                     });
                     chatMessages.appendChild(messageElement);
                     scrollToBottom();
                     messageInput.value = '';
+                })
+                .catch(error => {
+                    console.error('Error sending message:', error);
                 });
             });
 
-            // Enable real-time updates with Laravel Echo
-            window.Echo.private(`chat.${currentUserId}`)
-                .listen('MessageSent', (e) => {
-                    if (e.message.user_id === currentUserId) {
-                        const messageElement = createMessageElement(e.message);
-                        chatMessages.appendChild(messageElement);
-                        scrollToBottom();
-                    }
-                });
+            // Poll for new messages every 3 seconds
+            if (currentUserId) {
+                setInterval(() => {
+                    loadMessages(currentUserId);
+                }, 3000);
+            }
         });
     </script>
 </body>

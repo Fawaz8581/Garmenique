@@ -35,35 +35,60 @@ app.controller('HeaderController', ['$scope', '$window', '$rootScope', function(
 }]);
 
 // Contact Form Controller
-app.controller('ContactFormController', ['$scope', '$window', function($scope, $window) {
+app.controller('ContactFormController', ['$scope', '$window', '$http', function($scope, $window, $http) {
     // Initialize form data
     $scope.formData = {
         firstName: '',
         lastName: '',
         email: '',
-        jobRole: '',
-        companyDomain: '',
         message: ''
     };
     
     // Form submission handler
     $scope.submitForm = function() {
-        if ($scope.contactForm && $scope.contactForm.$valid) {
-            // In a real application, you'd send this data to a server
-            console.log('Form submitted:', $scope.formData);
+        if (!$scope.contactForm || $scope.contactForm.$valid) {
+            // Get the CSRF token
+            const token = document.querySelector('meta[name="csrf-token"]').content;
             
-            // Show success message (in a real app you'd wait for API response)
-            alert('Thank you for your message! We will get back to you soon.');
-            
-            // Reset form
-            $scope.formData = {
-                firstName: '',
-                lastName: '',
-                email: '',
-                jobRole: '',
-                companyDomain: '',
-                message: ''
+            // Prepare data
+            const formData = {
+                _token: token,
+                firstName: $scope.formData.firstName,
+                lastName: $scope.formData.lastName,
+                email: $scope.formData.email,
+                message: $scope.formData.message
             };
+            
+            // Send data to server
+            $http({
+                method: 'POST',
+                url: '/contact/submit',
+                data: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            }).then(function(response) {
+                if (response.data.success) {
+                    alert(response.data.message);
+                    
+                    // Reset form
+                    $scope.formData = {
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        message: ''
+                    };
+                    
+                    // If there's a redirect URL, navigate to it
+                    if (response.data.redirect) {
+                        window.location.href = response.data.redirect;
+                    }
+                }
+            }).catch(function(error) {
+                console.error('Error submitting form:', error);
+                alert('There was an error submitting your message. Please try again later.');
+            });
         }
     };
 }]);

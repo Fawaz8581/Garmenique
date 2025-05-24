@@ -122,7 +122,6 @@
             <li class="menu-item">
                 <i class="fas fa-envelope"></i>
                 <span>Messages</span>
-                <span class="notification-badge">14</span>
             </li>
             <li class="menu-item">
                 <i class="fas fa-cog"></i>
