@@ -189,21 +189,36 @@
             .size-btn {
                 background: #fff;
                 border: 1px solid #ddd;
-                width: 40px;
-                height: 40px;
+                padding: 6px 10px;
+                min-width: 40px;
+                height: 32px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                margin-right: 8px;
-                margin-bottom: 8px;
                 cursor: pointer;
                 font-size: 0.8rem;
+                transition: all 0.2s ease;
+                border-radius: 4px;
+                margin-right: 8px;
+                margin-bottom: 8px;
+            }
+            
+            .size-btn:hover {
+                border-color: #333;
             }
             
             .size-btn.active {
                 background: #333;
                 color: #fff;
                 border-color: #333;
+            }
+            
+            .clothing-sizes,
+            .number-sizes {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 15px;
             }
             
             .products-header {
@@ -444,6 +459,29 @@
             .price-inputs input {
                 text-align: right;
             }
+
+            /* Size filter styles */
+            .filter-subheading {
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: #666;
+                margin-bottom: 8px;
+            }
+            
+            .product-sizes {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                margin-top: 8px;
+            }
+            
+            .size-badge {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+                background: #f5f5f5;
+                border-radius: 3px;
+                color: #666;
+            }
         </style>
     </head>
     <body>
@@ -565,15 +603,24 @@
 
                     <div class="filter-group">
                         <h3 class="filter-heading">Size</h3>
-                        <div>
-                            <button class="size-btn">XS</button>
-                            <button class="size-btn">S</button>
-                            <button class="size-btn">M</button>
-                            <button class="size-btn">L</button>
-                            <button class="size-btn">XL</button>
-                            <button class="size-btn">XXL</button>
+                        @foreach($availableSizes as $type => $sizes)
+                            <div class="mb-3">
+                                <h4 class="filter-subheading">{{ ucfirst($type) }} Sizes</h4>
+                                <div class="{{ strtolower($type) }}-sizes">
+                                    @foreach($sizes as $size)
+                                        <button type="button" 
+                                                class="size-btn" 
+                                                data-size-type="{{ $type }}" 
+                                                data-size-id="{{ $size->id }}"
+                                                data-size-name="{{ $size->name }}"
+                                                onclick="toggleSize(this)">
+                                            {{ $size->name }}
+                                        </button>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
+                    </div>
 
                     <div class="filter-group">
                         <h3 class="filter-heading">Price Range</h3>
@@ -617,25 +664,39 @@
                     <div class="row mt-5 pt-3" id="productsContainer">
                         @if(count($products) > 0)
                             @foreach($products as $product)
-                            <div class="col-md-6 product-card mb-5" data-category="{{ $product->category->slug ?? 'uncategorized' }}" data-price="{{ $product->price }}">
+                            <div class="col-md-6 product-card mb-5" 
+                                data-category="{{ $product->category->slug ?? 'uncategorized' }}" 
+                                data-price="{{ $product->price }}"
+                                data-sizes="{{ json_encode($product->sizes) }}">
                                 <div class="product-container">
-                                <div class="product-image">
-                                    <a href="/catalog/product/{{ $product->id }}">
-                                        @if(!empty($product->images) && count($product->images) > 0)
-                                            <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
-                                        @else
-                                            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
-                                        @endif
-                                    </a>
-                                </div>
-                                        <div class="product-info">
-                                    <h3 class="product-title">
-                                        <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
-                                            </h3>
-                                    <p class="product-brand">{{ $product->category->name ?? 'Uncategorized' }}</p>
-                                            <div class="product-price">
+                                    <div class="product-image">
+                                        <a href="/catalog/product/{{ $product->id }}">
+                                            @if(!empty($product->images) && count($product->images) > 0)
+                                                <img src="{{ $product->images[0] }}" alt="{{ $product->name }}">
+                                            @else
+                                                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}">
+                                            @endif
+                                        </a>
+                                    </div>
+                                    <div class="product-info">
+                                        <h3 class="product-title">
+                                            <a href="/catalog/product/{{ $product->id }}" class="text-dark text-decoration-none">{{ $product->name }}</a>
+                                        </h3>
+                                        <p class="product-brand">{{ $product->category->name ?? 'Uncategorized' }}</p>
+                                        <div class="product-price">
                                             <span>IDR {{ number_format($product->price, 0, ',', '.') }}</span>
-                                            </div>
+                                        </div>
+                                        <div class="product-sizes">
+                                            @foreach($product->sizes as $size)
+                                                @if(isset($size['pivot']['stock']) && $size['pivot']['stock'] > 0)
+                                                    <span class="size-badge" 
+                                                          data-size-id="{{ $size['id'] }}" 
+                                                          data-size-type="{{ $size['type'] }}">
+                                                        {{ $size['name'] }}
+                                                    </span>
+                                                @endif
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -718,10 +779,17 @@
         <script src="{{ asset('js/catalog.js') }}"></script>
         
         <script>
-            // Legacy non-angular code for filters
             document.addEventListener('DOMContentLoaded', function() {
                 // Get categories from PHP
                 const categories = @json($categories->pluck('slug'));
+                
+                // Initialize filter state
+                const filterState = {
+                    categories: [],
+                    sizes: [],
+                    minPrice: 0,
+                    maxPrice: Infinity
+                };
                 
                 // Count products per category
                 categories.forEach(category => {
@@ -732,70 +800,118 @@
                     }
                 });
                 
-                // Toggle size buttons
+                // Toggle size buttons with visual feedback
                 const sizeButtons = document.querySelectorAll('.size-btn');
                 sizeButtons.forEach(btn => {
                     btn.addEventListener('click', function() {
+                        const sizeType = btn.dataset.sizeType;
+                        const sizeId = parseInt(btn.dataset.sizeId);
+                        const sizeName = btn.dataset.sizeName;
+                        
+                        // Toggle active state
                         btn.classList.toggle('active');
+                        
+                        // Update filter state
+                        updateFilterState();
+                        
+                        // Apply filters
                         filterProducts();
+                        
+                        // Log for debugging
+                        console.log('Size button clicked:', { sizeType, sizeId, sizeName });
+                        console.log('Current filter state:', filterState);
                     });
                 });
                 
                 // Category filter checkboxes
                 const categoryCheckboxes = document.querySelectorAll('.category-filter');
                 categoryCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', filterProducts);
-                });
-                
-                // Sort functionality
-                const sortSelect = document.getElementById('sortSelect');
-                if (sortSelect) {
-                    sortSelect.addEventListener('change', function() {
-                        sortProducts(this.value);
-                    });
-                }
-                
-                // Price input formatting
-                const priceInputs = document.querySelectorAll('.price-input');
-                priceInputs.forEach(input => {
-                    input.addEventListener('input', function(e) {
-                        // Remove non-numeric characters
-                        let value = this.value.replace(/\D/g, '');
-                        
-                        // Format with thousand separators
-                        if (value.length > 0) {
-                            value = parseInt(value).toLocaleString('id-ID');
-                        }
-                        
-                        this.value = value;
+                    checkbox.addEventListener('change', function() {
+                        updateFilterState();
                         filterProducts();
                     });
                 });
+
+                // Price input handling
+                const priceInputs = document.querySelectorAll('.price-input');
+                priceInputs.forEach(input => {
+                    input.addEventListener('input', function(e) {
+                        let value = this.value.replace(/\D/g, '');
+                        if (value.length > 0) {
+                            this.value = new Intl.NumberFormat('id-ID').format(value);
+                        }
+                        updateFilterState();
+                        filterProducts();
+                    });
+                });
+
+                // Update filter state
+                function updateFilterState() {
+                    // Update categories
+                    filterState.categories = Array.from(document.querySelectorAll('.category-filter:checked'))
+                        .map(cb => cb.dataset.category);
+
+                    // Update sizes
+                    filterState.sizes = Array.from(document.querySelectorAll('.size-btn.active'))
+                        .map(btn => ({
+                            id: parseInt(btn.dataset.sizeId),
+                            type: btn.dataset.sizeType,
+                            name: btn.dataset.sizeName
+                        }));
+
+                    // Update price range
+                    filterState.minPrice = parseInt(document.getElementById('minPrice').value.replace(/\D/g, '')) || 0;
+                    filterState.maxPrice = parseInt(document.getElementById('maxPrice').value.replace(/\D/g, '')) || Infinity;
+                    
+                    // Log for debugging
+                    console.log('Filter state updated:', filterState);
+                }
                 
                 // Product filtering function
                 function filterProducts() {
                     const products = document.querySelectorAll('.product-card');
-                    const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.dataset.category);
-                    const selectedSizes = Array.from(document.querySelectorAll('.size-btn.active')).map(btn => btn.textContent.trim());
-                    const minPrice = parseInt(document.getElementById('minPrice').value.replace(/\D/g, '')) || 0;
-                    const maxPrice = parseInt(document.getElementById('maxPrice').value.replace(/\D/g, '')) || Infinity;
-                    
                     let visibleCount = 0;
                     
                     products.forEach(product => {
                         const productCategory = product.dataset.category;
                         const productPrice = parseInt(product.dataset.price);
+                        const productSizes = JSON.parse(product.dataset.sizes || '[]');
                         
                         // Apply filters
                         let showProduct = true;
                         
-                        // Category filter - only apply if categories are selected
-                        if (selectedCategories.length > 0 && !selectedCategories.includes(productCategory)) {
+                        // Category filter
+                        if (filterState.categories.length > 0 && !filterState.categories.includes(productCategory)) {
                             showProduct = false;
                         }
                         
-                        // Price filter - only apply if price is outside range
-                        if (productPrice < minPrice || (maxPrice !== Infinity && productPrice > maxPrice)) {
+                        // Size filter
+                        if (filterState.sizes.length > 0) {
+                            const sizeMatch = filterState.sizes.some(selectedSize => {
+                                return productSizes.some(productSize => {
+                                    const match = productSize.id === selectedSize.id && 
+                                           productSize.type === selectedSize.type &&
+                                           productSize.stock > 0;
+                                    
+                                    // Log for debugging
+                                    console.log('Size comparison:', {
+                                        selected: selectedSize,
+                                        product: productSize,
+                                        matches: match
+                                    });
+                                    
+                                    return match;
+                                });
+                            });
+                            
+                            if (!sizeMatch) {
+                                showProduct = false;
+                            }
+                        }
+                        
+                        // Price filter
+                        if (productPrice < filterState.minPrice || 
+                            (filterState.maxPrice !== Infinity && productPrice > filterState.maxPrice)) {
                             showProduct = false;
                         }
                         
@@ -804,6 +920,13 @@
                         if (showProduct) {
                             visibleCount++;
                         }
+                        
+                        // Log for debugging
+                        console.log('Product visibility:', {
+                            product: product.querySelector('.product-title')?.textContent,
+                            visible: showProduct,
+                            sizes: productSizes
+                        });
                     });
                     
                     // Update count display
@@ -811,79 +934,160 @@
                     if (visibleProductCountEl) {
                         visibleProductCountEl.textContent = visibleCount;
                     }
+
+                    // Update total count
+                    const totalProductCountEl = document.getElementById('totalProductCount');
+                    if (totalProductCountEl) {
+                        totalProductCountEl.textContent = products.length;
+                    }
                 }
                 
-                // Product sorting function
-                function sortProducts(sortBy) {
-                    const productsContainer = document.getElementById('productsContainer');
-                    const products = Array.from(productsContainer.querySelectorAll('.product-card'));
-                    
-                    products.sort((a, b) => {
-                        const priceA = parseInt(a.dataset.price);
-                        const priceB = parseInt(b.dataset.price);
-                        
-                        switch(sortBy) {
-                            case 'price_low':
-                                return priceA - priceB;
-                            case 'price_high':
-                                return priceB - priceA;
-                            case 'newest':
-                                // Would need a date attribute on products
-                                return 0;
-                            case 'featured':
-                            default:
-                                // Default ordering
-                                return 0;
-                        }
-                    });
-                    
-                    // Re-append products in sorted order
-                    products.forEach(product => {
-                        productsContainer.appendChild(product);
-                    });
-                }
-                
-                // Reset filters button functionality
+                // Reset filters
                 const resetButton = document.getElementById('resetFilters');
                 if (resetButton) {
                     resetButton.addEventListener('click', function() {
                         // Reset category checkboxes
-                        const categoryCheckboxes = document.querySelectorAll('.category-filter');
-                        categoryCheckboxes.forEach(checkbox => {
+                        document.querySelectorAll('.category-filter').forEach(checkbox => {
                             checkbox.checked = false;
                         });
                         
                         // Reset size buttons
-                        sizeButtons.forEach(btn => {
+                        document.querySelectorAll('.size-btn').forEach(btn => {
                             btn.classList.remove('active');
                         });
                         
                         // Reset price inputs
-                        priceInputs.forEach(input => {
+                        document.querySelectorAll('.price-input').forEach(input => {
                             input.value = '';
                         });
                         
+                        // Reset filter state
+                        filterState.categories = [];
+                        filterState.sizes = [];
+                        filterState.minPrice = 0;
+                        filterState.maxPrice = Infinity;
+                        
                         // Reset sort select
+                        const sortSelect = document.getElementById('sortSelect');
                         if (sortSelect) {
                             sortSelect.value = 'featured';
                         }
                         
                         // Show all products
-                        document.querySelectorAll('.product-card').forEach(card => {
-                            card.style.display = '';
-                        });
-                        
-                        // Update product count
-                        const visibleProductCountEl = document.getElementById('visibleProductCount');
-                        const totalProductCount = document.querySelectorAll('.product-card').length;
-                        if (visibleProductCountEl) {
-                            visibleProductCountEl.textContent = totalProductCount;
-                        }
+                        filterProducts();
                     });
                 }
                 
                 // Initialize filters
+                updateFilterState();
                 filterProducts();
+            });
+
+            function toggleSize(button) {
+                // Toggle active class
+                button.classList.toggle('active');
+                
+                // Get all active size buttons
+                const activeSizes = document.querySelectorAll('.size-btn.active');
+                
+                // Get all products
+                const products = document.querySelectorAll('.product-card');
+                
+                // If no sizes selected, show all products
+                if (activeSizes.length === 0) {
+                    products.forEach(product => {
+                        product.style.display = '';
+                    });
+                    updateProductCount();
+                    return;
+                }
+                
+                // Filter products based on selected sizes
+                products.forEach(product => {
+                    const productSizes = JSON.parse(product.dataset.sizes || '[]');
+                    console.log('Product Sizes:', productSizes); // Debug log
+                    
+                    // Check if product has any of the selected sizes with stock > 0
+                    const hasSelectedSize = Array.from(activeSizes).some(sizeBtn => {
+                        const selectedSizeId = parseInt(sizeBtn.dataset.sizeId);
+                        const selectedSizeType = sizeBtn.dataset.sizeType;
+                        
+                        console.log('Checking size:', { // Debug log
+                            selectedSizeId,
+                            selectedSizeType,
+                            buttonText: sizeBtn.textContent.trim()
+                        });
+                        
+                        const match = productSizes.some(productSize => {
+                            const sizeMatch = productSize.id === selectedSizeId &&
+                                            productSize.type === selectedSizeType &&
+                                            productSize.stock > 0;
+                            
+                            console.log('Size comparison:', { // Debug log
+                                productSize,
+                                selectedSizeId,
+                                selectedSizeType,
+                                sizeMatch
+                            });
+                            
+                            return sizeMatch;
+                        });
+                        
+                        return match;
+                    });
+                    
+                    console.log('Product visibility:', { // Debug log
+                        product: product.querySelector('.product-title')?.textContent,
+                        hasSelectedSize
+                    });
+                    
+                    // Show/hide product based on size match
+                    product.style.display = hasSelectedSize ? '' : 'none';
+                });
+                
+                // Update product count
+                updateProductCount();
+                
+                // Debug log of current filter state
+                console.log('Current filter state:', {
+                    activeSizes: Array.from(activeSizes).map(btn => ({
+                        id: btn.dataset.sizeId,
+                        type: btn.dataset.sizeType,
+                        name: btn.textContent.trim()
+                    })),
+                    visibleProducts: document.querySelectorAll('.product-card[style="display: "]').length,
+                    totalProducts: products.length
+                });
+            }
+            
+            function updateProductCount() {
+                const visibleProducts = document.querySelectorAll('.product-card[style="display: "]').length;
+                const totalProducts = document.querySelectorAll('.product-card').length;
+                
+                const visibleProductCountEl = document.getElementById('visibleProductCount');
+                const totalProductCountEl = document.getElementById('totalProductCount');
+                
+                if (visibleProductCountEl) {
+                    visibleProductCountEl.textContent = visibleProducts;
+                }
+                if (totalProductCountEl) {
+                    totalProductCountEl.textContent = totalProducts;
+                }
+            }
+            
+            // Initialize product count
+            document.addEventListener('DOMContentLoaded', function() {
+                updateProductCount();
+                
+                // Debug log of initial product sizes
+                const products = document.querySelectorAll('.product-card');
+                products.forEach(product => {
+                    const productSizes = JSON.parse(product.dataset.sizes || '[]');
+                    console.log('Initial product sizes:', {
+                        product: product.querySelector('.product-title')?.textContent,
+                        sizes: productSizes
+                    });
+                });
             });
         </script>
     </body>
