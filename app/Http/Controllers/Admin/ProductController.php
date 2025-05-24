@@ -60,9 +60,18 @@ class ProductController extends Controller
             if (is_array($sizes)) {
                 foreach ($sizes as $sizeData) {
                     if (isset($sizeData['id']) && isset($sizeData['stock']) && $sizeData['stock'] > 0) {
-                        $product->sizes()->attach($sizeData['id'], [
-                            'stock' => $sizeData['stock']
-                        ]);
+                        // Get the size model to access its name
+                        $size = Size::find($sizeData['id']);
+                        if ($size) {
+                            // Insert directly into product_sizes table
+                            DB::table('product_sizes')->insert([
+                                'product_id' => $product->id,
+                                'size' => $size->name,
+                                'stock' => $sizeData['stock'],
+                                'created_at' => now(),
+                                'updated_at' => now()
+                            ]);
+                        }
                     }
                 }
             }
@@ -125,22 +134,61 @@ class ProductController extends Controller
                 ]);
             }
 
-            // Update sizes
-            $product->sizes()->detach(); // Remove all existing size relationships
+            // Update sizes - use sync instead of detach/attach
             $sizes = json_decode($request->sizes, true);
+            $syncData = [];
             
             if (is_array($sizes)) {
                 foreach ($sizes as $sizeData) {
                     if (isset($sizeData['id']) && isset($sizeData['stock']) && $sizeData['stock'] > 0) {
-                        $product->sizes()->attach($sizeData['id'], [
-                            'stock' => $sizeData['stock']
+                        // Get the size model to access its name
+                        $size = Size::find($sizeData['id']);
+                        if ($size) {
+                            // Use size name as the key in pivot table
+                            $syncData[$size->name] = ['stock' => $sizeData['stock']];
+                        }
+                    }
+                }
+            }
+            
+            // Use updateExistingPivot to directly update stock values for existing relationships
+            foreach ($syncData as $sizeName => $attributes) {
+                // Find if this size already exists for this product
+                $sizeId = DB::table('sizes')
+                    ->where('name', $sizeName)
+                    ->value('id');
+                
+                if ($sizeId) {
+                    // Check if relationship exists
+                    $exists = DB::table('product_sizes')
+                        ->where('product_id', $product->id)
+                        ->where('size', $sizeName)
+                        ->exists();
+                    
+                    if ($exists) {
+                        // Update existing record
+                        DB::table('product_sizes')
+                            ->where('product_id', $product->id)
+                            ->where('size', $sizeName)
+                            ->update(['stock' => $attributes['stock']]);
+                    } else {
+                        // Insert new record
+                        DB::table('product_sizes')->insert([
+                            'product_id' => $product->id,
+                            'size' => $sizeName,
+                            'stock' => $attributes['stock'],
+                            'created_at' => now(),
+                            'updated_at' => now()
                         ]);
                     }
                 }
             }
 
             // Update product status based on total stock
-            $totalStock = $product->sizes()->sum('stock');
+            $totalStock = DB::table('product_sizes')
+                ->where('product_id', $product->id)
+                ->sum('stock');
+                
             $product->update([
                 'status' => $totalStock > 0 ? 'In Stock' : 'Out of Stock'
             ]);

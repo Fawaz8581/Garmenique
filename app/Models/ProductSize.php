@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class ProductSize extends Model
+class ProductSize extends Pivot
 {
     use HasFactory;
+
+    protected $table = 'product_sizes';
 
     protected $fillable = [
         'product_id',
@@ -21,6 +23,14 @@ class ProductSize extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the size that belongs to this pivot.
+     */
+    public function size()
+    {
+        return $this->belongsTo(Size::class, 'size', 'name');
     }
 
     /**
