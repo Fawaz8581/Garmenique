@@ -181,39 +181,45 @@
         
         // Increase quantity
         $scope.increaseQuantity = function(item) {
-            $scope.recheckAuth().then(function() {
-                if (!$scope.isAuthenticated) {
-                    alert('Please login to manage your cart');
-                    $window.location.href = '/login';
-                    return;
-                }
-                
-                item.quantity++;
-                saveCartToSession();
-            });
+            console.log('Increasing quantity for item:', item.name, 'from', item.quantity);
+            
+            // Langsung tambahkan kuantitas
+            item.quantity++;
+            
+            // Simpan perubahan
+            saveCartToSession();
+            
+            // Update UI
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
         };
         
         // Decrease quantity
         $scope.decreaseQuantity = function(item) {
-            $scope.recheckAuth().then(function() {
-                if (!$scope.isAuthenticated) {
-                    alert('Please login to manage your cart');
-                    $window.location.href = '/login';
-                    return;
-                }
+            console.log('Decreasing quantity for item:', item.name, 'from', item.quantity);
+            
+            if(item.quantity > 1) {
+                // Kurangi kuantitas
+                item.quantity--;
                 
-                if(item.quantity > 1) {
-                    item.quantity--;
-                } else {
-                    // Remove item if quantity becomes 0
-                    var index = $scope.cartItems.indexOf(item);
-                    if(index !== -1) {
-                        $scope.cartItems.splice(index, 1);
-                    }
-                }
-                
+                // Simpan perubahan
                 saveCartToSession();
-            });
+            } else {
+                // Hapus item dari keranjang
+                var index = $scope.cartItems.indexOf(item);
+                if(index !== -1) {
+                    $scope.cartItems.splice(index, 1);
+                    
+                    // Simpan perubahan
+                    saveCartToSession();
+                }
+            }
+            
+            // Update UI
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
         };
         
         // Calculate subtotal
@@ -225,7 +231,7 @@
                     item.price;
                 subtotal += price * item.quantity;
             });
-            return subtotal * 15500; // Converting to IDR
+            return subtotal;
         };
         
         // Get total items
@@ -248,6 +254,40 @@
                 
                 $window.location.href = '/checkout';
             });
+        };
+        
+        // Force refresh cart items dengan nilai UI
+        $scope.syncWithDom = function() {
+            console.log('Syncing cart items with DOM');
+            
+            var cartItems = document.querySelectorAll('.cart-item');
+            
+            // Loop melalui semua item di cart UI
+            cartItems.forEach(function(itemEl, index) {
+                if (index < $scope.cartItems.length) {
+                    var qtyInput = itemEl.querySelector('input[type="text"]');
+                    if (qtyInput) {
+                        var newQty = parseInt(qtyInput.value) || 1;
+                        $scope.cartItems[index].quantity = newQty;
+                    }
+                }
+            });
+            
+            // Update UI
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
+            
+            // Simpan perubahan
+            saveCartToSession();
+        };
+        
+        // Expose syncWithDom ke window agar bisa dipanggil dari script di template
+        window.syncCartWithDom = function() {
+            var cartScope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+            if (cartScope) {
+                cartScope.syncWithDom();
+            }
         };
     }]);
 

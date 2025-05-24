@@ -414,17 +414,22 @@
                     return;
                 }
 
-                // Add to cart logic here
+                // Create product data object
                 const productData = {
                     id: {{ $product->id }},
                     name: '{{ $product->name }}',
                     price: {{ $product->price }},
+                    image: '{{ !empty($product->images) && count($product->images) > 0 ? asset($product->images[0]) : "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" }}',
                     size: selectedSize,
+                    color: 'Default', // Adding default color since it's required by cart
                     quantity: quantity
                 };
 
-                // You can implement your cart logic here
-                console.log('Adding to cart:', productData);
+                // Call the Angular controller's addToCart function
+                const scope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+                scope.$apply(function() {
+                    scope.addToCart(productData);
+                });
             }
         </script>
     </body>

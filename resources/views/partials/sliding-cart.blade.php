@@ -10,20 +10,25 @@
     </div>
     
     <div class="sliding-cart-body">
+        <!-- Debug Info (hide in production) -->
+        <div style="display: none;">
+            <pre>Auth: @{{ isAuthenticated }}, Loading: @{{ isLoading }}, Items: @{{ cartItems.length }}</pre>
+        </div>
+        
         <!-- Loading State -->
         <div class="cart-loading" ng-if="isLoading">
             <div class="spinner"></div>
             <p>Loading your cart...</p>
         </div>
         
-        <!-- Auth Required Message -->
-        <div class="auth-message" ng-if="!isAuthenticated && !isLoading">
+        <!-- Auth Required Message (only in cart.js pages, not catalog.js) -->
+        <div class="auth-message" ng-if="!isAuthenticated && !isLoading && cartItems.length === 0">
             <p>Please log in to view your cart</p>
             <a href="/login" class="login-button">Login / Register</a>
         </div>
         
         <!-- Cart Items -->
-        <div class="cart-items" ng-if="cartItems.length > 0 && isAuthenticated && !isLoading">
+        <div class="cart-items" ng-if="cartItems.length > 0">
             <div class="cart-item" ng-repeat="item in cartItems">
                 <div class="cart-item-image">
                     <img ng-src="@{{ item.image }}" alt="@{{ item.name }}">
@@ -34,16 +39,16 @@
                         @{{ item.size }} · @{{ item.color }}
                     </p>
                     <div class="cart-item-price">
-                        <span class="current-price" ng-if="item.discount">IDR @{{ (item.price * (1 - item.discount/100) * 15500).toLocaleString('id-ID') }}</span>
-                        <span class="current-price" ng-if="!item.discount">IDR @{{ (item.price * 15500).toLocaleString('id-ID') }}</span>
-                        <span class="old-price" ng-if="item.discount">IDR @{{ (item.price * 15500).toLocaleString('id-ID') }}</span>
+                        <span class="current-price" ng-if="item.discount">IDR @{{ (item.price * (1 - item.discount/100)).toLocaleString('id-ID') }}</span>
+                        <span class="current-price" ng-if="!item.discount">IDR @{{ item.price.toLocaleString('id-ID') }}</span>
+                        <span class="old-price" ng-if="item.discount">IDR @{{ item.price.toLocaleString('id-ID') }}</span>
                         <span class="discount-badge" ng-if="item.discount">@{{ item.discount }}% Off</span>
                     </div>
                 </div>
                 <div class="cart-item-quantity">
-                    <button class="quantity-btn minus" ng-click="decreaseQuantity(item)">−</button>
+                    <button class="quantity-btn minus" ng-click="decreaseQuantity(item)" onclick="handleQuantityAction('decrease', this)">−</button>
                     <input type="text" ng-model="item.quantity" readonly>
-                    <button class="quantity-btn plus" ng-click="increaseQuantity(item)">+</button>
+                    <button class="quantity-btn plus" ng-click="increaseQuantity(item)" onclick="handleQuantityAction('increase', this)">+</button>
                 </div>
             </div>
         </div>
@@ -54,7 +59,7 @@
         </div>
     </div>
     
-    <div class="sliding-cart-footer" ng-if="cartItems.length > 0 && isAuthenticated && !isLoading">
+    <div class="sliding-cart-footer" ng-if="cartItems.length > 0">
         <div class="cart-subtotal">
             <span>Subtotal (@{{ getTotalItems() }} items)</span>
             <span class="subtotal-price">IDR @{{ calculateSubtotal().toLocaleString('id-ID') }}</span>
@@ -112,4 +117,71 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-</style> 
+</style>
+
+<script>
+// Fungsi bantuan untuk memastikan controller terupdate
+function updateCartController() {
+    // Get cart controller scope
+    var cartScope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+    if (cartScope) {
+        // Force angular to check for changes
+        if (!cartScope.$$phase) {
+            cartScope.$apply();
+        }
+    }
+}
+
+// Fungsi bantuan untuk menangani tombol kuantitas
+function handleQuantityAction(action, button) {
+    console.log('Handling quantity action:', action);
+    
+    // Mencari input quantity dari tombol yang diklik
+    var inputEl = button.parentNode.querySelector('input');
+    if (!inputEl) return;
+    
+    // Mendapatkan nilai saat ini
+    var currentQty = parseInt(inputEl.value) || 1;
+    
+    // Ubah nilai berdasarkan aksi
+    if (action === 'increase') {
+        inputEl.value = currentQty + 1;
+    } else if (action === 'decrease') {
+        if (currentQty > 1) {
+            inputEl.value = currentQty - 1;
+        } else {
+            // Jika akan dihapus, cari item di cart dan hapus
+            var itemContainer = button.closest('.cart-item');
+            if (itemContainer) {
+                itemContainer.style.opacity = '0.5';
+                setTimeout(function() {
+                    if (itemContainer.parentNode) {
+                        itemContainer.parentNode.removeChild(itemContainer);
+                    }
+                    
+                    // Check if cart is empty after removal
+                    var remainingItems = document.querySelectorAll('.cart-item');
+                    if (remainingItems.length === 0) {
+                        var emptyCart = document.querySelector('.empty-cart');
+                        if (emptyCart) {
+                            emptyCart.style.display = 'block';
+                        }
+                        
+                        var cartFooter = document.querySelector('.sliding-cart-footer');
+                        if (cartFooter) {
+                            cartFooter.style.display = 'none';
+                        }
+                    }
+                }, 500);
+            }
+        }
+    }
+    
+    // Sinkronkan nilai input ke model AngularJS
+    if (typeof window.syncCartWithDom === 'function') {
+        setTimeout(function() {
+            window.syncCartWithDom();
+        }, 100);
+    }
+}
+</script> 

@@ -770,12 +770,88 @@ app.controller('AccountDropdownController', ['$scope', '$timeout', function($sco
 }]);
 
 // Cart Controller
-app.controller('CartController', ['$scope', '$window', '$rootScope', function($scope, $window, $rootScope) {
+app.controller('CartController', ['$scope', '$window', '$rootScope', '$http', function($scope, $window, $rootScope, $http) {
     // Initialize cart
     $scope.isCartActive = false;
     $scope.cartItems = [];
+    $scope.isAuthenticated = true; // Default to true to prevent login message
+    $scope.isLoading = false; // Set to false to avoid prolonged loading state
     
-    // Load cart items from localStorage on initialization
+    console.log('CartController initialized in catalog.js');
+    
+    // Setup CSRF token for all AJAX requests
+    var token = document.querySelector('meta[name="csrf-token"]');
+    if (token) {
+        $http.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+        console.log('CSRF token set up');
+    } else {
+        console.error('CSRF token not found in page');
+    }
+    
+    // Check authentication status immediately
+    $http.get('/check-auth?_=' + new Date().getTime(), {
+        headers: {'Cache-Control': 'no-cache'}
+    })
+    .then(function(response) {
+        console.log('Auth check response in catalog.js:', response.data);
+        $scope.isAuthenticated = response.data.authenticated;
+        
+        if ($scope.isAuthenticated) {
+            console.log('User is authenticated, loading cart from session');
+            loadCartFromSession();
+        } else {
+            console.log('User is not authenticated, loading cart from localStorage');
+            loadCartFromStorage();
+        }
+    })
+    .catch(function(error) {
+        console.error('Auth check error in catalog.js:', error);
+        // Default to true on error to prevent login message
+        $scope.isAuthenticated = true;
+        loadCartFromStorage();
+    })
+    .finally(function() {
+        $scope.isLoading = false;
+        // Force UI update
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
+    });
+    
+    // Load cart from session storage
+    function loadCartFromSession() {
+        console.log('Loading cart from session in catalog.js');
+        return $http.get('/get-cart?_=' + new Date().getTime(), {
+            headers: {'Cache-Control': 'no-cache'}
+        })
+        .then(function(response) {
+            console.log('Get cart response in catalog.js:', response.data);
+            if (response.data.cart && Array.isArray(response.data.cart)) {
+                $scope.cartItems = response.data.cart;
+                console.log('Cart loaded successfully with', $scope.cartItems.length, 'items');
+            } else {
+                console.log('Cart is empty in session');
+                $scope.cartItems = [];
+            }
+            
+            // Force UI update
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
+        })
+        .catch(function(error) {
+            console.error('Error loading cart from session in catalog.js:', error);
+            $scope.cartItems = [];
+            loadCartFromStorage(); // Fallback to localStorage
+            
+            // Force UI update
+            if(!$scope.$$phase) {
+                $scope.$apply();
+            }
+        });
+    }
+    
+    // Load cart items from localStorage
     function loadCartFromStorage() {
         try {
             var storedCart = localStorage.getItem('garmenique_cart');
@@ -796,8 +872,26 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
         }
     }
     
-    // Initialize from localStorage
-    loadCartFromStorage();
+    // Save cart to session
+    function saveCartToSession() {
+        if (!$scope.isAuthenticated) {
+            saveCartToStorage(); // Fallback to localStorage
+            return Promise.resolve();
+        }
+        
+        return $http.post('/save-cart', {
+            cart: $scope.cartItems
+        })
+        .then(function(response) {
+            console.log('Cart saved to session:', response.data);
+            return response;
+        })
+        .catch(function(error) {
+            console.error('Error saving cart to session:', error);
+            saveCartToStorage(); // Fallback to localStorage
+            throw error;
+        });
+    }
     
     // Listen for broadcast events
     $rootScope.$on('openCart', function() {
@@ -833,8 +927,12 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
             $scope.cartItems.push(item);
         }
         
-        // Save updated cart to localStorage
-        saveCartToStorage();
+        // Save updated cart
+        if ($scope.isAuthenticated) {
+            saveCartToSession();
+        } else {
+            saveCartToStorage();
+        }
         
         // Open the cart
         $scope.openCart();
@@ -847,12 +945,26 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
     
     // Increase quantity
     $scope.increaseQuantity = function(item) {
+        console.log('Increasing quantity for item:', item.name);
         item.quantity++;
-        saveCartToStorage();
+        
+        // Save updated cart
+        if ($scope.isAuthenticated) {
+            saveCartToSession();
+        } else {
+            saveCartToStorage();
+        }
+        
+        // Force update UI
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
     };
     
     // Decrease quantity
     $scope.decreaseQuantity = function(item) {
+        console.log('Decreasing quantity for item:', item.name);
+        
         if(item.quantity > 1) {
             item.quantity--;
         } else {
@@ -862,7 +974,18 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
                 $scope.cartItems.splice(index, 1);
             }
         }
-        saveCartToStorage();
+        
+        // Save updated cart
+        if ($scope.isAuthenticated) {
+            saveCartToSession();
+        } else {
+            saveCartToStorage();
+        }
+        
+        // Force update UI
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
     };
     
     // Calculate subtotal
@@ -874,7 +997,7 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
                 item.price;
             subtotal += price * item.quantity;
         });
-        return subtotal * 15500; // Converting to IDR
+        return subtotal;
     };
     
     // Get total items
@@ -888,7 +1011,51 @@ app.controller('CartController', ['$scope', '$window', '$rootScope', function($s
     
     // Proceed to checkout
     $scope.proceedToCheckout = function() {
+        if (!$scope.isAuthenticated) {
+            alert('Please login to checkout');
+            $window.location.href = '/login';
+            return;
+        }
+        
         $window.location.href = '/checkout';
+    };
+    
+    // Force refresh cart items dengan nilai UI
+    $scope.syncWithDom = function() {
+        console.log('Syncing cart items with DOM');
+        
+        var cartItems = document.querySelectorAll('.cart-item');
+        
+        // Loop melalui semua item di cart UI
+        cartItems.forEach(function(itemEl, index) {
+            if (index < $scope.cartItems.length) {
+                var qtyInput = itemEl.querySelector('input[type="text"]');
+                if (qtyInput) {
+                    var newQty = parseInt(qtyInput.value) || 1;
+                    $scope.cartItems[index].quantity = newQty;
+                }
+            }
+        });
+        
+        // Update UI
+        if(!$scope.$$phase) {
+            $scope.$apply();
+        }
+        
+        // Simpan perubahan
+        if ($scope.isAuthenticated) {
+            saveCartToSession();
+        } else {
+            saveCartToStorage();
+        }
+    };
+    
+    // Expose syncWithDom ke window agar bisa dipanggil dari script di template
+    window.syncCartWithDom = function() {
+        var cartScope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+        if (cartScope) {
+            cartScope.syncWithDom();
+        }
     };
 }]);
 
