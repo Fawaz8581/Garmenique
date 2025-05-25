@@ -32,7 +32,19 @@ class OrderController extends Controller
 
         try {
             $order = Order::findOrFail($id);
-            $order->status = $request->status;
+            $oldStatus = $order->status;
+            $newStatus = $request->status;
+            
+            // Handle stock management based on status change
+            if ($oldStatus === 'rejected' && $newStatus !== 'rejected') {
+                // If order was rejected but now is not, decrease stock
+                $this->updateProductStock($order, 'decrease');
+            } else if ($oldStatus !== 'rejected' && $newStatus === 'rejected') {
+                // If order was not rejected but now is, increase stock (return items)
+                $this->updateProductStock($order, 'increase');
+            }
+            
+            $order->status = $newStatus;
             $order->save();
 
             return response()->json([
@@ -49,6 +61,50 @@ class OrderController extends Controller
                 'message' => 'Failed to update order status',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+    
+    /**
+     * Update product stock based on order items
+     * 
+     * @param Order $order
+     * @param string $action 'increase' or 'decrease'
+     */
+    private function updateProductStock($order, $action = 'decrease')
+    {
+        if (empty($order->cart_items)) {
+            return;
+        }
+        
+        foreach ($order->cart_items as $item) {
+            if (!isset($item['id']) || !isset($item['size']) || !isset($item['quantity'])) {
+                continue;
+            }
+            
+            $product = \App\Models\Product::find($item['id']);
+            
+            if (!$product) {
+                continue;
+            }
+            
+            // Find the product size relationship
+            $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
+                ->where('size', $item['size'])
+                ->first();
+            
+            if (!$productSize) {
+                continue;
+            }
+            
+            // Update stock based on action
+            if ($action === 'decrease') {
+                $newStock = max(0, $productSize->stock - $item['quantity']);
+            } else {
+                $newStock = $productSize->stock + $item['quantity'];
+            }
+            
+            $productSize->stock = $newStock;
+            $productSize->save();
         }
     }
 

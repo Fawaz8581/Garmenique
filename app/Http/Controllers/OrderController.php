@@ -37,6 +37,9 @@ class OrderController extends Controller
                 'status' => 'pending'
             ]);
 
+            // Decrease product stock for each cart item
+            $this->updateProductStock($order->cart_items);
+            
             // Process payment (in a real application, you would integrate with a payment gateway here)
             
             return response()->json([
@@ -50,6 +53,44 @@ class OrderController extends Controller
                 'message' => 'Error placing order',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+    
+    /**
+     * Update product stock based on cart items
+     * 
+     * @param array $cartItems
+     */
+    private function updateProductStock($cartItems)
+    {
+        if (empty($cartItems)) {
+            return;
+        }
+        
+        foreach ($cartItems as $item) {
+            if (!isset($item['id']) || !isset($item['size']) || !isset($item['quantity'])) {
+                continue;
+            }
+            
+            $product = \App\Models\Product::find($item['id']);
+            
+            if (!$product) {
+                continue;
+            }
+            
+            // Find the product size relationship
+            $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
+                ->where('size', $item['size'])
+                ->first();
+            
+            if (!$productSize) {
+                continue;
+            }
+            
+            // Decrease stock
+            $newStock = max(0, $productSize->stock - $item['quantity']);
+            $productSize->stock = $newStock;
+            $productSize->save();
         }
     }
 } 
