@@ -210,7 +210,7 @@
             </nav>
             
             <div class="nav-icons">
-                <a href="javascript:void(0)" class="nav-icon" ng-click="toggleSearch()"><i class="fas fa-search"></i></a>
+                <a href="/messages" class="nav-icon"><i class="fas fa-envelope"></i></a>
                 @include('partials.account-dropdown')
                 <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
             </div>
@@ -268,10 +268,10 @@
     </div>
 
     <!-- Account Settings Section -->
-    <section class="account-section mt-5 pt-5">
-        <div class="account-container mt-5">
+    <section class="account-section mt-3">
+        <div class="account-container mt-3">
             <!-- Spacer -->
-            <div class="spacer py-4"></div>
+            <div class="spacer py-2"></div>
             
             <div class="account-header">
                 <h1>Account Settings</h1>

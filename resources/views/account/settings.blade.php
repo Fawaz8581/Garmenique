@@ -337,7 +337,7 @@
             </nav>
             
             <div class="nav-icons">
-                <a href="/admin/messages" class="nav-icon"><i class="fas fa-envelope"></i></a>
+                <a href="/messages" class="nav-icon"><i class="fas fa-envelope"></i></a>
                 @include('partials.account-dropdown')
                 <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
             </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Garmenique - Your Orders</title>
+    <title>Garmenique - Order History</title>
     <meta name="keyword" content="Garmenique">
     <meta name="description" content="Garmenique - Premium Clothing Brand">
 
@@ -25,6 +25,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body ng-app="garmeniqueApp">
     <!-- Header Section -->
     <header class="header" ng-controller="HeaderController">
@@ -44,9 +45,11 @@
             </nav>
             
             <div class="nav-icons">
-                <a href="/admin/messages" class="nav-icon"><i class="fas fa-envelope"></i></a>
+                <a href="/messages" class="nav-icon"><i class="fas fa-envelope"></i></a>
                 @include('partials.account-dropdown')
-                <a href="/cart" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
+                <a href="javascript:void(0)" class="nav-icon cart-icon" ng-click="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
             </div>
             
             <button class="mobile-toggle" ng-click="toggleNav()">
@@ -101,15 +104,12 @@
         </div>
     </div>
 
-    <!-- Your Orders Section -->
-    <section class="account-section mt-5 pt-5">
-        <div class="account-container mt-5">
-            <!-- Spacer -->
-            <div class="spacer py-4"></div>
-            
+    <!-- Account Settings Section -->
+    <section class="account-section" style="margin-top: 80px;">
+        <div class="account-container">
             <div class="account-header">
-                <h1>Your Orders</h1>
-                <p>View and track your orders</p>
+                <h1 style="font-size: 40px; font-weight: 500;">Account Settings</h1>
+                <p style="font-size: 16px; color: #6c757d;">Manage your account information and preferences</p>
             </div>
             
             <div class="account-content">
@@ -127,71 +127,82 @@
                 </div>
                 
                 <div class="account-main">
-                    <!-- If the user has no orders, show empty state -->
-                    <div class="empty-orders">
-                        <i class="fas fa-shopping-bag"></i>
-                        <h3>No orders yet</h3>
-                        <p>When you place an order, it will appear here.</p>
-                        <a href="/catalog" class="shop-now-btn">Start Shopping</a>
-                    </div>
+                    <h2>Order History</h2>
                     
-                    <!-- Example orders (commented out for now) -->
-                    <!--
-                    <div class="order-card">
-                        <div class="order-header">
-                            <div>
-                                <h3>Order #12345</h3>
-                                <span>Placed on May 15, 2023</span>
-                            </div>
-                            <div>
-                                <span class="badge" style="background-color: #28a745; color: white;">Delivered</span>
-                            </div>
+                    @if($orders->isEmpty())
+                        <div class="text-center py-5">
+                            <img src="{{ asset('images/icons/empty-orders.svg') }}" alt="No Orders" class="mb-4" style="width: 120px;">
+                            <h5>No orders yet</h5>
+                            <p class="text-muted">When you place an order, it will appear here.</p>
+                            <a href="{{ url('/catalog') }}" class="btn btn-dark px-4">Start Shopping</a>
                         </div>
-                        
-                        <div class="order-details">
-                            <div class="order-detail">
-                                <div class="order-label">Total</div>
-                                <div class="order-value">$249.99</div>
-                            </div>
-                            <div class="order-detail">
-                                <div class="order-label">Shipping Address</div>
-                                <div class="order-value">123 Main St, City</div>
-                            </div>
-                            <div class="order-detail">
-                                <div class="order-label">Payment Method</div>
-                                <div class="order-value">Credit Card</div>
-                            </div>
+                    @else
+                        <div class="orders-list">
+                            @foreach($orders as $order)
+                                <div class="order-item">
+                                    <div class="order-header">
+                                        <div class="order-info-group">
+                                            <div class="order-number">Order #{{ $order->order_number }}</div>
+                                            <div class="order-date">Placed on {{ $order->created_at->format('F j, Y') }}</div>
+                                        </div>
+                                        <div class="status-badge status-{{ strtolower($order->status) }}">
+                                            {{ ucfirst($order->status) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="order-content">
+                                        <div class="product-info-section">
+                                            @foreach($order->cart_items as $item)
+                                            <div class="product-row">
+                                                <div class="product-image">
+                                                    <img src="{{ $item['image'] }}" alt="{{ $item['name'] }}">
+                                                </div>
+                                                <div class="product-details">
+                                                    <div class="product-name">{{ $item['name'] }}</div>
+                                                    <div class="product-meta">
+                                                        <span>Size: {{ $item['size'] }}</span>
+                                                        <span class="separator">|</span>
+                                                        <span>Quantity: {{ $item['quantity'] }}</span>
+                                                    </div>
+                                                    <div class="price">
+                                                        <span>IDR {{ number_format($item['price'], 0, ',', '.') }}</span>
+                                                        <span class="per-item">per item</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+
+                                        <div class="order-summary-section">
+                                            <div class="shipping-info">
+                                                <span class="info-title">Shipping Address</span>
+                                                <div class="address">
+                                                    {{ $order->shipping_info['firstName'] }} {{ $order->shipping_info['lastName'] }}<br>
+                                                    {{ $order->shipping_info['address'] }}<br>
+                                                    {{ $order->shipping_info['city'] }}, {{ $order->shipping_info['postalCode'] }}
+                                                </div>
+                                            </div>
+
+                                            <div class="price-summary">
+                                                <div class="summary-line">
+                                                    <span>Subtotal:</span>
+                                                    <span>IDR {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+                                                </div>
+                                                <div class="summary-line">
+                                                    <span>Shipping:</span>
+                                                    <span>IDR {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                                                </div>
+                                                <div class="summary-line total">
+                                                    <span>Total:</span>
+                                                    <span>IDR {{ number_format($order->total, 0, ',', '.') }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                        
-                        <div class="order-items">
-                            <h4>Items (3)</h4>
-                            
-                            <div class="order-item">
-                                <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990" class="order-item-image" alt="Classic White Shirt">
-                                <div class="order-item-details">
-                                    <div class="order-item-title">Classic White Shirt</div>
-                                    <div class="order-item-meta">Size: M | Qty: 1 | $59.99</div>
-                                </div>
-                            </div>
-                            
-                            <div class="order-item">
-                                <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246" class="order-item-image" alt="Black Jeans">
-                                <div class="order-item-details">
-                                    <div class="order-item-title">Black Jeans</div>
-                                    <div class="order-item-meta">Size: 32 | Qty: 1 | $89.99</div>
-                                </div>
-                            </div>
-                            
-                            <div class="order-item">
-                                <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d" class="order-item-image" alt="Classic Sneakers">
-                                <div class="order-item-details">
-                                    <div class="order-item-title">Classic Sneakers</div>
-                                    <div class="order-item-meta">Size: 10 | Qty: 1 | $99.99</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    -->
+                    @endif
                 </div>
             </div>
         </div>
@@ -257,7 +268,573 @@
         </div>
     </footer>
 
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" ng-class="{'active': isCartActive}" ng-controller="CartController">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="close-cart" ng-click="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-items" ng-if="cartItems.length > 0">
+            <div class="cart-item" ng-repeat="item in cartItems">
+                <div class="cart-item-image">
+                    <img ng-src="@{{item.image}}" alt="@{{item.name}}">
+                </div>
+                <div class="cart-item-details">
+                    <h4>@{{item.name}}</h4>
+                    <p>Size: @{{item.size}}</p>
+                    <div class="cart-item-price">
+                        <span>IDR @{{item.price | number:0}}</span>
+                        <div class="quantity-controls">
+                            <button ng-click="decrementQuantity(item)">-</button>
+                            <span>@{{item.quantity}}</span>
+                            <button ng-click="incrementQuantity(item)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="remove-item" ng-click="removeItem(item)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="empty-cart" ng-if="cartItems.length === 0">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Your cart is empty</p>
+            <a href="/catalog" class="btn btn-primary">Continue Shopping</a>
+        </div>
+
+        <div class="cart-footer" ng-if="cartItems.length > 0">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span>IDR @{{getTotal() | number:0}}</span>
+            </div>
+            <a href="/checkout" class="btn btn-primary checkout-btn">Proceed to Checkout</a>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" ng-class="{'active': isCartActive}" ng-click="toggleCart()"></div>
+
     <!-- Scripts -->
     <script src="{{ asset('js/landingpage.js') }}"></script>
 </body>
-</html> 
+</html>
+
+<style>
+.account-section {
+    padding: 20px 0;
+}
+
+.account-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.account-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.account-header h1 {
+    margin-bottom: 8px;
+}
+
+.account-content {
+    display: flex;
+    gap: 30px;
+    margin-top: 2rem;
+}
+
+.account-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.account-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.account-nav li a {
+    display: block;
+    padding: 15px 20px;
+    color: #333;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.account-nav li a:hover {
+    color: #0d6efd;
+}
+
+.account-nav li a.active {
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.account-main {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.account-main h2 {
+    margin-bottom: 25px;
+    font-size: 24px;
+}
+
+.order-item-image {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.order-item-row {
+    transition: all 0.3s ease;
+}
+
+.order-item-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-dark {
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    border-radius: 5px;
+}
+
+.btn-dark:hover {
+    background-color: #343a40;
+}
+
+@media (max-width: 768px) {
+    .account-content {
+        flex-direction: column;
+    }
+    
+    .account-sidebar {
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: capitalize;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-processing {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.order-item {
+    transition: all 0.3s ease;
+}
+
+.order-item:hover {
+    transform: translateY(-2px);
+}
+
+.order-item-row {
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+.order-item-row:hover {
+    border-color: #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.order-summary h6 {
+    color: #495057;
+}
+
+.rounded-3 {
+    border-radius: 8px !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+
+.g-4 {
+    gap: 1.5rem !important;
+}
+
+.fw-semibold {
+    font-weight: 600 !important;
+}
+
+.card-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.order-item {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    max-width: 100%;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.order-number {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.order-date {
+    color: #666;
+    font-size: 14px;
+}
+
+.status-badge {
+    background: #fff3cd;
+    color: #856404;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.order-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.product-row {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.product-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-name {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.product-meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.product-meta .separator {
+    margin: 0 6px;
+    color: #ccc;
+}
+
+.price {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.per-item {
+    font-size: 13px;
+    color: #666;
+    margin-left: 4px;
+}
+
+.order-summary-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.shipping-info {
+    margin-bottom: 15px;
+}
+
+.info-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.address {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.price-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+}
+
+.summary-line.total {
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px solid #eee;
+    font-weight: 500;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .order-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cart Sidebar Styles */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-sidebar.active {
+    right: 0;
+}
+
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+}
+
+.cart-overlay.active {
+    display: block;
+}
+
+.cart-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+}
+
+.cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-details h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.cart-item-details p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.cart-item-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-controls button {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remove-item {
+    position: absolute;
+    top: 15px;
+    right: 0;
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+}
+
+.empty-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.empty-cart i {
+    font-size: 48px;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.cart-footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background: #fff;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+}
+
+.checkout-btn:hover {
+    background: #0b5ed7;
+}
+
+@media (max-width: 480px) {
+    .cart-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+}
+</style> 

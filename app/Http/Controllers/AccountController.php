@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\Order;
 
 class AccountController extends Controller
 {
@@ -38,7 +39,11 @@ class AccountController extends Controller
      */
     public function showOrders()
     {
-        return view('account.orders');
+        $orders = Order::where('user_id', Auth::id())
+                      ->orderBy('created_at', 'desc')
+                      ->get();
+
+        return view('account.orders', ['orders' => $orders]);
     }
     
     /**
