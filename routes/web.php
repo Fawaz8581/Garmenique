@@ -70,6 +70,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'userMessages'])->name('user.messages');
     Route::post('/messages/send', [\App\Http\Controllers\MessageController::class, 'sendMessage'])->name('messages.send');
     Route::get('/messages/admin', [\App\Http\Controllers\MessageController::class, 'getMessages'])->name('messages.data');
+
+    // Checkout routes
+    Route::get('/checkout', function () {
+        return view('checkout');
+    })->name('checkout');
+    
+    Route::get('/order-success', function () {
+        return view('order-success');
+    })->name('order.success');
+    
+    Route::post('/api/orders', [\App\Http\Controllers\OrderController::class, 'store']);
 });
 
 Route::get('/cart', function () {
