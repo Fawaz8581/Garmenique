@@ -16,8 +16,8 @@ class AdminUserSeeder extends Seeder
     {
         User::create([
             'name' => 'Admin',
-            'email' => 'admin@garmenique.com',
-            'password' => Hash::make('admin123'),
+            'email' => 'Admin@garmenique.us',
+            'password' => Hash::make('Garmenique2025'),
             'role' => 'admin',
         ]);
     }

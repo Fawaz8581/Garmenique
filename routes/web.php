@@ -206,3 +206,6 @@ Route::post('/save-cart', function (Request $request) {
         ], 500);
     }
 });
+
+// Create Admin Route
+Route::get('/create-admin', [App\Http\Controllers\AdminCreatorController::class, 'createAdmin']);
