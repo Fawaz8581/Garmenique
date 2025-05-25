@@ -87,49 +87,47 @@ Route::get('/product/{id}', function ($id) {
     return redirect('/catalog/product/' . $id);
 });
 
-// Admin Routes (All public for now)
-Route::prefix('admin')->group(function () {
-    // Dashboard
-    Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
-    
-    // Products
-    Route::get('/products', [ProductController::class, 'show'])->name('admin.products');
-    
-    // Categories
-    Route::get('/categories', [CategoryController::class, 'show'])->name('admin.categories');
-    
-    // Sizes
-    Route::get('/sizes', [SizeController::class, 'show'])->name('admin.sizes');
-    
-    // Messages
-    Route::get('/messages', [App\Http\Controllers\Admin\MessageController::class, 'index'])->name('admin.messages');
-    Route::get('/messages/{userId}', [App\Http\Controllers\Admin\MessageController::class, 'getMessages']);
-    Route::post('/messages/send', [App\Http\Controllers\Admin\MessageController::class, 'sendMessage']);
-
-    // API Routes
-    Route::prefix('api')->group(function () {
-        // Products API
-        Route::get('/products', [ProductController::class, 'index']);
-        Route::post('/products', [ProductController::class, 'store']);
-        Route::put('/products/{id}', [ProductController::class, 'update']);
-        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+// Admin Routes
+Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
+    Route::prefix('admin')->group(function () {
+        // Dashboard
+        Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
         
-        // Categories API
-        Route::get('/categories', [CategoryController::class, 'index']);
-        Route::post('/categories', [CategoryController::class, 'store']);
-        Route::put('/categories/{id}', [CategoryController::class, 'update']);
-        Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+        // Products
+        Route::get('/products', [ProductController::class, 'show'])->name('admin.products');
+        
+        // Categories
+        Route::get('/categories', [CategoryController::class, 'show'])->name('admin.categories');
+        
+        // Sizes
+        Route::get('/sizes', [SizeController::class, 'show'])->name('admin.sizes');
+        
+        // Messages
+        Route::get('/messages', [App\Http\Controllers\Admin\MessageController::class, 'index'])->name('admin.messages');
+        Route::get('/messages/{userId}', [App\Http\Controllers\Admin\MessageController::class, 'getMessages']);
+        Route::post('/messages/send', [App\Http\Controllers\Admin\MessageController::class, 'sendMessage']);
 
-        // Sizes API
-        Route::get('/sizes', [SizeController::class, 'index']);
-        Route::post('/sizes', [SizeController::class, 'store']);
-        Route::put('/sizes/{id}', [SizeController::class, 'update']);
-        Route::delete('/sizes/{id}', [SizeController::class, 'destroy']);
+        // API Routes
+        Route::prefix('api')->group(function () {
+            // Products API
+            Route::get('/products', [ProductController::class, 'index']);
+            Route::post('/products', [ProductController::class, 'store']);
+            Route::put('/products/{id}', [ProductController::class, 'update']);
+            Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+            
+            // Categories API
+            Route::get('/categories', [CategoryController::class, 'index']);
+            Route::post('/categories', [CategoryController::class, 'store']);
+            Route::put('/categories/{id}', [CategoryController::class, 'update']);
+            Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+            // Sizes API
+            Route::get('/sizes', [SizeController::class, 'index']);
+            Route::post('/sizes', [SizeController::class, 'store']);
+            Route::put('/sizes/{id}', [SizeController::class, 'update']);
+            Route::delete('/sizes/{id}', [SizeController::class, 'destroy']);
+        });
     });
-
-    // Auth Routes (will be used later)
-    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/login', [AdminAuthController::class, 'login']);
 });
 
 // Cart data management routes

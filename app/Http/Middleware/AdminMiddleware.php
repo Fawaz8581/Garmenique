@@ -17,24 +17,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // Temporarily allow all access
+        // Jika tidak login atau bukan admin, kembali ke landing page
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            return redirect('/');
+        }
+
         return $next($request);
-
-        // Authentication check commented out for now
-        /*
-        if (!Auth::check()) {
-            if ($request->ajax()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
-            return redirect()->route('admin.login');
-        }
-
-        if (Auth::user()->role !== 'admin') {
-            if ($request->ajax()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
-            return redirect('/')->with('error', 'Unauthorized access');
-        }
-        */
     }
 } 
