@@ -367,6 +367,20 @@
         .view-btn:hover {
             background-color: #218838;
         }
+        
+        /* Ensure details buttons are green */
+        button[onclick*="showProductDetails"],
+        .details-btn {
+            background-color: #28a745 !important;
+            color: white;
+        }
+        
+        button[onclick*="showProductDetails"]:hover,
+        .details-btn:hover {
+            background-color: #218838 !important;
+            color: white;
+        }
+        
         .form-control-plaintext {
             padding: 0.375rem 0;
             margin-bottom: 0;
@@ -385,6 +399,61 @@
             background-color: #f8d7da !important;
             border-color: #f5c6cb;
             color: #721c24;
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background-color: #14387F;
+            border-color: #14387F;
+            color: white;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0e2b63;
+            border-color: #0e2b63;
+        }
+        
+        .add-btn {
+            background-color: #14387F;
+            border-color: #14387F;
+            color: white;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        
+        .add-btn:hover {
+            background-color: #0e2b63;
+        }
+        
+        .action-btn {
+            background-color: #14387F;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: #0e2b63;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c82333;
         }
     </style>
     

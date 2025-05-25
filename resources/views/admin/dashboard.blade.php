@@ -60,8 +60,16 @@
         </div>
         
         <!-- Date Selector -->
-        <div class="date-selector">
-            <input type="date" class="date-input" id="selectedDate">
+        <div class="date-selector d-flex align-items-center">
+            <div class="me-3">
+                <label for="selectedDate" class="form-label mb-0 me-2">Date:</label>
+                <input type="date" class="date-input" id="selectedDate" value="{{ $selectedDate->format('Y-m-d') }}">
+            </div>
+            <div class="me-3">
+                <button id="allDatesBtn" class="btn btn-primary">
+                    <i class="fas fa-calendar-alt me-1"></i> All Dates
+                </button>
+            </div>
         </div>
         
         <!-- Dashboard Cards -->
@@ -148,11 +156,16 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">No recent orders found</td>
+                                    <td colspan="5" class="text-center">No orders found</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
+                        
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $recentOrdersPaginated->appends(request()->except('page'))->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,9 +271,106 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Set current date in the date selector
-        document.getElementById('selectedDate').valueAsDate = new Date();
-        
+        // Initialize date selector and filters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial date value if not already set
+            if (!document.getElementById('selectedDate').value) {
+                document.getElementById('selectedDate').valueAsDate = new Date();
+            }
+            
+            // Date selector change event
+            document.getElementById('selectedDate').addEventListener('change', function() {
+                // Reload the page with the new date parameter
+                const url = new URL(window.location.href);
+                url.searchParams.delete('all_dates'); // Remove all_dates parameter if exists
+                url.searchParams.set('date', this.value);
+                window.location.href = url.toString();
+            });
+            
+            // All dates button click event
+            document.getElementById('allDatesBtn').addEventListener('click', function() {
+                // Reload the page with all_dates parameter
+                const url = new URL(window.location.href);
+                url.searchParams.delete('date'); // Remove date parameter if exists
+                url.searchParams.set('all_dates', '1');
+                window.location.href = url.toString();
+            });
+            
+            // Apply filters on page load to ensure consistent state
+            setTimeout(() => {
+                applyFilters();
+            }, 100);
+        });
+
+        // Apply filters and reload dashboard data
+        function applyFilters() {
+            const selectedDate = document.getElementById('selectedDate').value;
+            
+            // Update the card period text
+            document.querySelectorAll('.card-period').forEach(el => {
+                el.textContent = 'Selected Date';
+            });
+            
+            // Fetch dashboard data with filters
+            fetchDashboardData(selectedDate);
+            
+            // Update URL with selected date (without reloading the page)
+            const url = new URL(window.location.href);
+            if (selectedDate) {
+                url.searchParams.set('date', selectedDate);
+            } else {
+                url.searchParams.delete('date');
+            }
+            window.history.replaceState({}, '', url);
+        }
+
+        // Update the fetchDashboardData function to accept date parameter
+        function fetchDashboardData(date = null) {
+            // Build query parameters
+            let params = new URLSearchParams();
+            if (date) params.append('date', date);
+            
+            const url = `/admin/api/dashboard-data?${params.toString()}`;
+            
+            // Fetch data with filters
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Update the dashboard cards
+                    document.querySelector('.dashboard-card:nth-child(1) .card-value').textContent = 
+                        'IDR ' + formatNumber(data.total_sales);
+                    document.querySelector('.dashboard-card:nth-child(1) .progress-percentage').textContent = 
+                        data.sales_percentage + '%';
+                    document.querySelector('.dashboard-card:nth-child(1) svg circle:nth-child(2)').setAttribute(
+                        'stroke-dashoffset', 220 - (data.sales_percentage * 2.2));
+
+                    // Update total orders explicitly
+                    const totalOrdersElement = document.querySelector('.dashboard-card:nth-child(2) .card-value');
+                    totalOrdersElement.textContent = data.total_orders;
+                    
+                    document.querySelector('.dashboard-card:nth-child(2) .progress-percentage').textContent = 
+                        data.orders_percentage + '%';
+                    document.querySelector('.dashboard-card:nth-child(2) svg circle:nth-child(2)').setAttribute(
+                        'stroke-dashoffset', 220 - (data.orders_percentage * 2.2));
+
+                    // Update recent orders table
+                    updateRecentOrdersTable(data.recent_orders);
+                    
+                    // Update card period text to show selected date
+                    const formattedDate = new Date(data.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    document.querySelectorAll('.card-period').forEach(el => {
+                        el.textContent = formattedDate;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching dashboard data:', error);
+                });
+        }
+
         // Sidebar toggle for mobile
         document.getElementById('toggleSidebar').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -315,13 +425,6 @@
             });
         });
 
-        // Date selector change event
-        document.getElementById('selectedDate').addEventListener('change', function() {
-            // You can implement date-based filtering here
-            // For now, let's just reload the dashboard data
-            fetchDashboardData();
-        });
-
         // Set up action buttons for order details
         document.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('details-btn')) {
@@ -338,6 +441,9 @@
                 .then(data => {
                     if (data.success) {
                         displayOrderDetails(data.order);
+                        // Show the modal after data is loaded
+                        const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                        orderDetailsModal.show();
                     } else {
                         alert('Failed to fetch order details: ' + data.message);
                     }
@@ -346,6 +452,9 @@
                     console.error('Error fetching order details:', error);
                     // For demo purposes, we'll use mock data if the API isn't implemented yet
                     displayMockOrderDetails(orderId);
+                    // Show the modal after mock data is loaded
+                    const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                    orderDetailsModal.show();
                 });
         }
 
@@ -404,10 +513,6 @@
                 `;
                 productsList.appendChild(productItem);
             });
-            
-            // Show the modal
-            const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
-            orderDetailsModal.show();
         }
 
         // Mock data for demo purposes if API isn't ready
@@ -494,183 +599,73 @@
                     
                     // Update the status in the table
                     const statusCell = document.querySelector(`button[data-order-id="${orderId}"]`).closest('tr').querySelector('.status-badge');
-                    statusCell.className = `status-badge status-${status}`;
+                    statusCell.className = `status-badge status-${status.toLowerCase()}`;
                     statusCell.textContent = capitalizeFirstLetter(status);
-                    
-                    // Store the new status in the edit button data attribute
-                    document.querySelector(`button.edit-btn[data-order-id="${orderId}"]`).setAttribute('data-order-status', status);
-                    
-                    // Refresh dashboard data
-                    fetchDashboardData();
-                } else {
-                    alert('Failed to update order status: ' + data.message);
                 }
             })
             .catch(error => {
-                console.error('Error updating order status:', error);
-                alert('An error occurred while updating the order status.');
+                console.error('Error saving order status:', error);
             });
         });
-
-        // Update recent orders table in AJAX callback
-        function updateRecentOrdersTable(orders) {
-            const tbody = document.querySelector('.orders-table tbody');
-            tbody.innerHTML = '';
-
-            if (orders.length === 0) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = '<td colspan="5" class="text-center">No recent orders found</td>';
-                tbody.appendChild(tr);
-            } else {
-                orders.forEach(order => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${order.product_name}</td>
-                        <td>${order.product_number}</td>
-                        <td>IDR ${formatNumber(order.total)}</td>
-                        <td><span class="status-badge status-${order.status.toLowerCase()}">${capitalizeFirstLetter(order.status)}</span></td>
-                        <td class="action-buttons">
-                            <button class="action-btn details-btn" data-order-id="${order.id}">Details</button>
-                            <button class="action-btn edit-btn" data-order-id="${order.id}" 
-                                    data-bs-toggle="modal" data-bs-target="#editOrderModal" 
-                                    data-order-number="${order.order_number}"
-                                    data-order-status="${order.status}">Edit</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        }
-
-        // Update the fetchDashboardData function to use our new updateRecentOrdersTable function
-        function fetchDashboardData() {
-            fetch('/admin/api/dashboard-data')
-                .then(response => response.json())
-                .then(data => {
-                    // Update the dashboard cards
-                    document.querySelector('.dashboard-card:nth-child(1) .card-value').textContent = 
-                        'IDR ' + formatNumber(data.total_sales);
-                    document.querySelector('.dashboard-card:nth-child(1) .progress-percentage').textContent = 
-                        data.sales_percentage + '%';
-                    document.querySelector('.dashboard-card:nth-child(1) svg circle:nth-child(2)').setAttribute(
-                        'stroke-dashoffset', 220 - (data.sales_percentage * 2.2));
-
-                    document.querySelector('.dashboard-card:nth-child(2) .card-value').textContent = 
-                        data.total_orders;
-                    document.querySelector('.dashboard-card:nth-child(2) .progress-percentage').textContent = 
-                        data.orders_percentage + '%';
-                    document.querySelector('.dashboard-card:nth-child(2) svg circle:nth-child(2)').setAttribute(
-                        'stroke-dashoffset', 220 - (data.orders_percentage * 2.2));
-
-                    // Update recent orders table with our new function
-                    updateRecentOrdersTable(data.recent_orders);
-                })
-                .catch(error => console.error('Error fetching dashboard data:', error));
-        }
-
+        
         // Helper function to format numbers with commas
         function formatNumber(number) {
-            return new Intl.NumberFormat('id-ID').format(number);
+            // Convert to integer first to remove decimal places
+            number = Math.round(Number(number));
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
-
+        
         // Helper function to capitalize first letter
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
     </script>
+    <style>
+    /* Filter section styles */
+    .date-selector {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
 
-<style>
-/* Existing styles... */
+    .date-input {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
 
-/* Status badge styles */
-.status-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-}
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+    }
 
-.status-pending {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
+    /* Button styles */
+    .btn-primary {
+        background-color: #14387F;
+        border-color: #14387F;
+        color: white;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
 
-.status-rejected {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
+    .btn-primary:hover {
+        background-color: #0e2b63;
+        border-color: #0e2b63;
+    }
 
-.status-confirmed {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-.status-packing {
-    background-color: #d6d8db;
-    color: #383d41;
-    border: 1px solid #c6c8ca;
-}
-
-.status-shipped {
-    background-color: #cce5ff;
-    color: #004085;
-    border: 1px solid #b8daff;
-}
-
-.status-delivered {
-    background-color: #e2efda;
-    color: #285b2a;
-    border: 1px solid #c6e7c6;
-}
-
-.status-completed {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.status-processing {
-    background-color: #cce5ff;
-    color: #004085;
-    border: 1px solid #b8daff;
-}
-
-/* Action buttons styles */
-.action-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.action-btn {
-    padding: 6px 12px;
-    background-color: #2a5298;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: background-color 0.2s;
-}
-
-.action-btn:hover {
-    background-color: #1e3c72;
-}
-
-.details-btn {
-    background-color: #2a5298;
-}
-
-.edit-btn {
-    background-color: #6c757d;
-}
-
-.edit-btn:hover {
-    background-color: #5a6268;
-}
-</style>
+    /* Status badge styles */
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    </style>
 </body>
-</html> 
+</html>

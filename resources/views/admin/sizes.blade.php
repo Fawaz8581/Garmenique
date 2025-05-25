@@ -70,18 +70,23 @@
         .delete-btn:hover {
             color: #dc3545;
         }
-        .add-size-btn {
-            background: #007bff;
+        
+        /* Button styles */
+        .btn-primary {
+            background-color: #14387F;
+            border-color: #14387F;
             color: white;
-            border: none;
+            font-weight: 500;
             padding: 8px 16px;
             border-radius: 4px;
-            cursor: pointer;
             transition: background-color 0.2s;
         }
-        .add-size-btn:hover {
-            background: #0056b3;
+        
+        .btn-primary:hover {
+            background-color: #0e2b63;
+            border-color: #0e2b63;
         }
+        
         .size-type-info {
             color: #666;
             font-size: 0.9rem;
@@ -159,8 +164,8 @@
                         <div class="size-list" id="numberSizeList">
                             <!-- Size items will be loaded here -->
                         </div>
-                        <button class="add-size-btn" onclick="showAddSizeModal('number')">
-                            <i class="fas fa-plus"></i> Add Number Size
+                        <button class="btn btn-primary add-size-btn" onclick="showAddSizeModal('number')">
+                            <i class="fas fa-plus me-1"></i> Add Number Size
                         </button>
                     </div>
                 </div>
@@ -173,8 +178,8 @@
                         <div class="size-list" id="clothingSizeList">
                             <!-- Size items will be loaded here -->
                         </div>
-                        <button class="add-size-btn" onclick="showAddSizeModal('clothing')">
-                            <i class="fas fa-plus"></i> Add Clothing Size
+                        <button class="btn btn-primary add-size-btn" onclick="showAddSizeModal('clothing')">
+                            <i class="fas fa-plus me-1"></i> Add Clothing Size
                         </button>
                     </div>
                 </div>
@@ -242,6 +247,30 @@
         // Initialize modals
         const addSizeModal = new bootstrap.Modal(document.getElementById('addSizeModal'));
         const editSizeModal = new bootstrap.Modal(document.getElementById('editSizeModal'));
+
+        // Validation functions
+        function validateNumberInput(event) {
+            // Allow only numbers
+            const input = event.target;
+            const value = input.value;
+            
+            // HTML5 number input should handle this, but adding as extra validation
+            if (!/^\d*$/.test(value)) {
+                // If non-numeric characters are entered, remove them
+                input.value = value.replace(/[^\d]/g, '');
+            }
+        }
+        
+        function validateLetterInput(event) {
+            // Allow only letters
+            const input = event.target;
+            const value = input.value;
+            
+            if (!/^[A-Za-z]*$/.test(value)) {
+                // If non-letter characters are entered, remove them
+                input.value = value.replace(/[^A-Za-z]/g, '');
+            }
+        }
 
         // Load sizes on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -329,8 +358,37 @@
         function showAddSizeModal(type) {
             document.getElementById('sizeType').value = type;
             document.getElementById('sizeName').value = '';
-            document.getElementById('sizeNameHelp').textContent = 
-                type === 'number' ? 'Enter a number size (e.g., 30, 31, 32)' : 'Enter a clothing size (e.g., XS, S, M)';
+            
+            const sizeNameInput = document.getElementById('sizeName');
+            const sizeNameHelp = document.getElementById('sizeNameHelp');
+            
+            if (type === 'number') {
+                sizeNameHelp.textContent = 'Enter a number size (e.g., 30, 31, 32)';
+                sizeNameInput.setAttribute('pattern', '[0-9]+');
+                sizeNameInput.setAttribute('title', 'Please enter numbers only');
+                sizeNameInput.setAttribute('type', 'number');
+                sizeNameInput.setAttribute('min', '1');
+                
+                // Remove any existing event listeners
+                sizeNameInput.removeEventListener('input', validateNumberInput);
+                sizeNameInput.removeEventListener('input', validateLetterInput);
+                
+                // Add event listener for number validation
+                sizeNameInput.addEventListener('input', validateNumberInput);
+            } else {
+                sizeNameHelp.textContent = 'Enter a clothing size (e.g., XS, S, M)';
+                sizeNameInput.setAttribute('pattern', '[A-Za-z]+');
+                sizeNameInput.setAttribute('title', 'Please enter letters only');
+                sizeNameInput.setAttribute('type', 'text');
+                
+                // Remove any existing event listeners
+                sizeNameInput.removeEventListener('input', validateNumberInput);
+                sizeNameInput.removeEventListener('input', validateLetterInput);
+                
+                // Add event listener for letter validation
+                sizeNameInput.addEventListener('input', validateLetterInput);
+            }
+            
             addSizeModal.show();
         }
 
@@ -339,8 +397,37 @@
             document.getElementById('editSizeId').value = id;
             document.getElementById('editSizeType').value = type;
             document.getElementById('editSizeName').value = name;
-            document.getElementById('editSizeNameHelp').textContent = 
-                type === 'number' ? 'Enter a number size (e.g., 30, 31, 32)' : 'Enter a clothing size (e.g., XS, S, M)';
+            
+            const editSizeNameInput = document.getElementById('editSizeName');
+            const editSizeNameHelp = document.getElementById('editSizeNameHelp');
+            
+            if (type === 'number') {
+                editSizeNameHelp.textContent = 'Enter a number size (e.g., 30, 31, 32)';
+                editSizeNameInput.setAttribute('pattern', '[0-9]+');
+                editSizeNameInput.setAttribute('title', 'Please enter numbers only');
+                editSizeNameInput.setAttribute('type', 'number');
+                editSizeNameInput.setAttribute('min', '1');
+                
+                // Remove any existing event listeners
+                editSizeNameInput.removeEventListener('input', validateNumberInput);
+                editSizeNameInput.removeEventListener('input', validateLetterInput);
+                
+                // Add event listener for number validation
+                editSizeNameInput.addEventListener('input', validateNumberInput);
+            } else {
+                editSizeNameHelp.textContent = 'Enter a clothing size (e.g., XS, S, M)';
+                editSizeNameInput.setAttribute('pattern', '[A-Za-z]+');
+                editSizeNameInput.setAttribute('title', 'Please enter letters only');
+                editSizeNameInput.setAttribute('type', 'text');
+                
+                // Remove any existing event listeners
+                editSizeNameInput.removeEventListener('input', validateNumberInput);
+                editSizeNameInput.removeEventListener('input', validateLetterInput);
+                
+                // Add event listener for letter validation
+                editSizeNameInput.addEventListener('input', validateLetterInput);
+            }
+            
             editSizeModal.show();
         }
 
@@ -351,6 +438,18 @@
 
             if (!name) {
                 alert('Please enter a size name');
+                return;
+            }
+
+            // Validate number sizes (only numbers)
+            if (type === 'number' && !/^\d+$/.test(name)) {
+                alert('Number sizes must contain only numbers');
+                return;
+            }
+
+            // Validate clothing sizes (only letters)
+            if (type === 'clothing' && !/^[A-Za-z]+$/.test(name)) {
+                alert('Clothing sizes must contain only letters');
                 return;
             }
 
@@ -385,6 +484,18 @@
 
             if (!name) {
                 alert('Please enter a size name');
+                return;
+            }
+
+            // Validate number sizes (only numbers)
+            if (type === 'number' && !/^\d+$/.test(name)) {
+                alert('Number sizes must contain only numbers');
+                return;
+            }
+
+            // Validate clothing sizes (only letters)
+            if (type === 'clothing' && !/^[A-Za-z]+$/.test(name)) {
+                alert('Clothing sizes must contain only letters');
                 return;
             }
 

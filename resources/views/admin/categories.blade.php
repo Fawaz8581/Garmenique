@@ -20,6 +20,39 @@
     
     <!-- Admin Products CSS -->
     <link rel="stylesheet" href="{{ asset('css/admin/products.css') }}">
+
+    <style>
+        /* Button styles */
+        .btn-primary {
+            background-color: #14387F;
+            border-color: #14387F;
+            color: white;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0e2b63;
+            border-color: #0e2b63;
+        }
+
+        .add-btn {
+            background-color: #14387F;
+            border-color: #14387F;
+            color: white;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        
+        .add-btn:hover {
+            background-color: #0e2b63;
+        }
+    </style>
 </head>
 <body>
     <!-- Mobile Menu Toggle -->
@@ -227,12 +260,14 @@
                     <td>${category.description || '-'}</td>
                     <td>${category.products_count || 0}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary edit-category-btn" data-id="${category.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger delete-category-btn" data-id="${category.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-primary edit-category-btn" data-id="${category.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger delete-category-btn" data-id="${category.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 categoriesTableBody.appendChild(row);

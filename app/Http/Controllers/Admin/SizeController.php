@@ -17,16 +17,32 @@ class SizeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => [
+        $validationRules = [
+            'type' => 'required|in:number,clothing'
+        ];
+        
+        if ($request->type === 'number') {
+            $validationRules['name'] = [
                 'required',
-                'string',
+                'numeric',
+                'integer',
+                'min:1',
                 Rule::unique('sizes')->where(function ($query) use ($request) {
                     return $query->where('type', $request->type);
                 })
-            ],
-            'type' => 'required|in:number,clothing'
-        ]);
+            ];
+        } else {
+            $validationRules['name'] = [
+                'required',
+                'string',
+                'regex:/^[A-Za-z]+$/',
+                Rule::unique('sizes')->where(function ($query) use ($request) {
+                    return $query->where('type', $request->type);
+                })
+            ];
+        }
+
+        $request->validate($validationRules);
 
         $size = Size::create($request->all());
         return response()->json([
@@ -38,18 +54,35 @@ class SizeController extends Controller
     public function update(Request $request, $id)
     {
         $size = Size::findOrFail($id);
-
-        $request->validate([
-            'name' => [
+        
+        $validationRules = [
+            'type' => 'required|in:number,clothing'
+        ];
+        
+        if ($request->type === 'number') {
+            $validationRules['name'] = [
                 'required',
-                'string',
+                'numeric',
+                'integer',
+                'min:1',
                 Rule::unique('sizes')->where(function ($query) use ($request, $size) {
                     return $query->where('type', $request->type)
                                 ->where('id', '!=', $size->id);
                 })
-            ],
-            'type' => 'required|in:number,clothing'
-        ]);
+            ];
+        } else {
+            $validationRules['name'] = [
+                'required',
+                'string',
+                'regex:/^[A-Za-z]+$/',
+                Rule::unique('sizes')->where(function ($query) use ($request, $size) {
+                    return $query->where('type', $request->type)
+                                ->where('id', '!=', $size->id);
+                })
+            ];
+        }
+
+        $request->validate($validationRules);
 
         $size->update($request->all());
         return response()->json([
