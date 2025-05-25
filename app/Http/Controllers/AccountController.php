@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\Models\Order;
+use App\Models\Product;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -131,5 +134,97 @@ class AccountController extends Controller
         $user->save();
         
         return redirect()->route('account.contact')->with('status', 'Contact information updated successfully!');
+    }
+
+    /**
+     * Get dashboard data including total sales, total orders, and recent orders.
+     */
+    public function getDashboardData()
+    {
+        // Get current user ID
+        $userId = Auth::id();
+        
+        // Get the date 24 hours ago
+        $last24Hours = Carbon::now()->subHours(24);
+        
+        // Calculate total sales and total orders for the last 24 hours
+        $totalSales = Order::where('user_id', $userId)
+                          ->where('created_at', '>=', $last24Hours)
+                          ->sum('total');
+        
+        $totalOrders = Order::where('user_id', $userId)
+                           ->where('created_at', '>=', $last24Hours)
+                           ->count();
+        
+        // Get recent orders with product details
+        $recentOrders = Order::where('user_id', $userId)
+                            ->orderBy('created_at', 'desc')
+                            ->take(5)
+                            ->get()
+                            ->map(function ($order) {
+                                // Extract the first product from each order
+                                $firstItem = !empty($order->cart_items) ? $order->cart_items[0] : null;
+                                
+                                return [
+                                    'id' => $order->id,
+                                    'order_number' => $order->order_number,
+                                    'created_at' => $order->created_at,
+                                    'status' => $order->status,
+                                    'total' => $order->total,
+                                    'product_name' => $firstItem ? $firstItem['name'] : 'N/A',
+                                    'product_number' => 'GA-' . str_pad(($order->id % 1000), 4, '0', STR_PAD_LEFT),
+                                    'product_image' => $firstItem ? $firstItem['image'] : null,
+                                ];
+                            });
+        
+        // Calculate sales percentage (compared to previous 24 hours)
+        $previousPeriod = [
+            $last24Hours->copy()->subHours(24),
+            $last24Hours
+        ];
+        
+        $previousSales = Order::where('user_id', $userId)
+                             ->whereBetween('created_at', $previousPeriod)
+                             ->sum('total');
+        
+        $previousOrders = Order::where('user_id', $userId)
+                              ->whereBetween('created_at', $previousPeriod)
+                              ->count();
+        
+        // Calculate percentages (avoid division by zero)
+        $salesPercentage = $previousSales > 0 
+            ? min(100, round(($totalSales / $previousSales) * 100)) 
+            : ($totalSales > 0 ? 100 : 0);
+        
+        $ordersPercentage = $previousOrders > 0 
+            ? min(100, round(($totalOrders / $previousOrders) * 100)) 
+            : ($totalOrders > 0 ? 100 : 0);
+        
+        return [
+            'total_sales' => $totalSales,
+            'total_orders' => $totalOrders,
+            'recent_orders' => $recentOrders,
+            'sales_percentage' => $salesPercentage,
+            'orders_percentage' => $ordersPercentage,
+            'date' => Carbon::now()->format('m/d/Y')
+        ];
+    }
+    
+    /**
+     * Show the dashboard page with analytics.
+     */
+    public function showDashboard()
+    {
+        $dashboardData = $this->getDashboardData();
+        return view('account.dashboard', $dashboardData);
+    }
+    
+    /**
+     * Get dashboard data as JSON for AJAX requests.
+     */
+    public function getDashboardDataJson()
+    {
+        $dashboardData = $this->getDashboardData();
+        return response()->json($dashboardData);
     }
 }

@@ -65,6 +65,10 @@ Route::middleware(['auth'])->group(function () {
     
     // Orders routes
     Route::get('/account/orders', [AccountController::class, 'showOrders'])->name('account.orders');
+    
+    // Dashboard routes
+    Route::get('/account/dashboard', [AccountController::class, 'showDashboard'])->name('account.dashboard');
+    Route::get('/api/account/dashboard-data', [AccountController::class, 'getDashboardDataJson'])->name('api.account.dashboard-data');
 
     // User Messages routes
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'userMessages'])->name('user.messages');
@@ -103,6 +107,7 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
     Route::prefix('admin')->group(function () {
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('/api/dashboard-data', [DashboardController::class, 'getDashboardDataJson'])->name('admin.dashboard.data');
         
         // Products
         Route::get('/products', [ProductController::class, 'show'])->name('admin.products');
@@ -137,6 +142,10 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
             Route::post('/sizes', [SizeController::class, 'store']);
             Route::put('/sizes/{id}', [SizeController::class, 'update']);
             Route::delete('/sizes/{id}', [SizeController::class, 'destroy']);
+            
+            // Orders API
+            Route::put('/orders/{id}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus']);
+            Route::get('/orders/{id}', [App\Http\Controllers\Admin\OrderController::class, 'getOrderDetails']);
         });
     });
 });

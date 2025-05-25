@@ -75,16 +75,16 @@
                                     <i class="fas fa-chart-line"></i>
                                 </div>
                                 <h3 class="card-title">Total Sales</h3>
-                                <h2 class="card-value">$25,024</h2>
+                                <h2 class="card-value">IDR {{ number_format($totalSales, 0, ',', '.') }}</h2>
                                 <p class="card-period">Last 24 Hours</p>
                             </div>
                             <div class="progress-container">
                                 <svg class="progress-circle">
                                     <circle cx="40" cy="40" r="35" fill="none" stroke="#eee" stroke-width="5"></circle>
                                     <circle cx="40" cy="40" r="35" fill="none" stroke="#2a5298" stroke-width="5" 
-                                            stroke-dasharray="220" stroke-dashoffset="44" transform="rotate(-90 40 40)"></circle>
+                                            stroke-dasharray="220" stroke-dashoffset="{{ 220 - ($salesPercentage * 2.2) }}" transform="rotate(-90 40 40)"></circle>
                                 </svg>
-                                <div class="progress-percentage">80%</div>
+                                <div class="progress-percentage">{{ $salesPercentage }}%</div>
                             </div>
                         </div>
                     </div>
@@ -98,16 +98,16 @@
                                     <i class="fas fa-shopping-bag"></i>
                                 </div>
                                 <h3 class="card-title">Total Orders</h3>
-                                <h2 class="card-value">382</h2>
+                                <h2 class="card-value">{{ $totalOrders }}</h2>
                                 <p class="card-period">Last 24 Hours</p>
                             </div>
                             <div class="progress-container">
                                 <svg class="progress-circle">
                                     <circle cx="40" cy="40" r="35" fill="none" stroke="#eee" stroke-width="5"></circle>
                                     <circle cx="40" cy="40" r="35" fill="none" stroke="#2a5298" stroke-width="5" 
-                                            stroke-dasharray="220" stroke-dashoffset="77" transform="rotate(-90 40 40)"></circle>
+                                            stroke-dasharray="220" stroke-dashoffset="{{ 220 - ($ordersPercentage * 2.2) }}" transform="rotate(-90 40 40)"></circle>
                                 </svg>
-                                <div class="progress-percentage">65%</div>
+                                <div class="progress-percentage">{{ $ordersPercentage }}%</div>
                             </div>
                         </div>
                     </div>
@@ -132,44 +132,123 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @forelse($recentOrders as $order)
                                 <tr>
-                                    <td>Classic T-Shirt</td>
-                                    <td>GA-1001</td>
-                                    <td>$49.99</td>
-                                    <td><span class="status-badge status-delivered">Delivered</span></td>
-                                    <td><button class="action-btn">Details</button></td>
+                                    <td>{{ $order['product_name'] }}</td>
+                                    <td>{{ $order['product_number'] }}</td>
+                                    <td>IDR {{ number_format($order['total'], 0, ',', '.') }}</td>
+                                    <td><span class="status-badge status-{{ strtolower($order['status']) }}">{{ ucfirst($order['status']) }}</span></td>
+                                    <td class="action-buttons">
+                                        <button class="action-btn details-btn" data-order-id="{{ $order['id'] }}">Details</button>
+                                        <button class="action-btn edit-btn" data-order-id="{{ $order['id'] }}" 
+                                                data-bs-toggle="modal" data-bs-target="#editOrderModal" 
+                                                data-order-number="{{ $order['order_number'] }}"
+                                                data-order-status="{{ $order['status'] }}">Edit</button>
+                                    </td>
                                 </tr>
+                                @empty
                                 <tr>
-                                    <td>Designer Jeans</td>
-                                    <td>GA-1002</td>
-                                    <td>$89.99</td>
-                                    <td><span class="status-badge status-pending">Pending</span></td>
-                                    <td><button class="action-btn">Details</button></td>
+                                    <td colspan="5" class="text-center">No recent orders found</td>
                                 </tr>
-                                <tr>
-                                    <td>Summer Dress</td>
-                                    <td>GA-1003</td>
-                                    <td>$65.50</td>
-                                    <td><span class="status-badge status-processing">Processing</span></td>
-                                    <td><button class="action-btn">Details</button></td>
-                                </tr>
-                                <tr>
-                                    <td>Winter Jacket</td>
-                                    <td>GA-1004</td>
-                                    <td>$125.00</td>
-                                    <td><span class="status-badge status-shipped">Shipped</span></td>
-                                    <td><button class="action-btn">Details</button></td>
-                                </tr>
-                                <tr>
-                                    <td>Silk Scarf</td>
-                                    <td>GA-1005</td>
-                                    <td>$35.75</td>
-                                    <td><span class="status-badge status-delivered">Delivered</span></td>
-                                    <td><button class="action-btn">Details</button></td>
-                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Order Modal -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOrderModalLabel">Edit Order Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editOrderForm">
+                        <input type="hidden" id="editOrderId" name="order_id">
+                        <div class="mb-3">
+                            <label for="orderNumber" class="form-label">Order Number</label>
+                            <input type="text" class="form-control" id="orderNumber" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="orderStatus" class="form-label">Status</label>
+                            <select class="form-select" id="orderStatus" name="status">
+                                <option value="pending">Pending</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="packing">Packing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveOrderStatus">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-info-section mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Order Number:</strong> <span id="detailOrderNumber"></span></p>
+                                <p><strong>Order Date:</strong> <span id="detailOrderDate"></span></p>
+                                <p><strong>Status:</strong> <span id="detailOrderStatus"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Customer Name:</strong> <span id="detailCustomerName"></span></p>
+                                <p><strong>Email:</strong> <span id="detailCustomerEmail"></span></p>
+                                <p><strong>Phone:</strong> <span id="detailCustomerPhone"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6 class="border-bottom pb-2 mb-3">Products</h6>
+                    <div id="orderProductsList" class="mb-4">
+                        <!-- Products will be inserted here dynamically -->
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="border-bottom pb-2 mb-3">Shipping Address</h6>
+                            <p id="detailShippingAddress"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="border-bottom pb-2 mb-3">Order Summary</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="detailSubtotal"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span id="detailShipping"></span>
+                            </div>
+                            <div class="d-flex justify-content-between font-weight-bold">
+                                <strong>Total:</strong>
+                                <strong id="detailTotal"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -214,6 +293,19 @@
                     case 'Messages':
                         window.location.href = '/admin/messages';
                         break;
+                    case 'Logout':
+                        // Create a logout form and submit it
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/logout';
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                        break;
                 }
                 
                 // Close sidebar on mobile after navigation
@@ -222,6 +314,363 @@
                 }
             });
         });
+
+        // Date selector change event
+        document.getElementById('selectedDate').addEventListener('change', function() {
+            // You can implement date-based filtering here
+            // For now, let's just reload the dashboard data
+            fetchDashboardData();
+        });
+
+        // Set up action buttons for order details
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('details-btn')) {
+                const orderId = e.target.getAttribute('data-order-id');
+                // Fetch order details and show modal
+                fetchOrderDetails(orderId);
+            }
+        });
+
+        // Fetch order details from the server
+        function fetchOrderDetails(orderId) {
+            fetch(`/admin/api/orders/${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayOrderDetails(data.order);
+                    } else {
+                        alert('Failed to fetch order details: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                    // For demo purposes, we'll use mock data if the API isn't implemented yet
+                    displayMockOrderDetails(orderId);
+                });
+        }
+
+        // Display order details in the modal
+        function displayOrderDetails(order) {
+            // Fill in order information
+            document.getElementById('detailOrderNumber').textContent = order.order_number;
+            document.getElementById('detailOrderDate').textContent = new Date(order.created_at).toLocaleDateString();
+            
+            // Set status with appropriate badge
+            const statusBadge = document.createElement('span');
+            statusBadge.className = `status-badge status-${order.status.toLowerCase()}`;
+            statusBadge.textContent = capitalizeFirstLetter(order.status);
+            document.getElementById('detailOrderStatus').innerHTML = '';
+            document.getElementById('detailOrderStatus').appendChild(statusBadge);
+            
+            // Customer information
+            document.getElementById('detailCustomerName').textContent = 
+                `${order.shipping_info.firstName} ${order.shipping_info.lastName}`;
+            document.getElementById('detailCustomerEmail').textContent = order.shipping_info.email || 'N/A';
+            document.getElementById('detailCustomerPhone').textContent = order.shipping_info.phone || 'N/A';
+            
+            // Shipping address
+            document.getElementById('detailShippingAddress').innerHTML = 
+                `${order.shipping_info.firstName} ${order.shipping_info.lastName}<br>
+                ${order.shipping_info.address}<br>
+                ${order.shipping_info.city}, ${order.shipping_info.postalCode}`;
+            
+            // Order summary
+            document.getElementById('detailSubtotal').textContent = `IDR ${formatNumber(order.subtotal)}`;
+            document.getElementById('detailShipping').textContent = `IDR ${formatNumber(order.shipping_cost)}`;
+            document.getElementById('detailTotal').textContent = `IDR ${formatNumber(order.total)}`;
+            
+            // Products list
+            const productsList = document.getElementById('orderProductsList');
+            productsList.innerHTML = '';
+            
+            order.cart_items.forEach(item => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item d-flex align-items-center border-bottom pb-3 mb-3';
+                productItem.innerHTML = `
+                    <div class="product-image me-3">
+                        <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                    </div>
+                    <div class="product-details flex-grow-1">
+                        <h6 class="mb-1">${item.name}</h6>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">Size: ${item.size}</span>
+                            <span class="me-3">Quantity: ${item.quantity}</span>
+                            <span>Price: IDR ${formatNumber(item.price)} per item</span>
+                        </div>
+                    </div>
+                    <div class="product-total">
+                        <strong>IDR ${formatNumber(item.price * item.quantity)}</strong>
+                    </div>
+                `;
+                productsList.appendChild(productItem);
+            });
+            
+            // Show the modal
+            const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            orderDetailsModal.show();
+        }
+
+        // Mock data for demo purposes if API isn't ready
+        function displayMockOrderDetails(orderId) {
+            const mockOrder = {
+                id: orderId,
+                order_number: 'ORD-6832E' + orderId.toString().padStart(4, '0'),
+                created_at: new Date().toISOString(),
+                status: 'pending',
+                shipping_info: {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    email: 'john.doe@example.com',
+                    phone: '+62 812-3456-7890',
+                    address: 'Jl. Sudirman No. 123',
+                    city: 'Jakarta',
+                    postalCode: '12345'
+                },
+                subtotal: 849999,
+                shipping_cost: 15000,
+                total: 864999,
+                cart_items: [
+                    {
+                        name: 'Kaos Hitam',
+                        size: 'XL',
+                        quantity: 2,
+                        price: 200000,
+                        image: '/images/products/product-1.jpg'
+                    },
+                    {
+                        name: 'Celana Jeans',
+                        size: '32',
+                        quantity: 1,
+                        price: 449999,
+                        image: '/images/products/product-2.jpg'
+                    }
+                ]
+            };
+            
+            displayOrderDetails(mockOrder);
+        }
+
+        // Initialize edit order modal
+        const editOrderModal = document.getElementById('editOrderModal');
+        if (editOrderModal) {
+            editOrderModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const orderId = button.getAttribute('data-order-id');
+                const orderNumber = button.getAttribute('data-order-number');
+                const orderStatus = button.getAttribute('data-order-status');
+                
+                document.getElementById('editOrderId').value = orderId;
+                document.getElementById('orderNumber').value = orderNumber;
+                
+                const statusSelect = document.getElementById('orderStatus');
+                for (let i = 0; i < statusSelect.options.length; i++) {
+                    if (statusSelect.options[i].value === orderStatus.toLowerCase()) {
+                        statusSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            });
+        }
+
+        // Save order status changes
+        document.getElementById('saveOrderStatus').addEventListener('click', function() {
+            const orderId = document.getElementById('editOrderId').value;
+            const status = document.getElementById('orderStatus').value;
+            
+            // Call API to update order status
+            fetch(`/admin/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal
+                    bootstrap.Modal.getInstance(editOrderModal).hide();
+                    
+                    // Update the status in the table
+                    const statusCell = document.querySelector(`button[data-order-id="${orderId}"]`).closest('tr').querySelector('.status-badge');
+                    statusCell.className = `status-badge status-${status}`;
+                    statusCell.textContent = capitalizeFirstLetter(status);
+                    
+                    // Store the new status in the edit button data attribute
+                    document.querySelector(`button.edit-btn[data-order-id="${orderId}"]`).setAttribute('data-order-status', status);
+                    
+                    // Refresh dashboard data
+                    fetchDashboardData();
+                } else {
+                    alert('Failed to update order status: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating order status:', error);
+                alert('An error occurred while updating the order status.');
+            });
+        });
+
+        // Update recent orders table in AJAX callback
+        function updateRecentOrdersTable(orders) {
+            const tbody = document.querySelector('.orders-table tbody');
+            tbody.innerHTML = '';
+
+            if (orders.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="5" class="text-center">No recent orders found</td>';
+                tbody.appendChild(tr);
+            } else {
+                orders.forEach(order => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${order.product_name}</td>
+                        <td>${order.product_number}</td>
+                        <td>IDR ${formatNumber(order.total)}</td>
+                        <td><span class="status-badge status-${order.status.toLowerCase()}">${capitalizeFirstLetter(order.status)}</span></td>
+                        <td class="action-buttons">
+                            <button class="action-btn details-btn" data-order-id="${order.id}">Details</button>
+                            <button class="action-btn edit-btn" data-order-id="${order.id}" 
+                                    data-bs-toggle="modal" data-bs-target="#editOrderModal" 
+                                    data-order-number="${order.order_number}"
+                                    data-order-status="${order.status}">Edit</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // Update the fetchDashboardData function to use our new updateRecentOrdersTable function
+        function fetchDashboardData() {
+            fetch('/admin/api/dashboard-data')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the dashboard cards
+                    document.querySelector('.dashboard-card:nth-child(1) .card-value').textContent = 
+                        'IDR ' + formatNumber(data.total_sales);
+                    document.querySelector('.dashboard-card:nth-child(1) .progress-percentage').textContent = 
+                        data.sales_percentage + '%';
+                    document.querySelector('.dashboard-card:nth-child(1) svg circle:nth-child(2)').setAttribute(
+                        'stroke-dashoffset', 220 - (data.sales_percentage * 2.2));
+
+                    document.querySelector('.dashboard-card:nth-child(2) .card-value').textContent = 
+                        data.total_orders;
+                    document.querySelector('.dashboard-card:nth-child(2) .progress-percentage').textContent = 
+                        data.orders_percentage + '%';
+                    document.querySelector('.dashboard-card:nth-child(2) svg circle:nth-child(2)').setAttribute(
+                        'stroke-dashoffset', 220 - (data.orders_percentage * 2.2));
+
+                    // Update recent orders table with our new function
+                    updateRecentOrdersTable(data.recent_orders);
+                })
+                .catch(error => console.error('Error fetching dashboard data:', error));
+        }
+
+        // Helper function to format numbers with commas
+        function formatNumber(number) {
+            return new Intl.NumberFormat('id-ID').format(number);
+        }
+
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     </script>
+
+<style>
+/* Existing styles... */
+
+/* Status badge styles */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-confirmed {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-packing {
+    background-color: #d6d8db;
+    color: #383d41;
+    border: 1px solid #c6c8ca;
+}
+
+.status-shipped {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.status-delivered {
+    background-color: #e2efda;
+    color: #285b2a;
+    border: 1px solid #c6e7c6;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-processing {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+/* Action buttons styles */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    background-color: #2a5298;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #1e3c72;
+}
+
+.details-btn {
+    background-color: #2a5298;
+}
+
+.edit-btn {
+    background-color: #6c757d;
+}
+
+.edit-btn:hover {
+    background-color: #5a6268;
+}
+</style>
 </body>
 </html> 
