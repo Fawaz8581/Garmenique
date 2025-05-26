@@ -27,7 +27,7 @@
         }
         .form-box{
             width: 380px;
-            height: 380px;
+            height: 420px;
             background: rgba(255, 255, 255, 0.842);
             box-shadow: 0 0 20px 9px #6865641e;
             border-radius: 35px;
@@ -99,13 +99,28 @@
             margin: 15px 0;
             font-size: 12px;
         }
+        .alert {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
     <div class="main">
         <div class="form-box">
             <h2>Reset Password</h2>
-            <p>Enter your email address and we'll send you a link to reset your password.</p>
+            <p>Set your new password below</p>
             
             <div class="social-icons">
                 <lottie-player src="https://assets4.lottiefiles.com/packages/lf20_3s913D.json"  background="transparent"  speed="1"    loop  autoplay></lottie-player>
@@ -115,23 +130,25 @@
                 <lottie-player src="https://assets4.lottiefiles.com/packages/lf20_YGNGxq.json"  background="transparent"  speed="1"    loop  autoplay></lottie-player>           
             </div>
             
-            <form method="POST" action="{{ route('password.email') }}">
+            <form method="POST" action="{{ route('password.update') }}">
                 @csrf
                 
-                @if (session('status'))
-                    <div style="padding: 10px; background-color: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 10px; text-align: center; font-size: 14px;">
-                        {{ session('status') }}
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ $email ?? old('email') }}">
+                
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
                 
-                @error('email')
-                    <div style="padding: 10px; background-color: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 10px; text-align: center; font-size: 14px;">
-                        {{ $message }}
-                    </div>
-                @enderror
-                
-                <input type="email" name="email" class="input-field" placeholder="Email Address" value="{{ old('email') }}" required>
-                <button type="submit" class="submit-btn">Send Password Reset Link</button>
+                <input type="password" name="password" class="input-field" placeholder="New Password" required>
+                <input type="password" name="password_confirmation" class="input-field" placeholder="Confirm Password" required>
+                <button type="submit" class="submit-btn">Reset Password</button>
             </form>
             
             <div class="back-link">
