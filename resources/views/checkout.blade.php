@@ -360,6 +360,61 @@
                             </div>
                         </div>
 
+                        <!-- Phone Number Options -->
+                        <div class="phone-options mt-4">
+                            <h5 class="mb-3">Phone Number</h5>
+                            
+                            <!-- Option 1: Use Saved Phone Number -->
+                            <div class="address-option" ng-class="{'selected': phoneOption === 'saved'}" 
+                                 ng-click="selectPhoneOption('saved')">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-phone me-2"></i>
+                                    <div>
+                                        <h6 class="mb-0">Use Saved Phone Number</h6>
+                                        <small class="text-muted">Use the phone number from your account settings</small>
+                                        
+                                        @auth
+                                        <div class="saved-phone mt-2" ng-show="phoneOption === 'saved'">
+                                            <p class="mb-0">{{ Auth::user()->country_code ?? '' }} {{ Auth::user()->phone_number ?? 'No phone number saved' }}</p>
+                                        </div>
+                                        @endauth
+                                        
+                                        @guest
+                                        <p class="text-danger mt-2" ng-show="phoneOption === 'saved'">
+                                            Please <a href="{{ route('login') }}">login</a> to use your saved phone number
+                                        </p>
+                                        @endguest
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Option 2: Enter New Phone Number -->
+                            <div class="address-option mt-3" ng-class="{'selected': phoneOption === 'new'}" 
+                                 ng-click="selectPhoneOption('new')">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-edit me-2"></i>
+                                    <div>
+                                        <h6 class="mb-0">Enter New Phone Number</h6>
+                                        <small class="text-muted">Provide a phone number for this order</small>
+                                    </div>
+                                </div>
+                                
+                                <div ng-show="phoneOption === 'new'" class="mt-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">+</span>
+                                        <input type="text" class="form-control" id="countryCode" name="countryCode" 
+                                               placeholder="Country Code" ng-model="shippingInfo.countryCode" 
+                                               style="width: 80px; flex: 0 0 80px;">
+                                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
+                                               placeholder="Phone Number" ng-model="shippingInfo.phoneNumber">
+                                    </div>
+                                    <div class="invalid-feedback" ng-show="checkoutForm.phoneNumber.$dirty && phoneOption === 'new' && !shippingInfo.phoneNumber">
+                                        Please enter a phone number
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Address Selection Options -->
                         <div class="address-options mt-4">
                             <h5 class="mb-3">Select Address Option</h5>
@@ -484,6 +539,8 @@
                             <p>@{{ shippingInfo.firstName }} @{{ shippingInfo.lastName }}</p>
                             <p>@{{ shippingInfo.address }}</p>
                             <p>@{{ shippingInfo.email }}</p>
+                            <p ng-if="phoneOption === 'saved'">Phone: {{ Auth::user()->country_code ?? '' }} {{ Auth::user()->phone_number ?? 'N/A' }}</p>
+                            <p ng-if="phoneOption === 'new'">Phone: +@{{ shippingInfo.countryCode }} @{{ shippingInfo.phoneNumber }}</p>
                         </div>
                         <div class="review-section mt-4">
                             <h5>Payment Method</h5>

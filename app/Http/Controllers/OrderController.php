@@ -16,22 +16,26 @@ class OrderController extends Controller
         try {
             // Validate the request
             $request->validate([
-                'shipping.firstName' => 'required|string|max:255',
-                'shipping.lastName' => 'required|string|max:255',
-                'shipping.email' => 'required|email|max:255',
-                'shipping.address' => 'required|string|max:255',
-                'shipping.city' => 'nullable|string|max:255',
-                'shipping.postalCode' => 'nullable|string|max:20',
-                'payment.method' => 'required|in:credit,paypal',
+                'shippingInfo.firstName' => 'required|string|max:255',
+                'shippingInfo.lastName' => 'required|string|max:255',
+                'shippingInfo.email' => 'required|email|max:255',
+                'shippingInfo.address' => 'required|string|max:255',
+                'shippingInfo.city' => 'nullable|string|max:255',
+                'shippingInfo.postalCode' => 'nullable|string|max:20',
+                'shippingInfo.countryCode' => 'nullable|string|max:10',
+                'shippingInfo.phoneNumber' => 'nullable|string|max:20',
+                'paymentInfo.method' => 'required|in:credit,paypal',
                 'cart' => 'required|array|min:1',
-                'totals' => 'required|array'
+                'subtotal' => 'required|numeric',
+                'shipping' => 'required|numeric',
+                'total' => 'required|numeric'
             ]);
             
             Log::info('Order validation passed', [
-                'shipping' => $request->shipping,
-                'payment_method' => $request->payment['method'],
+                'shipping' => $request->shippingInfo,
+                'payment_method' => $request->paymentInfo['method'],
                 'cart_count' => count($request->cart),
-                'total' => $request->totals['total']
+                'total' => $request->total
             ]);
 
             // Check if user is authenticated
@@ -47,12 +51,12 @@ class OrderController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_number' => 'ORD-' . strtoupper(uniqid()),
-                'shipping_info' => $request->shipping,
-                'payment_info' => $request->payment,
+                'shipping_info' => $request->shippingInfo,
+                'payment_info' => $request->paymentInfo,
                 'cart_items' => $request->cart,
-                'subtotal' => $request->totals['subtotal'],
-                'shipping_cost' => $request->totals['shipping'],
-                'total' => $request->totals['total'],
+                'subtotal' => $request->subtotal,
+                'shipping_cost' => $request->shipping,
+                'total' => $request->total,
                 'status' => 'pending'
             ]);
             
@@ -69,6 +73,7 @@ class OrderController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Order placed successfully',
+                'order_id' => $order->id,
                 'order' => $order
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {

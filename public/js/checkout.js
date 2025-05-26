@@ -6,6 +6,9 @@ angular.module('garmeniqueApp', [])
         // Initialize address option
         $scope.addressOption = '';
         
+        // Initialize phone option
+        $scope.phoneOption = '';
+        
         // Initialize shipping info
         $scope.shippingInfo = {
             firstName: '',
@@ -13,7 +16,9 @@ angular.module('garmeniqueApp', [])
             email: '',
             address: '',
             city: '',
-            postalCode: ''
+            postalCode: '',
+            countryCode: '',
+            phoneNumber: ''
         };
         
         // Initialize payment info
@@ -34,6 +39,14 @@ angular.module('garmeniqueApp', [])
 
         // Google address search input
         $scope.googleAddress = '';
+        
+        // Setup CSRF token for AJAX requests
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            $http.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+        } else {
+            console.error('CSRF token not found');
+        }
 
         // Function to format number to IDR
         $scope.formatIDR = function(number) {
@@ -114,6 +127,27 @@ angular.module('garmeniqueApp', [])
             }
         };
         
+        // Handle phone option selection
+        $scope.selectPhoneOption = function(option) {
+            $scope.phoneOption = option;
+            
+            if (option === 'saved') {
+                // Load user's saved phone number
+                $http.get('/api/user-address')
+                    .then(function(response) {
+                        if (response.data) {
+                            // Phone number is already displayed from the server-side,
+                            // but we'll store it for submission
+                            $scope.shippingInfo.savedCountryCode = response.data.country_code || '';
+                            $scope.shippingInfo.savedPhoneNumber = response.data.phone_number || '';
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error loading user phone number:', error);
+                    });
+            }
+        };
+        
         // Navigation functions
         $scope.nextStep = function() {
             // Check if cart is empty
@@ -151,6 +185,20 @@ angular.module('garmeniqueApp', [])
             if (!$scope.addressOption) {
                 alert('Please select an address option (saved address or Google Maps).');
                 return false;
+            }
+            
+            // Check if phone option is selected
+            if (!$scope.phoneOption) {
+                alert('Please select a phone number option (saved phone or new phone).');
+                return false;
+            }
+            
+            // Validate phone number if new phone option is selected
+            if ($scope.phoneOption === 'new') {
+                if (!$scope.shippingInfo.countryCode || !$scope.shippingInfo.phoneNumber) {
+                    alert('Please enter a valid phone number with country code.');
+                    return false;
+                }
             }
             
             if (!$scope.shippingInfo.firstName || 
@@ -211,79 +259,70 @@ angular.module('garmeniqueApp', [])
         
         // Submit order
         $scope.submitOrder = function() {
+            // Final validation
             if (!$scope.validateShippingInfo() || !$scope.validatePaymentInfo()) {
                 return;
             }
             
-            // Show loading notification
-            $scope.showNotification('Processing your order...', false);
-            
+            // Prepare order data
             const orderData = {
-                shipping: $scope.shippingInfo,
-                payment: {
+                shippingInfo: {
+                    firstName: $scope.shippingInfo.firstName,
+                    lastName: $scope.shippingInfo.lastName,
+                    email: $scope.shippingInfo.email,
+                    address: $scope.shippingInfo.address,
+                    city: $scope.shippingInfo.city,
+                    postalCode: $scope.shippingInfo.postalCode,
+                },
+                paymentInfo: {
                     method: $scope.paymentMethod,
-                    details: $scope.paymentMethod === 'credit' ? $scope.paymentInfo : {}
+                    // Only include card details if credit card is selected
+                    ...$scope.paymentMethod === 'credit' && {
+                        cardNumber: $scope.paymentInfo.cardNumber,
+                        expiryDate: $scope.paymentInfo.expiryDate,
+                        cvv: $scope.paymentInfo.cvv
+                    }
                 },
                 cart: $scope.cart,
-                totals: {
-                    subtotal: $scope.subtotal,
-                    shipping: $scope.shipping,
-                    total: $scope.total
-                }
+                subtotal: $scope.subtotal,
+                shipping: $scope.shipping,
+                total: $scope.total
             };
-
-            // Add CSRF token to headers
-            $http.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
-            // Send order to server
+            // Add phone information based on selected option
+            if ($scope.phoneOption === 'saved') {
+                orderData.shippingInfo.countryCode = $scope.shippingInfo.savedCountryCode;
+                orderData.shippingInfo.phoneNumber = $scope.shippingInfo.savedPhoneNumber;
+            } else if ($scope.phoneOption === 'new') {
+                orderData.shippingInfo.countryCode = $scope.shippingInfo.countryCode;
+                orderData.shippingInfo.phoneNumber = $scope.shippingInfo.phoneNumber;
+            }
+            
+            // Show processing notification
+            $scope.showNotification('Processing your order...', false);
+            
+            // Send order data to server
+            console.log('Sending order data:', orderData);
             $http.post('/api/orders', orderData)
                 .then(function(response) {
-                    if (response.data && response.data.success) {
-                        // Clear cart from both server and session storage
+                    console.log('Order response:', response.data);
+                    if (response.data.success) {
+                        // Clear cart in session storage
                         sessionStorage.removeItem('cart');
-                        $http.post('/save-cart', { cart: [] })
-                            .then(function() {
-                                // Redirect to success page
-                                window.location.href = '/order-success';
-                            })
-                            .catch(function(error) {
-                                console.error('Error clearing cart:', error);
-                                // Still redirect to success page since order was placed
-                                window.location.href = '/order-success';
-                            });
+                        
+                        // Redirect to success page
+                        window.location.href = '/order-success';
                     } else {
-                        // Handle unexpected success response format
-                        console.error('Unexpected response format:', response);
-                        $scope.showNotification('There was an error processing your order. Please try again.');
+                        $scope.showNotification('Error: ' + response.data.message);
                     }
                 })
                 .catch(function(error) {
-                    console.error('Error placing order:', error);
-                    
-                    let errorMessage = 'There was an error processing your order. Please try again.';
-                    
-                    // Try to extract more specific error message
-                    if (error.data && error.data.message) {
-                        errorMessage = error.data.message;
-                    } else if (error.data && error.data.error) {
-                        errorMessage = error.data.error;
-                    } else if (error.status === 422) {
-                        errorMessage = 'Please check your information and try again.';
-                        
-                        // Handle validation errors
-                        if (error.data && error.data.errors) {
-                            const firstError = Object.values(error.data.errors)[0];
-                            if (Array.isArray(firstError) && firstError.length > 0) {
-                                errorMessage = firstError[0];
-                            }
-                        }
-                    } else if (error.status === 401) {
-                        errorMessage = 'Please login to complete your order.';
-                    } else if (error.status === 500) {
-                        errorMessage = 'Server error. Please try again later.';
+                    console.error('Error submitting order:', error);
+                    // Log detailed error information
+                    if (error.data) {
+                        console.error('Error details:', error.data);
                     }
-                    
-                    $scope.showNotification(errorMessage);
+                    $scope.showNotification('An error occurred while processing your order. Please try again.');
                 });
         };
 

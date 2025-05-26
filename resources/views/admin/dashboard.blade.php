@@ -854,13 +854,24 @@
             document.getElementById('detailCustomerName').textContent = 
                 `${order.shipping_info.firstName} ${order.shipping_info.lastName}`;
             document.getElementById('detailCustomerEmail').textContent = order.shipping_info.email || 'N/A';
-            document.getElementById('detailCustomerPhone').textContent = order.shipping_info.phone || 'N/A';
+            
+            // Format and display phone number
+            let phoneDisplay = 'N/A';
+            if (order.shipping_info.phoneNumber) {
+                // If country code exists, format with it
+                if (order.shipping_info.countryCode) {
+                    phoneDisplay = `+${order.shipping_info.countryCode} ${order.shipping_info.phoneNumber}`;
+                } else {
+                    phoneDisplay = order.shipping_info.phoneNumber;
+                }
+            }
+            document.getElementById('detailCustomerPhone').textContent = phoneDisplay;
             
             // Shipping address
             document.getElementById('detailShippingAddress').innerHTML = 
                 `${order.shipping_info.firstName} ${order.shipping_info.lastName}<br>
                 ${order.shipping_info.address}<br>
-                ${order.shipping_info.city}, ${order.shipping_info.postalCode}`;
+                ${order.shipping_info.city || ''} ${order.shipping_info.postalCode || ''}`.trim();
             
             // Order summary
             document.getElementById('detailSubtotal').textContent = `IDR ${formatNumber(order.subtotal)}`;
@@ -905,7 +916,8 @@
                     firstName: 'John',
                     lastName: 'Doe',
                     email: 'john.doe@example.com',
-                    phone: '+62 812-3456-7890',
+                    countryCode: '62',
+                    phoneNumber: '812-3456-7890',
                     address: 'Jl. Sudirman No. 123',
                     city: 'Jakarta',
                     postalCode: '12345'
