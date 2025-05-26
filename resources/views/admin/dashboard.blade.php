@@ -782,6 +782,9 @@
                     case 'Messages':
                         window.location.href = '/admin/messages';
                         break;
+                    case 'Settings':
+                        window.location.href = '/admin/settings';
+                        break;
                     case 'Logout':
                         // Create a logout form and submit it
                         const form = document.createElement('form');

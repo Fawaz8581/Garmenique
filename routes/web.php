@@ -170,6 +170,9 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         Route::get('/messages', [App\Http\Controllers\Admin\MessageController::class, 'index'])->name('admin.messages');
         Route::get('/messages/{userId}', [App\Http\Controllers\Admin\MessageController::class, 'getMessages']);
         Route::post('/messages/send', [App\Http\Controllers\Admin\MessageController::class, 'sendMessage']);
+        
+        // Settings
+        Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'show'])->name('admin.settings');
 
         // API Routes
         Route::prefix('api')->group(function () {

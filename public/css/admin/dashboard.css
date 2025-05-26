@@ -401,11 +401,58 @@ body {
 }
 
 .change-positive {
-    color: #1dd1a1;
+    color: #28a745;
 }
 
 .change-negative {
-    color: #ff6b6b;
+    color: #dc3545;
+}
+
+/* Settings Section */
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section .card {
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.settings-section .card-body {
+    padding: 25px;
+}
+
+.settings-section .section-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.settings-section .form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.settings-section .form-control, 
+.settings-section .form-select {
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    padding: 10px 15px;
+}
+
+.settings-section .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 10px 20px;
+    font-weight: 500;
+}
+
+.settings-section .btn-primary:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
 }
 
 /* Responsive Styles */

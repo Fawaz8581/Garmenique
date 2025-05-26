@@ -381,6 +381,22 @@
                     case 'Messages':
                         window.location.href = '/admin/messages';
                         break;
+                    case 'Settings':
+                        window.location.href = '/admin/settings';
+                        break;
+                    case 'Logout':
+                        // Create a logout form and submit it
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/logout';
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = document.querySelector('meta[name="csrf-token"]').content;
+                        form.appendChild(csrfInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                        break;
                 }
                 
                 // Close sidebar on mobile after navigation
