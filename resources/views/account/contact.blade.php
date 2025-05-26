@@ -356,7 +356,7 @@
                             <div class="address-grid">
                                 <div>
                                     <label for="city">City</label>
-                                    <input type="text" id="city" name="city" class="address-field" placeholder="City">
+                                    <input type="text" id="city" name="city" class="address-field" placeholder="City" value="{{ Auth::user()->city ?? '' }}">
                                 </div>
                                 <div>
                                     <label for="state">State/Province</label>
@@ -367,7 +367,7 @@
                             <div class="address-grid">
                                 <div>
                                     <label for="postal_code">Postal Code</label>
-                                    <input type="text" id="postal_code" name="postal_code" class="address-field" placeholder="Postal/ZIP code">
+                                    <input type="text" id="postal_code" name="postal_code" class="address-field" placeholder="Postal/ZIP code" value="{{ Auth::user()->postal_code ?? '' }}">
                                 </div>
                                 <div>
                                     <label for="country">Country</label>

@@ -125,12 +125,16 @@ class AccountController extends Controller
             'country_code' => ['nullable', 'string', 'max:10'],
             'phone_number' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
         ]);
         
         // Update user information
         $user->country_code = $validated['country_code'];
         $user->phone_number = $validated['phone_number'];
         $user->address = $validated['address'];
+        $user->city = $validated['city'] ?? null;
+        $user->postal_code = $validated['postal_code'] ?? null;
         $user->save();
         
         return redirect()->route('account.contact')->with('status', 'Contact information updated successfully!');
@@ -224,7 +228,27 @@ class AccountController extends Controller
      */
     public function getDashboardDataJson()
     {
-        $dashboardData = $this->getDashboardData();
-        return response()->json($dashboardData);
+        return response()->json($this->getDashboardData());
+    }
+    
+    /**
+     * Get user's address information for checkout.
+     */
+    public function getUserAddress()
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        
+        return response()->json([
+            'name' => $user->name,
+            'address' => $user->address,
+            'city' => $user->city,
+            'postal_code' => $user->postal_code,
+            'country_code' => $user->country_code,
+            'phone_number' => $user->phone_number,
+        ]);
     }
 }

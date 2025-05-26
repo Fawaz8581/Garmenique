@@ -115,6 +115,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/dashboard', [AccountController::class, 'showDashboard'])->name('account.dashboard');
     Route::get('/api/account/dashboard-data', [AccountController::class, 'getDashboardDataJson'])->name('api.account.dashboard-data');
 
+    // User address for checkout
+    Route::get('/api/user-address', [AccountController::class, 'getUserAddress']);
+
     // User Messages routes
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'userMessages'])->name('user.messages');
     Route::post('/messages/send', [\App\Http\Controllers\MessageController::class, 'sendMessage'])->name('messages.send');
