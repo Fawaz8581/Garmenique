@@ -450,6 +450,15 @@
                             <input type="email" id="email" name="email" class="form-control" value="{{ Auth::user()->email }}" readonly>
                         </div>
                         
+                        <!-- Hidden input for country_code -->
+                        <input type="hidden" id="country_code" name="country_code" value="{{ old('country_code', Auth::user()->country_code ?? '+62') }}">
+                        
+                        <!-- Hidden input for phone_number -->
+                        <input type="hidden" id="phone_number" name="phone_number" value="{{ old('phone_number', Auth::user()->phone_number ?? '') }}">
+                        
+                        <!-- Hidden input for address -->
+                        <input type="hidden" id="address" name="address" value="{{ old('address', Auth::user()->address ?? '') }}">
+                        
                         <button type="submit" class="btn-save">Save Changes</button>
                     </form>
                 </div>
