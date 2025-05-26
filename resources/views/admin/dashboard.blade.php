@@ -66,9 +66,15 @@
                 <input type="date" class="date-input" id="selectedDate" value="{{ $selectedDate->format('Y-m-d') }}">
             </div>
             <div class="me-3">
+                @if(!$showAllDates)
                 <button id="allDatesBtn" class="btn btn-primary">
                     <i class="fas fa-calendar-alt me-1"></i> All Dates
                 </button>
+                @else
+                <button id="filterByDateBtn" class="btn btn-outline-primary">
+                    <i class="fas fa-filter me-1"></i> Filter by Date
+                </button>
+                @endif
             </div>
         </div>
         
@@ -164,7 +170,56 @@
                         
                         <!-- Pagination -->
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $recentOrdersPaginated->appends(request()->except('page'))->links() }}
+                            <div class="custom-pagination">
+                                @if ($recentOrdersPaginated->hasPages())
+                                    <ul class="pagination">
+                                        {{-- Previous Page Link --}}
+                                        @if ($recentOrdersPaginated->onFirstPage())
+                                            <li class="page-item disabled">
+                                                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                                            </li>
+                                        @else
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $recentOrdersPaginated->appends(request()->except('page'))->previousPageUrl() }}" rel="prev">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                        @endif
+
+                                        {{-- Pagination Elements --}}
+                                        @php
+                                            $urlParams = request()->except('page');
+                                        @endphp
+                                        @foreach ($recentOrdersPaginated->getUrlRange(1, $recentOrdersPaginated->lastPage()) as $page => $url)
+                                            @php
+                                                $urlWithParams = Request::url() . '?' . http_build_query(array_merge($urlParams, ['page' => $page]));
+                                            @endphp
+                                            @if ($page == $recentOrdersPaginated->currentPage())
+                                                <li class="page-item active" aria-current="page">
+                                                    <span class="page-link">{{ $page }}</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $urlWithParams }}">{{ $page }}</a>
+                                                </li>
+                                            @endif
+                                        @endforeach
+
+                                        {{-- Next Page Link --}}
+                                        @if ($recentOrdersPaginated->hasMorePages())
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $recentOrdersPaginated->appends(request()->except('page'))->nextPageUrl() }}" rel="next">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        @else
+                                            <li class="page-item disabled">
+                                                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                                            </li>
+                                        @endif
+                                    </ul>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -280,55 +335,323 @@
             
             // Date selector change event
             document.getElementById('selectedDate').addEventListener('change', function() {
-                // Reload the page with the new date parameter
-                const url = new URL(window.location.href);
-                url.searchParams.delete('all_dates'); // Remove all_dates parameter if exists
-                url.searchParams.set('date', this.value);
-                window.location.href = url.toString();
+                // Only trigger navigation if not in all dates mode or if the input is not disabled
+                if (!this.disabled) {
+                    // Reload the page with the new date parameter
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('all_dates'); // Remove all_dates parameter if exists
+                    url.searchParams.set('date', this.value);
+                    window.location.href = url.toString();
+                }
             });
             
             // All dates button click event
-            document.getElementById('allDatesBtn').addEventListener('click', function() {
-                // Reload the page with all_dates parameter
-                const url = new URL(window.location.href);
-                url.searchParams.delete('date'); // Remove date parameter if exists
-                url.searchParams.set('all_dates', '1');
-                window.location.href = url.toString();
-            });
+            if (document.getElementById('allDatesBtn')) {
+                document.getElementById('allDatesBtn').addEventListener('click', function() {
+                    // Reload the page with all_dates parameter
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('date'); // Remove date parameter if exists
+                    url.searchParams.set('all_dates', '1');
+                    
+                    // Prevent automatic refresh by storing the URL and navigating directly
+                    const targetUrl = url.toString();
+                    window.location.href = targetUrl;
+                });
+            }
             
-            // Apply filters on page load to ensure consistent state
-            setTimeout(() => {
-                applyFilters();
-            }, 100);
+            // Filter by date button click event
+            if (document.getElementById('filterByDateBtn')) {
+                document.getElementById('filterByDateBtn').addEventListener('click', function() {
+                    // Enable the date input
+                    const dateInput = document.getElementById('selectedDate');
+                    dateInput.disabled = false;
+                    
+                    // Reload the page with the selected date parameter
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('all_dates'); // Remove all_dates parameter
+                    url.searchParams.set('date', dateInput.value);
+                    window.location.href = url.toString();
+                });
+            }
+            
+            // Check if we're on the all_dates view and update UI accordingly
+            if (new URLSearchParams(window.location.search).has('all_dates')) {
+                document.querySelectorAll('.card-period').forEach(el => {
+                    el.textContent = 'All Time';
+                });
+                
+                // Disable date input when viewing all dates, but don't hide it
+                const dateInput = document.getElementById('selectedDate');
+                if (dateInput) {
+                    dateInput.disabled = true;
+                }
+            }
+            
+            // Handle pagination clicks
+            document.querySelectorAll('.custom-pagination .page-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Skip if this is a disabled link
+                    if (this.parentElement.classList.contains('disabled') || 
+                        this.parentElement.classList.contains('active')) {
+                        return;
+                    }
+                    
+                    const url = new URL(this.href);
+                    const page = url.searchParams.get('page');
+                    
+                    if (page) {
+                        // Update current URL with the new page number without refreshing
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('page', page);
+                        window.history.pushState({}, '', currentUrl);
+                        
+                        // Fetch data for the new page
+                        const isAllDates = currentUrl.searchParams.has('all_dates');
+                        const date = currentUrl.searchParams.get('date');
+                        
+                        // Build query parameters for API call
+                        let params = new URLSearchParams();
+                        params.set('page', page);
+                        
+                        if (isAllDates) {
+                            params.set('all_dates', '1');
+                        } else if (date) {
+                            params.set('date', date);
+                        }
+                        
+                        // Show loading indicator
+                        const tableBody = document.querySelector('.orders-table tbody');
+                        if (tableBody) {
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
+                        }
+                        
+                        // Fetch updated data
+                        fetch(`/admin/api/dashboard-data?${params.toString()}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Update table with new data
+                                updateRecentOrdersTable(data.recent_orders);
+                                
+                                // Update pagination UI
+                                updatePaginationUI(data.pagination);
+                                
+                                // Re-attach event listeners to the new pagination links
+                                attachPaginationListeners();
+                            })
+                            .catch(error => {
+                                console.error('Error fetching paginated data:', error);
+                                if (tableBody) {
+                                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
+                                }
+                            });
+                    }
+                });
+            });
         });
+        
+        // Function to attach event listeners to pagination links
+        function attachPaginationListeners() {
+            document.querySelectorAll('.custom-pagination .page-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Skip if this is a disabled link
+                    if (this.parentElement.classList.contains('disabled') || 
+                        this.parentElement.classList.contains('active')) {
+                        return;
+                    }
+                    
+                    const url = new URL(this.href);
+                    const page = url.searchParams.get('page');
+                    
+                    if (page) {
+                        // Update current URL with the new page number without refreshing
+                        const currentUrl = new URL(window.location.href);
+                        currentUrl.searchParams.set('page', page);
+                        window.history.pushState({}, '', currentUrl);
+                        
+                        // Fetch data for the new page
+                        const isAllDates = currentUrl.searchParams.has('all_dates');
+                        const date = currentUrl.searchParams.get('date');
+                        
+                        // Build query parameters for API call
+                        let params = new URLSearchParams();
+                        params.set('page', page);
+                        
+                        if (isAllDates) {
+                            params.set('all_dates', '1');
+                        } else if (date) {
+                            params.set('date', date);
+                        }
+                        
+                        // Show loading indicator
+                        const tableBody = document.querySelector('.orders-table tbody');
+                        if (tableBody) {
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
+                        }
+                        
+                        // Fetch updated data
+                        fetch(`/admin/api/dashboard-data?${params.toString()}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Update table with new data
+                                updateRecentOrdersTable(data.recent_orders);
+                                
+                                // Update pagination UI
+                                updatePaginationUI(data.pagination);
+                                
+                                // Re-attach event listeners to pagination links
+                                attachPaginationListeners();
+                            })
+                            .catch(error => {
+                                console.error('Error fetching paginated data:', error);
+                                if (tableBody) {
+                                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
+                                }
+                            });
+                    }
+                });
+            });
+        }
+        
+        // Function to update pagination UI
+        function updatePaginationUI(pagination) {
+            const paginationContainer = document.querySelector('.custom-pagination');
+            if (!paginationContainer) return;
+            
+            // Get current URL and parameters
+            const currentUrl = new URL(window.location.href);
+            const urlParams = {};
+            
+            // Preserve existing parameters
+            for (const [key, value] of currentUrl.searchParams.entries()) {
+                if (key !== 'page') {
+                    urlParams[key] = value;
+                }
+            }
+            
+            // Create new pagination HTML
+            let paginationHtml = '<ul class="pagination">';
+            
+            // Previous page link
+            if (pagination.current_page > 1) {
+                const prevPageUrl = new URL(window.location.href);
+                prevPageUrl.searchParams.set('page', pagination.current_page - 1);
+                for (const [key, value] of Object.entries(urlParams)) {
+                    prevPageUrl.searchParams.set(key, value);
+                }
+                
+                paginationHtml += `<li class="page-item">
+                    <a class="page-link" href="${prevPageUrl.toString()}" rel="prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>`;
+            } else {
+                paginationHtml += `<li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                </li>`;
+            }
+            
+            // Page links
+            const totalPages = pagination.last_page;
+            const currentPage = pagination.current_page;
+            
+            // Determine range of pages to show
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            // Adjust if we're near the beginning or end
+            if (endPage - startPage < 4 && totalPages > 5) {
+                if (currentPage < 3) {
+                    endPage = Math.min(5, totalPages);
+                } else if (currentPage > totalPages - 2) {
+                    startPage = Math.max(1, totalPages - 4);
+                }
+            }
+            
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    paginationHtml += `<li class="page-item active" aria-current="page">
+                        <span class="page-link">${i}</span>
+                    </li>`;
+                } else {
+                    const pageUrl = new URL(window.location.href);
+                    pageUrl.searchParams.set('page', i);
+                    for (const [key, value] of Object.entries(urlParams)) {
+                        pageUrl.searchParams.set(key, value);
+                    }
+                    
+                    paginationHtml += `<li class="page-item">
+                        <a class="page-link" href="${pageUrl.toString()}">${i}</a>
+                    </li>`;
+                }
+            }
+            
+            // Next page link
+            if (pagination.current_page < pagination.last_page) {
+                const nextPageUrl = new URL(window.location.href);
+                nextPageUrl.searchParams.set('page', pagination.current_page + 1);
+                for (const [key, value] of Object.entries(urlParams)) {
+                    nextPageUrl.searchParams.set(key, value);
+                }
+                
+                paginationHtml += `<li class="page-item">
+                    <a class="page-link" href="${nextPageUrl.toString()}" rel="next">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>`;
+            } else {
+                paginationHtml += `<li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                </li>`;
+            }
+            
+            paginationHtml += '</ul>';
+            
+            // Replace pagination HTML
+            paginationContainer.innerHTML = paginationHtml;
+        }
 
         // Apply filters and reload dashboard data
         function applyFilters() {
             const selectedDate = document.getElementById('selectedDate').value;
+            const isAllDates = new URLSearchParams(window.location.search).has('all_dates');
             
             // Update the card period text
             document.querySelectorAll('.card-period').forEach(el => {
-                el.textContent = 'Selected Date';
+                el.textContent = isAllDates ? 'All Time' : 'Selected Date';
             });
             
             // Fetch dashboard data with filters
-            fetchDashboardData(selectedDate);
+            fetchDashboardData(selectedDate, isAllDates);
             
             // Update URL with selected date (without reloading the page)
             const url = new URL(window.location.href);
-            if (selectedDate) {
+            if (isAllDates) {
+                url.searchParams.delete('date');
+                url.searchParams.set('all_dates', '1');
+            } else if (selectedDate) {
+                url.searchParams.delete('all_dates');
                 url.searchParams.set('date', selectedDate);
             } else {
                 url.searchParams.delete('date');
+                url.searchParams.delete('all_dates');
             }
             window.history.replaceState({}, '', url);
         }
 
         // Update the fetchDashboardData function to accept date parameter
-        function fetchDashboardData(date = null) {
+        function fetchDashboardData(date = null, isAllDates = false) {
             // Build query parameters
             let params = new URLSearchParams();
-            if (date) params.append('date', date);
+            if (isAllDates) {
+                params.append('all_dates', '1');
+            } else if (date) {
+                params.append('date', date);
+            }
             
             const url = `/admin/api/dashboard-data?${params.toString()}`;
             
@@ -356,19 +679,72 @@
                     // Update recent orders table
                     updateRecentOrdersTable(data.recent_orders);
                     
-                    // Update card period text to show selected date
-                    const formattedDate = new Date(data.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                    });
+                    // Update card period text based on filter
                     document.querySelectorAll('.card-period').forEach(el => {
-                        el.textContent = formattedDate;
+                        if (data.show_all_dates) {
+                            el.textContent = 'All Time';
+                        } else {
+                            const formattedDate = new Date(data.date).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                            });
+                            el.textContent = formattedDate;
+                        }
                     });
                 })
                 .catch(error => {
                     console.error('Error fetching dashboard data:', error);
                 });
+        }
+
+        // Function to update the recent orders table
+        function updateRecentOrdersTable(orders) {
+            const tableBody = document.querySelector('.orders-table tbody');
+            if (!tableBody) return;
+            
+            // Clear existing rows
+            tableBody.innerHTML = '';
+            
+            if (orders.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = '<td colspan="5" class="text-center">No orders found</td>';
+                tableBody.appendChild(emptyRow);
+                return;
+            }
+            
+            // Add new rows
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                
+                // Format the status badge
+                const statusClass = `status-badge status-${order.status.toLowerCase()}`;
+                const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+                
+                row.innerHTML = `
+                    <td>${order.product_name}</td>
+                    <td>${order.product_number}</td>
+                    <td>IDR ${formatNumber(order.total)}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td class="action-buttons">
+                        <button class="action-btn details-btn" data-order-id="${order.id}">Details</button>
+                        <button class="action-btn edit-btn" data-order-id="${order.id}" 
+                                data-bs-toggle="modal" data-bs-target="#editOrderModal" 
+                                data-order-number="${order.order_number}"
+                                data-order-status="${order.status}">Edit</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Re-attach event listeners for the new buttons
+            document.querySelectorAll('.details-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-order-id');
+                    fetchOrderDetails(orderId);
+                });
+            });
         }
 
         // Sidebar toggle for mobile
@@ -389,7 +765,10 @@
                 // Handle navigation
                 switch(menuText) {
                     case 'Dashboard':
-                        window.location.href = '/admin';
+                        // Preserve the all_dates parameter if it exists
+                        const url = new URL(window.location.href);
+                        const hasAllDates = url.searchParams.has('all_dates');
+                        window.location.href = hasAllDates ? '/admin?all_dates=1' : '/admin';
                         break;
                     case 'Products':
                         window.location.href = '/admin/products';
@@ -665,6 +1044,62 @@
         border-radius: 20px;
         font-size: 13px;
         font-weight: 500;
+    }
+    
+    /* Pagination styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .pagination .page-item {
+        list-style: none;
+    }
+    
+    .pagination .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 38px;
+        min-width: 38px;
+        padding: 0 10px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        color: #14387F;
+        background-color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #14387F;
+        border-color: #14387F;
+        color: white;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        color: #0e2b63;
+        z-index: 2;
+    }
+    
+    /* Previous/Next buttons */
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-size: 16px;
+        font-weight: bold;
     }
     </style>
 </body>

@@ -26,8 +26,12 @@ class DashboardController extends Controller
         })->count();
 
         // Get the selected date or default to today
-        $selectedDate = $request->input('date') ? Carbon::parse($request->input('date')) : Carbon::today();
         $showAllDates = $request->has('all_dates');
+        
+        // Always set a valid selectedDate even when in all_dates mode
+        $selectedDate = $request->input('date') 
+            ? Carbon::parse($request->input('date')) 
+            : Carbon::today();
         
         // Set time range for the selected date (entire day)
         $startDate = $selectedDate->copy()->startOfDay();
@@ -87,7 +91,8 @@ class DashboardController extends Controller
             $recentOrdersQuery->whereBetween('created_at', [$startDate, $endDate]);
         }
         
-        $recentOrdersPaginated = $recentOrdersQuery->paginate(5);
+        // Preserve the all_dates parameter when paginating
+        $recentOrdersPaginated = $recentOrdersQuery->paginate(5)->appends($request->except('page'));
         
         $recentOrders = $recentOrdersPaginated->map(function ($order) {
             // Extract the first product from each order
@@ -130,8 +135,12 @@ class DashboardController extends Controller
     public function getDashboardDataJson(Request $request)
     {
         // Get the selected date or default to today
-        $selectedDate = $request->input('date') ? Carbon::parse($request->input('date')) : Carbon::today();
         $showAllDates = $request->has('all_dates');
+        
+        // Always set a valid selectedDate even when in all_dates mode
+        $selectedDate = $request->input('date') 
+            ? Carbon::parse($request->input('date')) 
+            : Carbon::today();
         
         // Set time range for the selected date (entire day)
         $startDate = $selectedDate->copy()->startOfDay();
@@ -193,7 +202,9 @@ class DashboardController extends Controller
         
         $page = $request->input('page', 1);
         $perPage = 5;
-        $recentOrdersPaginated = $recentOrdersQuery->paginate($perPage);
+        
+        // Preserve the all_dates parameter when paginating
+        $recentOrdersPaginated = $recentOrdersQuery->paginate($perPage)->appends($request->except('page'));
         
         $recentOrders = $recentOrdersPaginated->map(function ($order) {
             // Extract the first product from each order
