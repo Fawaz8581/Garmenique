@@ -233,7 +233,31 @@
                                             
                                             <div class="order-status">
                                                 <span class="info-title">Status</span>
-                                                <span class="status-badge status-{{ strtolower($order->status) }}">{{ ucfirst($order->status) }}</span>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <span class="status-badge status-{{ strtolower($order->status) }}">{{ ucfirst($order->status) }}</span>
+                                                    
+                                                    @if(strtolower($order->status) === 'shipped')
+                                                        @php
+                                                            $trackingUrl = '#';
+                                                            if(isset($order->shipping_info['expedition'])) {
+                                                                switch($order->shipping_info['expedition']) {
+                                                                    case 'jne':
+                                                                        $trackingUrl = 'https://jne.co.id/tracking-package';
+                                                                        break;
+                                                                    case 'jnt':
+                                                                        $trackingUrl = 'https://jet.co.id/track';
+                                                                        break;
+                                                                    case 'sicepat':
+                                                                        $trackingUrl = 'https://www.sicepat.com/';
+                                                                        break;
+                                                                }
+                                                            }
+                                                        @endphp
+                                                        <a href="{{ $trackingUrl }}" class="btn-track-order" target="_blank">
+                                                            <i class="fas fa-map-marker-alt me-2"></i> Track Your Order
+                                                        </a>
+                                                    @endif
+                                                </div>
                                             </div>
                                             
                                             @if(!empty($order->notes))
