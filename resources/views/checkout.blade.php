@@ -31,6 +31,35 @@
             margin: 40px auto;
             padding: 0 20px;
         }
+        
+        .shipping-method {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .shipping-method:hover {
+            border-color: #adb5bd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .shipping-method.selected {
+            border-color: #000;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .shipping-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
 
         .checkout-header {
             display: flex;
@@ -462,6 +491,9 @@
                                         <i class="fas fa-location-arrow me-2"></i> Get Your Address
                                     </button>
                                     <div id="map" class="mt-3"></div>
+                                    <div class="alert alert-info mt-2 small">
+                                        <i class="fas fa-info-circle me-1"></i> Shipping costs will be calculated based on your address. Rates are calculated from Bogor to your destination.
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -477,6 +509,69 @@
                         <!-- Hidden fields for city and postal code -->
                         <input type="hidden" id="city" name="city" ng-model="shippingInfo.city" value="">
                         <input type="hidden" id="postalCode" name="postalCode" ng-model="shippingInfo.postalCode" value="">
+                        
+                        <!-- Shipping Expedition Selection -->
+                        <div class="shipping-options mt-4">
+                            <h5 class="mb-3">Select Shipping Expedition</h5>
+                            
+                            <div class="alert alert-info mb-3" ng-if="!shippingInfo.address">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Please enter your shipping address first to see accurate shipping rates. Rates shown are estimates.
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="shipping-method" ng-class="{'selected': shippingInfo.expedition === 'jne'}" 
+                                     ng-click="selectShippingExpedition('jne')">
+                                    <div class="d-flex align-items-center">
+                                        <div class="shipping-logo me-3">
+                                            <i class="fas fa-truck text-primary" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">JNE</h6>
+                                            <small class="text-muted">Regular delivery</small>
+                                        </div>
+                                        <div class="ms-auto">
+                                            <span class="shipping-price" ng-if="shippingInfo.address">IDR @{{ formatIDR(shippingRates.jne) }}</span>
+                                            <span class="shipping-price text-muted" ng-if="!shippingInfo.address">Calculated after address entry</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="shipping-method mt-2" ng-class="{'selected': shippingInfo.expedition === 'jnt'}" 
+                                     ng-click="selectShippingExpedition('jnt')">
+                                    <div class="d-flex align-items-center">
+                                        <div class="shipping-logo me-3">
+                                            <i class="fas fa-shipping-fast text-danger" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">J&T Express</h6>
+                                            <small class="text-muted">Regular delivery</small>
+                                        </div>
+                                        <div class="ms-auto">
+                                            <span class="shipping-price" ng-if="shippingInfo.address">IDR @{{ formatIDR(shippingRates.jnt) }}</span>
+                                            <span class="shipping-price text-muted" ng-if="!shippingInfo.address">Calculated after address entry</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="shipping-method mt-2" ng-class="{'selected': shippingInfo.expedition === 'sicepat'}" 
+                                     ng-click="selectShippingExpedition('sicepat')">
+                                    <div class="d-flex align-items-center">
+                                        <div class="shipping-logo me-3">
+                                            <i class="fas fa-bolt text-success" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">SiCepat</h6>
+                                            <small class="text-muted">Regular delivery</small>
+                                        </div>
+                                        <div class="ms-auto">
+                                            <span class="shipping-price" ng-if="shippingInfo.address">IDR @{{ formatIDR(shippingRates.sicepat) }}</span>
+                                            <span class="shipping-price text-muted" ng-if="!shippingInfo.address">Calculated after address entry</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Payment Information -->
@@ -543,6 +638,12 @@
                             <p ng-if="phoneOption === 'new'">Phone: +@{{ shippingInfo.countryCode }} @{{ shippingInfo.phoneNumber }}</p>
                         </div>
                         <div class="review-section mt-4">
+                            <h5>Shipping Method</h5>
+                            <p ng-if="shippingInfo.expedition === 'jne'">JNE - Regular delivery </p>
+                            <p ng-if="shippingInfo.expedition === 'jnt'">J&T Express - Regular delivery </p>
+                            <p ng-if="shippingInfo.expedition === 'sicepat'">SiCepat - Reguler delivery </p>
+                        </div>
+                        <div class="review-section mt-4">
                             <h5>Payment Method</h5>
                             <p ng-if="paymentMethod === 'credit'">
                                 Credit Card ending in @{{ paymentInfo.cardNumber.slice(-4) }}
@@ -597,9 +698,10 @@
                         <span>Subtotal</span>
                         <span>IDR @{{ formatIDR(subtotal) }}</span>
                     </div>
-                    <div class="summary-item">
+                                            <div class="summary-item">
                         <span>Shipping</span>
-                        <span>IDR @{{ formatIDR(shipping) }}</span>
+                        <span ng-if="shippingInfo.address">IDR @{{ formatIDR(shipping) }}</span>
+                        <span ng-if="!shippingInfo.address" class="text-muted">Enter address to calculate</span>
                     </div>
                     <div class="summary-item summary-total">
                         <span>Total</span>
@@ -820,6 +922,12 @@
                                                                      data.address?.town || 
                                                                      data.address?.village || '';
                                             scope.shippingInfo.postalCode = data.address?.postcode || '';
+                                            
+                                            // Recalculate shipping when address changes
+                                            if (scope.shippingInfo.expedition) {
+                                                scope.calculateShippingCost(scope.shippingInfo.expedition);
+                                                scope.total = scope.subtotal + scope.shipping;
+                                            }
                                         });
                                         
                                         // Show success notification
@@ -920,12 +1028,18 @@
                             
                             // Update Angular model
                             const scope = angular.element(document.getElementById('address')).scope();
-                            scope.$apply(function() {
-                                scope.googleAddress = address;
-                                scope.shippingInfo.address = address;
-                                scope.shippingInfo.city = '';
-                                scope.shippingInfo.postalCode = '';
-                            });
+                                                            scope.$apply(function() {
+                                    scope.googleAddress = address;
+                                    scope.shippingInfo.address = address;
+                                    scope.shippingInfo.city = '';
+                                    scope.shippingInfo.postalCode = '';
+                                    
+                                    // Recalculate shipping when address changes
+                                    if (scope.shippingInfo.expedition) {
+                                        scope.calculateShippingCost(scope.shippingInfo.expedition);
+                                        scope.total = scope.subtotal + scope.shipping;
+                                    }
+                                });
                         } else {
                             handleGeocodeError(new Error('No results from Google API'), { lat, lng: lon });
                         }
@@ -964,6 +1078,12 @@
                     scope.shippingInfo.address = fallbackAddress;
                     scope.shippingInfo.city = '';
                     scope.shippingInfo.postalCode = '';
+                    
+                    // Recalculate shipping when address changes
+                    if (scope.shippingInfo.expedition) {
+                        scope.calculateShippingCost(scope.shippingInfo.expedition);
+                        scope.total = scope.subtotal + scope.shipping;
+                    }
                 });
                 
                 // Show fallback message

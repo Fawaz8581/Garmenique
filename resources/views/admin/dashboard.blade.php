@@ -140,6 +140,7 @@
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Product Number</th>
+                                    <th>Shipping Method</th>
                                     <th>Payments</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -150,6 +151,21 @@
                                 <tr>
                                     <td>{{ $order['product_name'] }}</td>
                                     <td>{{ $order['product_number'] }}</td>
+                                    <td>
+                                        @php
+                                            $expedition = isset($order['shipping_info']['expedition']) ? $order['shipping_info']['expedition'] : 'N/A';
+                                            $expeditionName = 'N/A';
+                                            
+                                            if ($expedition === 'jne') {
+                                                $expeditionName = 'JNE';
+                                            } elseif ($expedition === 'jnt') {
+                                                $expeditionName = 'J&T Express';
+                                            } elseif ($expedition === 'sicepat') {
+                                                $expeditionName = 'SiCepat';
+                                            }
+                                        @endphp
+                                        {{ $expeditionName }}
+                                    </td>
                                     <td>IDR {{ number_format($order['total'], 0, ',', '.') }}</td>
                                     <td><span class="status-badge status-{{ strtolower($order['status']) }}">{{ ucfirst($order['status']) }}</span></td>
                                     <td class="action-buttons">
@@ -162,7 +178,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">No orders found</td>
+                                    <td colspan="6" class="text-center">No orders found</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -424,7 +440,7 @@
                         // Show loading indicator
                         const tableBody = document.querySelector('.orders-table tbody');
                         if (tableBody) {
-                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
+                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
                         }
                         
                         // Fetch updated data
@@ -443,7 +459,7 @@
                             .catch(error => {
                                 console.error('Error fetching paginated data:', error);
                                 if (tableBody) {
-                                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
+                                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
                                 }
                             });
                     }
@@ -489,7 +505,7 @@
                         // Show loading indicator
                         const tableBody = document.querySelector('.orders-table tbody');
                         if (tableBody) {
-                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
+                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
                         }
                         
                         // Fetch updated data
@@ -508,7 +524,7 @@
                             .catch(error => {
                                 console.error('Error fetching paginated data:', error);
                                 if (tableBody) {
-                                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
+                                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
                                 }
                             });
                     }
@@ -708,7 +724,7 @@
             
             if (orders.length === 0) {
                 const emptyRow = document.createElement('tr');
-                emptyRow.innerHTML = '<td colspan="5" class="text-center">No orders found</td>';
+                emptyRow.innerHTML = '<td colspan="6" class="text-center">No orders found</td>';
                 tableBody.appendChild(emptyRow);
                 return;
             }
@@ -721,9 +737,26 @@
                 const statusClass = `status-badge status-${order.status.toLowerCase()}`;
                 const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
                 
+                // Determine expedition name
+                let expeditionName = 'N/A';
+                if (order.shipping_info && order.shipping_info.expedition) {
+                    switch(order.shipping_info.expedition) {
+                        case 'jne':
+                            expeditionName = 'JNE';
+                            break;
+                        case 'jnt':
+                            expeditionName = 'J&T Express';
+                            break;
+                        case 'sicepat':
+                            expeditionName = 'SiCepat';
+                            break;
+                    }
+                }
+                
                 row.innerHTML = `
                     <td>${order.product_name}</td>
                     <td>${order.product_number}</td>
+                    <td>${expeditionName}</td>
                     <td>IDR ${formatNumber(order.total)}</td>
                     <td><span class="${statusClass}">${statusText}</span></td>
                     <td class="action-buttons">
@@ -870,11 +903,30 @@
             }
             document.getElementById('detailCustomerPhone').textContent = phoneDisplay;
             
-            // Shipping address
+            // Shipping address and expedition
+            let expeditionInfo = '';
+            if (order.shipping_info.expedition) {
+                let expeditionName = '';
+                switch(order.shipping_info.expedition) {
+                    case 'jne':
+                        expeditionName = 'JNE - Regular delivery';
+                        break;
+                    case 'jnt':
+                        expeditionName = 'J&T Express - Regular delivery';
+                        break;
+                    case 'sicepat':
+                        expeditionName = 'SiCepat - Regular delivery';
+                        break;
+                    default:
+                        expeditionName = order.shipping_info.expedition;
+                }
+                expeditionInfo = `<br><strong>Shipping Method:</strong> ${expeditionName}`;
+            }
+            
             document.getElementById('detailShippingAddress').innerHTML = 
                 `${order.shipping_info.firstName} ${order.shipping_info.lastName}<br>
                 ${order.shipping_info.address}<br>
-                ${order.shipping_info.city || ''} ${order.shipping_info.postalCode || ''}`.trim();
+                ${order.shipping_info.city || ''} ${order.shipping_info.postalCode || ''}${expeditionInfo}`.trim();
             
             // Order summary
             document.getElementById('detailSubtotal').textContent = `IDR ${formatNumber(order.subtotal)}`;
@@ -923,7 +975,8 @@
                     phoneNumber: '812-3456-7890',
                     address: 'Jl. Sudirman No. 123',
                     city: 'Jakarta',
-                    postalCode: '12345'
+                    postalCode: '12345',
+                    expedition: 'jne'
                 },
                 subtotal: 849999,
                 shipping_cost: 15000,

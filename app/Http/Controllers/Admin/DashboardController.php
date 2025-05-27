@@ -102,6 +102,9 @@ class DashboardController extends Controller
             $orderNumberParts = explode('-', $order->order_number);
             $productNumber = isset($orderNumberParts[1]) ? $orderNumberParts[1] : '';
             
+            // Get shipping expedition information
+            $shippingInfo = $order->shipping_info ?? [];
+            
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -110,6 +113,7 @@ class DashboardController extends Controller
                 'total' => $order->total,
                 'product_name' => $firstItem ? $firstItem['name'] : 'N/A',
                 'product_number' => 'ORD-' . $productNumber,
+                'shipping_info' => $shippingInfo,
             ];
         });
 
@@ -214,6 +218,9 @@ class DashboardController extends Controller
             $orderNumberParts = explode('-', $order->order_number);
             $productNumber = isset($orderNumberParts[1]) ? $orderNumberParts[1] : '';
             
+            // Get shipping expedition information
+            $shippingInfo = $order->shipping_info ?? [];
+            
             return [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
@@ -222,6 +229,7 @@ class DashboardController extends Controller
                 'total' => $order->total,
                 'product_name' => $firstItem ? $firstItem['name'] : 'N/A',
                 'product_number' => 'ORD-' . $productNumber,
+                'shipping_info' => $shippingInfo,
             ];
         });
         

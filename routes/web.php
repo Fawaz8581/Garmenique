@@ -278,3 +278,8 @@ Route::post('/save-cart', function (Request $request) {
 
 // Create Admin Route
 Route::get('/create-admin', [App\Http\Controllers\AdminCreatorController::class, 'createAdmin']);
+
+// Cart API routes
+Route::post('/api/clear-cart', [\App\Http\Controllers\Api\CartController::class, 'clearCart']);
+Route::post('/api/update-cart', [\App\Http\Controllers\Api\CartController::class, 'updateCart']);
+Route::post('/api/remove-from-cart', [\App\Http\Controllers\Api\CartController::class, 'removeFromCart']);

@@ -119,9 +119,32 @@ class OrderController extends Controller
         try {
             $order = Order::findOrFail($id);
             
+            // Ensure shipping expedition information is properly formatted
+            $orderData = $order->toArray();
+            
+            // Format shipping expedition if it exists
+            if (isset($orderData['shipping_info']) && isset($orderData['shipping_info']['expedition'])) {
+                $expedition = $orderData['shipping_info']['expedition'];
+                $expeditionName = 'Standard Shipping';
+                
+                switch ($expedition) {
+                    case 'jne':
+                        $expeditionName = 'JNE - Regular delivery';
+                        break;
+                    case 'jnt':
+                        $expeditionName = 'J&T Express - Regular delivery';
+                        break;
+                    case 'sicepat':
+                        $expeditionName = 'SiCepat - Regular delivery';
+                        break;
+                }
+                
+                $orderData['shipping_info']['expedition_name'] = $expeditionName;
+            }
+            
             return response()->json([
                 'success' => true,
-                'order' => $order
+                'order' => $orderData
             ]);
         } catch (\Exception $e) {
             return response()->json([

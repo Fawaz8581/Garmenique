@@ -17,6 +17,23 @@ app.controller('HeaderController', ['$scope', '$window', '$rootScope', function(
         $rootScope.$broadcast('toggleSearch');
     };
     
+    // Cart Toggle
+    $scope.isCartActive = false;
+    
+    $scope.toggleCart = function() {
+        $scope.isCartActive = !$scope.isCartActive;
+        $rootScope.$broadcast('toggleCart', $scope.isCartActive);
+    };
+    
+    // Listen for cart update events from other pages/controllers
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'cartUpdated') {
+            $scope.$apply(function() {
+                $rootScope.$broadcast('cartUpdated', event.data.cart);
+            });
+        }
+    });
+    
     // Sticky Header
     var headerHeight = 0;
     
@@ -237,4 +254,125 @@ app.controller('AccountDropdownController', ['$scope', '$timeout', function($sco
             $scope.isOpen = false;
         }, 200); // Small delay to improve user experience
     };
+}]);
+
+// Cart Controller
+app.controller('CartController', ['$scope', '$http', '$rootScope', function($scope, $http, $rootScope) {
+    // Initialize cart items
+    $scope.cartItems = [];
+    $scope.isCartActive = false;
+    
+    // Toggle cart visibility
+    $scope.toggleCart = function() {
+        $scope.isCartActive = !$scope.isCartActive;
+    };
+    
+    // Listen for toggle events from header
+    $rootScope.$on('toggleCart', function(event, isActive) {
+        $scope.isCartActive = isActive;
+    });
+    
+    // Listen for cart update events
+    $rootScope.$on('cartUpdated', function(event, cart) {
+        $scope.cartItems = cart || [];
+        // Save to session storage as backup
+        try {
+            sessionStorage.setItem('cart', JSON.stringify($scope.cartItems));
+        } catch (e) {
+            console.error('Error saving cart to session storage:', e);
+        }
+    });
+    
+    // Load cart data
+    $scope.loadCart = function() {
+        $http.get('/get-cart')
+            .then(function(response) {
+                if (response.data.cart) {
+                    $scope.cartItems = response.data.cart;
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading cart:', error);
+                // Fallback to session storage if server request fails
+                try {
+                    let cartData = JSON.parse(sessionStorage.getItem('cart') || '[]');
+                    $scope.cartItems = cartData;
+                } catch (error) {
+                    console.error('Error loading cart from session storage:', error);
+                    $scope.cartItems = [];
+                }
+            });
+    };
+    
+    // Calculate total price
+    $scope.getTotal = function() {
+        return $scope.cartItems.reduce(function(total, item) {
+            return total + (item.price * item.quantity);
+        }, 0);
+    };
+    
+    // Increment quantity
+    $scope.incrementQuantity = function(item) {
+        item.quantity++;
+        $scope.updateCart(item);
+    };
+    
+    // Decrement quantity
+    $scope.decrementQuantity = function(item) {
+        if (item.quantity > 1) {
+            item.quantity--;
+            $scope.updateCart(item);
+        }
+    };
+    
+    // Remove item from cart
+    $scope.removeItem = function(item) {
+        $scope.cartItems = $scope.cartItems.filter(function(cartItem) {
+            return !(cartItem.id === item.id && cartItem.size === item.size);
+        });
+        
+        // Update cart on server
+        $http.post('/api/remove-from-cart', {
+            productId: item.id,
+            size: item.size
+        })
+        .then(function(response) {
+            console.log('Item removed from cart:', response.data);
+        })
+        .catch(function(error) {
+            console.error('Error removing item from cart:', error);
+        });
+        
+        // Update session storage
+        try {
+            sessionStorage.setItem('cart', JSON.stringify($scope.cartItems));
+        } catch (e) {
+            console.error('Error saving cart to session storage:', e);
+        }
+    };
+    
+    // Update cart item
+    $scope.updateCart = function(item) {
+        $http.post('/api/update-cart', {
+            productId: item.id,
+            size: item.size,
+            quantity: item.quantity
+        })
+        .then(function(response) {
+            console.log('Cart updated:', response.data);
+        })
+        .catch(function(error) {
+            console.error('Error updating cart:', error);
+        });
+        
+        // Update session storage
+        try {
+            sessionStorage.setItem('cart', JSON.stringify($scope.cartItems));
+        } catch (e) {
+            console.error('Error saving cart to session storage:', e);
+        }
+    };
+    
+    // Load cart on controller initialization
+    $scope.loadCart();
 }]);

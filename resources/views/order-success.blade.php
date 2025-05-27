@@ -131,5 +131,47 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/landingpage.js') }}"></script>
+    <script>
+        // Clear cart data on successful order
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear cart in session storage
+            sessionStorage.removeItem('cart');
+            
+            // Get CSRF token
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            
+            // Clear cart on server via API
+            fetch('/api/clear-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server cart cleared:', data);
+                
+                // Broadcast cart update event to other controllers/pages
+                if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage({type: 'cartUpdated', cart: []}, '*');
+                }
+                
+                // If Angular is available, update the cart controller
+                if (window.angular) {
+                    var scope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
+                    if (scope) {
+                        scope.$apply(function() {
+                            scope.cartItems = [];
+                        });
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing cart on server:', error);
+            });
+        });
+    </script>
 </body>
 </html> 

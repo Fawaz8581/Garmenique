@@ -182,6 +182,39 @@
                                                     {{ $order->shipping_info['city'] }}, {{ $order->shipping_info['postalCode'] }}
                                                 </div>
                                             </div>
+                                            
+                                            <div class="shipping-info">
+                                                <span class="info-title">Shipping Method</span>
+                                                <div class="shipping-method">
+                                                    @php
+                                                        $expeditionName = 'Standard Shipping';
+                                                        $expeditionIcon = 'fa-truck';
+                                                        $expeditionColor = 'text-secondary';
+                                                        
+                                                        if(isset($order->shipping_info['expedition'])) {
+                                                            switch($order->shipping_info['expedition']) {
+                                                                case 'jne':
+                                                                    $expeditionName = 'JNE - Regular delivery';
+                                                                    $expeditionIcon = 'fa-truck';
+                                                                    $expeditionColor = 'text-primary';
+                                                                    break;
+                                                                case 'jnt':
+                                                                    $expeditionName = 'J&T Express - Regular delivery';
+                                                                    $expeditionIcon = 'fa-shipping-fast';
+                                                                    $expeditionColor = 'text-danger';
+                                                                    break;
+                                                                case 'sicepat':
+                                                                    $expeditionName = 'SiCepat - Regular delivery';
+                                                                    $expeditionIcon = 'fa-bolt';
+                                                                    $expeditionColor = 'text-success';
+                                                                    break;
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    <i class="fas {{ $expeditionIcon }} {{ $expeditionColor }}"></i>
+                                                    {{ $expeditionName }}
+                                                </div>
+                                            </div>
 
                                             <div class="price-summary">
                                                 <div class="summary-line">
@@ -634,6 +667,19 @@
 
 .shipping-info {
     margin-bottom: 15px;
+}
+
+.shipping-method {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+}
+
+.shipping-method i {
+    margin-right: 8px;
+    font-size: 16px;
 }
 
 .info-title {
