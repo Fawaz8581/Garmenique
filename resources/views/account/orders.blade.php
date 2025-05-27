@@ -230,6 +230,30 @@
                                                     <span>IDR {{ number_format($order->total, 0, ',', '.') }}</span>
                                                 </div>
                                             </div>
+                                            
+                                            <div class="order-status">
+                                                <span class="info-title">Status</span>
+                                                <span class="status-badge status-{{ strtolower($order->status) }}">{{ ucfirst($order->status) }}</span>
+                                            </div>
+                                            
+                                            @if(!empty($order->notes))
+                                            <div class="order-notes">
+                                                <span class="info-title">Notes from Seller</span>
+                                                <div class="notes-container">
+                                                    @foreach($order->notes as $note)
+                                                        @if(isset($note['admin']) && $note['admin'])
+                                                            <div class="note-item">
+                                                                <div class="note-header">
+                                                                    <span class="note-date">{{ \Carbon\Carbon::parse($note['date'])->format('M d, Y - H:i') }}</span>
+                                                                    <span class="note-status status-badge status-{{ strtolower($note['status']) }}">{{ ucfirst($note['status']) }}</span>
+                                                                </div>
+                                                                <div class="note-message">{{ $note['message'] }}</div>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

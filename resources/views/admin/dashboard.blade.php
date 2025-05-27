@@ -270,6 +270,11 @@
                                 <option value="completed">Completed</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="orderNote" class="form-label">Note to Customer</label>
+                            <textarea class="form-control" id="orderNote" name="note" rows="3" placeholder="Add a note that will be visible to the customer"></textarea>
+                            <small class="text-muted">This note will be visible in the customer's order history.</small>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -1021,6 +1026,23 @@
                         break;
                     }
                 }
+                
+                // Fetch order details to get the last note
+                fetch(`/admin/api/orders/${orderId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.order.notes && data.order.notes.length > 0) {
+                            // Get the last admin note
+                            const adminNotes = data.order.notes.filter(note => note.admin === true);
+                            if (adminNotes.length > 0) {
+                                const lastNote = adminNotes[adminNotes.length - 1];
+                                document.getElementById('orderNote').value = lastNote.message;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching order details:', error);
+                    });
             });
         }
 
@@ -1028,6 +1050,7 @@
         document.getElementById('saveOrderStatus').addEventListener('click', function() {
             const orderId = document.getElementById('editOrderId').value;
             const status = document.getElementById('orderStatus').value;
+            const note = document.getElementById('orderNote').value;
             
             // Call API to update order status
             fetch(`/admin/api/orders/${orderId}/status`, {
@@ -1036,7 +1059,10 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ status: status })
+                body: JSON.stringify({ 
+                    status: status,
+                    note: note
+                })
             })
             .then(response => response.json())
             .then(data => {
@@ -1048,10 +1074,16 @@
                     const statusCell = document.querySelector(`button[data-order-id="${orderId}"]`).closest('tr').querySelector('.status-badge');
                     statusCell.className = `status-badge status-${status.toLowerCase()}`;
                     statusCell.textContent = capitalizeFirstLetter(status);
+                    
+                    // Show success message
+                    alert('Order status updated successfully' + (note ? ' with note to customer' : ''));
+                } else {
+                    alert('Failed to update order status: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error saving order status:', error);
+                alert('Failed to update order status. Please try again.');
             });
         });
         

@@ -20,12 +20,13 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:pending,rejected,confirmed,packing,shipped,delivered,completed',
+            'note' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid status value',
+                'message' => 'Invalid input values',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -44,7 +45,14 @@ class OrderController extends Controller
                 $this->updateProductStock($order, 'increase');
             }
             
+            // Update order status
             $order->status = $newStatus;
+            
+            // Add admin note if provided
+            if ($request->filled('note')) {
+                $order->addNote($request->note, $newStatus, true);
+            }
+            
             $order->save();
 
             return response()->json([
@@ -52,13 +60,14 @@ class OrderController extends Controller
                 'message' => 'Order status updated successfully',
                 'order' => [
                     'id' => $order->id,
-                    'status' => $order->status
+                    'status' => $order->status,
+                    'has_notes' => !empty($order->notes)
                 ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update order status',
+                'message' => 'Failed to update order status: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -18,17 +18,47 @@ class Order extends Model
         'subtotal',
         'shipping_cost',
         'total',
-        'status'
+        'status',
+        'notes'
     ];
 
     protected $casts = [
         'shipping_info' => 'array',
         'payment_info' => 'array',
-        'cart_items' => 'array'
+        'cart_items' => 'array',
+        'notes' => 'array'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    
+    /**
+     * Add a note to the order
+     *
+     * @param string $message The note message
+     * @param string $status Current order status
+     * @param bool $isAdmin Whether the note is from admin
+     * @return $this
+     */
+    public function addNote($message, $status = null, $isAdmin = false)
+    {
+        $notes = $this->notes ?? [];
+        
+        // If notes is null or not an array, initialize it
+        if (!is_array($notes)) {
+            $notes = [];
+        }
+        
+        $notes[] = [
+            'date' => now()->toDateTimeString(),
+            'status' => $status ?? $this->status,
+            'message' => $message,
+            'admin' => $isAdmin
+        ];
+        
+        $this->notes = $notes;
+        return $this;
     }
 } 
