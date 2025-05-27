@@ -1018,8 +1018,8 @@
                 
                 document.getElementById('editOrderId').value = orderId;
                 document.getElementById('orderNumber').value = orderNumber;
-                document.getElementById('orderNote').value = ''; // Clear note field
                 
+                // Set the current status in the dropdown
                 const statusSelect = document.getElementById('orderStatus');
                 for (let i = 0; i < statusSelect.options.length; i++) {
                     if (statusSelect.options[i].value === orderStatus.toLowerCase()) {
@@ -1027,6 +1027,47 @@
                         break;
                     }
                 }
+                
+                // Fetch order details to get the last note
+                fetch(`/admin/api/orders/${orderId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Set the current status in case it wasn't set correctly from the button attribute
+                            for (let i = 0; i < statusSelect.options.length; i++) {
+                                if (statusSelect.options[i].value === data.order.status.toLowerCase()) {
+                                    statusSelect.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                            
+                            // Clear the note field initially
+                            document.getElementById('orderNote').value = '';
+                            
+                            // Get the last note for the current status if it exists
+                            if (data.order.notes && data.order.notes.length > 0) {
+                                const currentStatusNotes = data.order.notes.filter(note => 
+                                    note.admin === true && note.status === data.order.status
+                                );
+                                
+                                if (currentStatusNotes.length > 0) {
+                                    // Sort by date descending and get the latest note
+                                    currentStatusNotes.sort((a, b) => 
+                                        new Date(b.date) - new Date(a.date)
+                                    );
+                                    document.getElementById('orderNote').value = currentStatusNotes[0].message;
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching order details:', error);
+                    });
+            });
+            
+            // Add event listener to reset note field when status changes
+            document.getElementById('orderStatus').addEventListener('change', function() {
+                document.getElementById('orderNote').value = '';
             });
         }
 
