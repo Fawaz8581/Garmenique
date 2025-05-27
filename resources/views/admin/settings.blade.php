@@ -102,6 +102,12 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="admin-users-tab" data-bs-toggle="tab" data-bs-target="#admin-users-settings" 
+                                    type="button" role="tab" aria-controls="admin-users-settings" aria-selected="false">
+                                <i class="fas fa-user-shield me-2"></i>Admin Users
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system-settings" 
                                     type="button" role="tab" aria-controls="system-settings" aria-selected="false">
                                 <i class="fas fa-server me-2"></i>System Settings
@@ -178,6 +184,119 @@
                                 </div>
                                 <div class="col-12 mt-3">
                                     <button type="button" class="btn btn-primary">Save User Settings</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Admin Users Settings -->
+                        <div class="tab-pane fade" id="admin-users-settings" role="tabpanel" aria-labelledby="admin-users-tab">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h4 class="mb-3">Create New Admin User</h4>
+                                    <p class="text-muted">Add a new admin user who will have full access to the admin dashboard.</p>
+                                    
+                                    @if(session('success'))
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            {{ session('success') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+
+                                    @if(session('error'))
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            {{ session('error') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    
+                                    @if ($errors->any())
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <ul class="mb-0">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    
+                                    <form action="{{ route('admin.users.create') }}" method="POST" class="border rounded p-4">
+                                        @csrf
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="name" class="form-label">Username</label>
+                                                    <input type="text" class="form-control" id="name" name="name" required>
+                                                    <small class="form-text text-muted">Username for the admin account</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="email" class="form-label">Email</label>
+                                                    <input type="email" class="form-control" id="email" name="email" required>
+                                                    <small class="form-text text-muted">Email address for the admin account</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="password" class="form-label">Password</label>
+                                                    <input type="password" class="form-control" id="password" name="password" required>
+                                                    <small class="form-text text-muted">Minimum 8 characters</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                                                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-user-plus me-2"></i>Create Admin User
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4 class="mb-3">Existing Admin Users</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Username</th>
+                                                    <th scope="col">Email</th>
+                                                    <th scope="col">Created At</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if(isset($adminUsers) && count($adminUsers) > 0)
+                                                    @foreach($adminUsers as $index => $user)
+                                                        <tr>
+                                                            <td>{{ $index + 1 }}</td>
+                                                            <td>{{ $user->name }}</td>
+                                                            <td>{{ $user->email }}</td>
+                                                            <td>{{ $user->created_at->format('M d, Y') }}</td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">No admin users found</td>
+                                                    </tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
