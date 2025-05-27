@@ -50,6 +50,7 @@ class OrderController extends Controller
             
             // Add admin note if provided
             if ($request->filled('note')) {
+                // Each status change gets its own note
                 $order->addNote($request->note, $newStatus, true);
             }
             

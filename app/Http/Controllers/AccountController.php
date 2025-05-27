@@ -44,7 +44,7 @@ class AccountController extends Controller
     {
         $orders = Order::where('user_id', Auth::id())
                       ->orderBy('created_at', 'desc')
-                      ->get();
+                      ->paginate(3);
 
         return view('account.orders', ['orders' => $orders]);
     }

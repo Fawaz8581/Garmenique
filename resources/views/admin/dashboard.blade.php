@@ -1018,6 +1018,7 @@
                 
                 document.getElementById('editOrderId').value = orderId;
                 document.getElementById('orderNumber').value = orderNumber;
+                document.getElementById('orderNote').value = ''; // Clear note field
                 
                 const statusSelect = document.getElementById('orderStatus');
                 for (let i = 0; i < statusSelect.options.length; i++) {
@@ -1026,23 +1027,6 @@
                         break;
                     }
                 }
-                
-                // Fetch order details to get the last note
-                fetch(`/admin/api/orders/${orderId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.order.notes && data.order.notes.length > 0) {
-                            // Get the last admin note
-                            const adminNotes = data.order.notes.filter(note => note.admin === true);
-                            if (adminNotes.length > 0) {
-                                const lastNote = adminNotes[adminNotes.length - 1];
-                                document.getElementById('orderNote').value = lastNote.message;
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching order details:', error);
-                    });
             });
         }
 

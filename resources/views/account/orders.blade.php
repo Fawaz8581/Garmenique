@@ -240,17 +240,28 @@
                                             <div class="order-notes">
                                                 <span class="info-title">Notes from Seller</span>
                                                 <div class="notes-container">
-                                                    @foreach($order->notes as $note)
-                                                        @if(isset($note['admin']) && $note['admin'])
-                                                            <div class="note-item">
-                                                                <div class="note-header">
-                                                                    <span class="note-date">{{ \Carbon\Carbon::parse($note['date'])->format('M d, Y - H:i') }}</span>
-                                                                    <span class="note-status status-badge status-{{ strtolower($note['status']) }}">{{ ucfirst($note['status']) }}</span>
-                                                                </div>
-                                                                <div class="note-message">{{ $note['message'] }}</div>
+                                                    @php
+                                                        // Get only the latest note for the current status
+                                                        $currentStatusNotes = collect($order->notes)
+                                                            ->filter(function($note) use ($order) {
+                                                                return isset($note['admin']) && 
+                                                                       $note['admin'] === true && 
+                                                                       $note['status'] === $order->status;
+                                                            })
+                                                            ->sortByDesc('date');
+                                                        
+                                                        $latestNote = $currentStatusNotes->first();
+                                                    @endphp
+                                                    
+                                                    @if($latestNote)
+                                                        <div class="note-item">
+                                                            <div class="note-header">
+                                                                <span class="note-date">{{ \Carbon\Carbon::parse($latestNote['date'])->format('M d, Y - H:i') }}</span>
+                                                                <span class="note-status status-badge status-{{ strtolower($latestNote['status']) }}">{{ ucfirst($latestNote['status']) }}</span>
                                                             </div>
-                                                        @endif
-                                                    @endforeach
+                                                            <div class="note-message">{{ $latestNote['message'] }}</div>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                             @endif
@@ -258,6 +269,54 @@
                                     </div>
                                 </div>
                             @endforeach
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container">
+                            <div class="custom-pagination">
+                                @if ($orders->hasPages())
+                                    <ul class="pagination">
+                                        {{-- Previous Page Link --}}
+                                        @if ($orders->onFirstPage())
+                                            <li class="page-item disabled">
+                                                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                                            </li>
+                                        @else
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $orders->previousPageUrl() }}" rel="prev">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                        @endif
+
+                                        {{-- Pagination Elements --}}
+                                        @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
+                                            @if ($page == $orders->currentPage())
+                                                <li class="page-item active" aria-current="page">
+                                                    <span class="page-link">{{ $page }}</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                </li>
+                                            @endif
+                                        @endforeach
+
+                                        {{-- Next Page Link --}}
+                                        @if ($orders->hasMorePages())
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $orders->nextPageUrl() }}" rel="next">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        @else
+                                            <li class="page-item disabled">
+                                                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                                            </li>
+                                        @endif
+                                    </ul>
+                                @endif
+                            </div>
                         </div>
                     @endif
                 </div>
