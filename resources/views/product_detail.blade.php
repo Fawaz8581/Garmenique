@@ -103,6 +103,28 @@
                     max-width: 120px;
                 }
             }
+
+            /* Admin icon styling */
+            .admin-icon-link {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .admin-nav-icon {
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+                border-radius: 50%;
+                border: 2px solid #14387F;
+                padding: 2px;
+                background-color: white;
+            }
+            
+            /* Hover effect for admin icon */
+            .admin-icon-link:hover {
+                transform: scale(1.1);
+            }
         </style>
     </head>
     <body ng-app="garmeniqueApp">
@@ -124,6 +146,13 @@
                 </nav>
                 
                 <div class="nav-icons">
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <a href="/admin" class="nav-icon admin-icon-link" title="Admin Dashboard">
+                                <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Admin" class="admin-nav-icon">
+                            </a>
+                        @endif
+                    @endauth
                     <a href="{{ route('user.messages') }}" class="nav-icon"><i class="fas fa-envelope"></i></a>
                     @include('partials.account-dropdown')
                     <a href="javascript:void(0)" class="nav-icon" ng-click="openCartPanel()"><i class="fas fa-shopping-cart"></i></a>
