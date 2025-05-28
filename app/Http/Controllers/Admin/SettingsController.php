@@ -58,4 +58,32 @@ class SettingsController extends Controller
             return redirect()->back()->with('error', 'Failed to create admin user: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Delete an admin user.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function deleteAdminUser($id)
+    {
+        try {
+            // Find the user
+            $user = User::findOrFail($id);
+            
+            // Check if this is the first admin user (lowest ID)
+            $firstAdmin = User::where('role', 'admin')->orderBy('id', 'asc')->first();
+            
+            if ($user->id === $firstAdmin->id) {
+                return redirect()->back()->with('error', 'The primary admin account cannot be deleted.');
+            }
+            
+            // Delete the user
+            $user->delete();
+            
+            return redirect()->back()->with('success', 'Admin user deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete admin user: ' . $e->getMessage());
+        }
+    }
 } 
