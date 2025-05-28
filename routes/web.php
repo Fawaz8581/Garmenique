@@ -175,6 +175,16 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'show'])->name('admin.settings');
         Route::post('/users/create', [App\Http\Controllers\Admin\SettingsController::class, 'createAdminUser'])->name('admin.users.create');
 
+        // Test Image Upload
+        Route::get('/test-image-upload', function() {
+            return view('admin.image_upload_test');
+        })->name('admin.test-image-upload');
+        
+        // Test direct database image upload
+        Route::get('/test-db-image', function() {
+            return view('admin.db_image_test');
+        })->name('admin.test-db-image');
+
         // API Routes
         Route::prefix('api')->group(function () {
             // Products API
@@ -182,6 +192,7 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
             Route::post('/products', [ProductController::class, 'store']);
             Route::put('/products/{id}', [ProductController::class, 'update']);
             Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+            Route::get('/products/{id}/image', [ProductController::class, 'getImage'])->name('product.image');
             
             // Categories API
             Route::get('/categories', [CategoryController::class, 'index']);
@@ -280,7 +291,20 @@ Route::post('/save-cart', function (Request $request) {
 // Create Admin Route
 Route::get('/create-admin', [App\Http\Controllers\AdminCreatorController::class, 'createAdmin']);
 
+// Debug route to check route definitions
+Route::get('/debug-routes', function() {
+    return [
+        'product_image_route' => route('product.image', ['id' => 1]),
+        'upload_image_route' => route('upload.image'),
+        'get_image_route' => route('get.image', ['type' => 'product', 'id' => 1])
+    ];
+});
+
 // Cart API routes
 Route::post('/api/clear-cart', [\App\Http\Controllers\Api\CartController::class, 'clearCart']);
 Route::post('/api/update-cart', [\App\Http\Controllers\Api\CartController::class, 'updateCart']);
 Route::post('/api/remove-from-cart', [\App\Http\Controllers\Api\CartController::class, 'removeFromCart']);
+
+// General API routes
+Route::post('/api/upload-image', [App\Http\Controllers\ImageController::class, 'storeImage'])->name('upload.image');
+Route::get('/api/images/{type}/{id}', [App\Http\Controllers\ImageController::class, 'getImage'])->name('get.image');

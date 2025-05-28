@@ -225,13 +225,15 @@
                 
                 <div class="row">
                     <!-- Product Image on Left -->
-                    <div class="col-md-7">
+                    <div class="col-md-6">
                         <div class="main-product-image">
-                            @if(!empty($product->images) && count($product->images) > 0)
-                                <img src="{{ asset($product->images[0]) }}" alt="{{ $product->name }}" class="img-fluid">
-                            @else
-                                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}" class="img-fluid">
-                            @endif
+                        @if($product->db_image_url)
+                            <img src="{{ $product->db_image_url }}" alt="{{ $product->name }}" class="img-fluid">
+                        @elseif(!empty($product->images) && count($product->images) > 0)
+                            <img src="{{ asset($product->images[0]) }}" alt="{{ $product->name }}" class="img-fluid">
+                        @else
+                            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="{{ $product->name }}" class="img-fluid">
+                        @endif
                         </div>
                     </div>
                     
@@ -448,7 +450,7 @@
                     id: {{ $product->id }},
                     name: '{{ $product->name }}',
                     price: {{ $product->price }},
-                    image: '{{ !empty($product->images) && count($product->images) > 0 ? asset($product->images[0]) : "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" }}',
+                    image: '{{ $product->db_image_url ?? (!empty($product->images) && count($product->images) > 0 ? asset($product->images[0]) : "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80") }}',
                     size: selectedSize,
                     color: 'Default', // Adding default color since it's required by cart
                     quantity: quantity

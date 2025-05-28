@@ -39,11 +39,20 @@ class Product extends Model
     ];
 
     /**
+     * The attributes that should be hidden from serialization.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'image_data'
+    ];
+
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
-    protected $appends = ['image_url', 'category_name', 'total_stock', 'sizes', 'available_sizes'];
+    protected $appends = ['image_url', 'category_name', 'total_stock', 'sizes', 'available_sizes', 'db_image_url'];
     
     /**
      * Get the image URL for display.
@@ -54,6 +63,19 @@ class Product extends Model
     {
         if (!empty($this->images) && is_array($this->images)) {
             return asset($this->images[0]);
+        }
+        return null;
+    }
+
+    /**
+     * Get the database image URL for display.
+     *
+     * @return string|null
+     */
+    public function getDbImageUrlAttribute()
+    {
+        if ($this->image_data) {
+            return route('product.image', ['id' => $this->id]);
         }
         return null;
     }
@@ -160,5 +182,29 @@ class Product extends Model
         ]);
         
         return $sizeData;
+    }
+
+    /**
+     * Get image data attribute - handle binary data properly
+     * 
+     * @param mixed $value
+     * @return mixed
+     */
+    public function getImageDataAttribute($value)
+    {
+        // Return the base64-encoded data
+        return $value;
+    }
+    
+    /**
+     * Set image data attribute - handle binary data properly
+     * 
+     * @param mixed $value
+     * @return void
+     */
+    public function setImageDataAttribute($value)
+    {
+        // Don't attempt to set binary data through the model
+        // Use direct DB queries instead
     }
 } 

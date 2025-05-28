@@ -539,18 +539,25 @@
                 .then(response => response.json())
                 .then(data => {
                     if (Array.isArray(data)) {
-                    products = data;
+                        products = data;
                         console.log('Fetched products:', products);
-                    products.forEach(product => {
-                            console.log(`Product ${product.id} sizes:`, product.sizes);
+                        
+                        // Debug each product's sizes structure
+                        products.forEach(product => {
+                            console.log(`Product ${product.id} (${product.name}) sizes:`, product.sizes);
+                            if (product.sizes) {
+                                console.log(`Size keys for product ${product.id}:`, Object.keys(product.sizes));
+                                console.log(`Size values for product ${product.id}:`, Object.values(product.sizes));
+                            }
                         });
-                    renderProducts(products);
-                    loadingIndicator.classList.add('d-none');
-                    
-                    if (products.length === 0) {
-                        noProductsMessage.classList.remove('d-none');
-                    } else {
-                        noProductsMessage.classList.add('d-none');
+                        
+                        renderProducts(products);
+                        loadingIndicator.classList.add('d-none');
+                        
+                        if (products.length === 0) {
+                            noProductsMessage.classList.remove('d-none');
+                        } else {
+                            noProductsMessage.classList.add('d-none');
                         }
                     } else {
                         console.error('Invalid data format received:', data);
@@ -613,9 +620,11 @@
             const categoryName = product.category_name || 'Uncategorized';
             
             // Get product image
-            const imageUrl = product.image_url
-                ? product.image_url
-                : 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
+            const imageUrl = product.db_image_url 
+                ? product.db_image_url 
+                : (product.image_url
+                    ? product.image_url
+                    : 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');
             
             // Format price with Indonesian number format
             const formattedPrice = new Intl.NumberFormat('id-ID').format(product.price);
@@ -745,20 +754,54 @@
                 const selectedSizes = [];
                 document.querySelectorAll('#addProductModal .size-checkbox:checked').forEach(checkbox => {
                     const stockInput = checkbox.parentElement.querySelector('.size-stock');
-                    if (stockInput && stockInput.value && parseInt(stockInput.value) > 0) {
+                    if (stockInput) {
+                        // Always include the size if checked, even if stock is 0
                         selectedSizes.push({
                             id: parseInt(checkbox.value),
-                            stock: parseInt(stockInput.value)
+                            stock: parseInt(stockInput.value) || 0
                         });
                     }
                 });
 
+                // Validate form data
+                if (!formData.get('name')) {
+                    showNotification('Error', 'Product name is required', 'error');
+                    return;
+                }
+
+                if (!formData.get('category_id')) {
+                    showNotification('Error', 'Category is required', 'error');
+                    return;
+                }
+
+                if (!formData.get('price')) {
+                    showNotification('Error', 'Price is required', 'error');
+                    return;
+                }
+
+                if (selectedSizes.length === 0) {
+                    showNotification('Error', 'At least one size must be selected', 'error');
+                    return;
+                }
+                
                 // Log the sizes data for debugging
                 console.log('Selected sizes:', selectedSizes);
                 console.log('Sizes JSON:', JSON.stringify(selectedSizes));
                 
                 // Append sizes as JSON string
                 formData.append('sizes', JSON.stringify(selectedSizes));
+
+                // Show loading state
+                addProductBtn.disabled = true;
+                addProductBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
+                
+                // Disable close button during add
+                const closeBtn = document.querySelector('#addProductModal .btn-close');
+                if (closeBtn) closeBtn.disabled = true;
+                
+                // Disable cancel button during add
+                const cancelBtn = document.querySelector('#addProductModal .btn-secondary');
+                if (cancelBtn) cancelBtn.disabled = true;
 
                 // Send request
                 fetch('/admin/api/products', {
@@ -768,9 +811,26 @@
                     },
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || `Error: ${response.status} ${response.statusText}`);
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    // Reset button state
+                    addProductBtn.disabled = false;
+                    addProductBtn.innerHTML = 'Add Product';
+                    
+                    // Re-enable close and cancel buttons
+                    if (closeBtn) closeBtn.disabled = false;
+                    if (cancelBtn) cancelBtn.disabled = false;
+                    
                     if (data.success) {
+                        console.log('Add successful, received data:', data);
+                        
                         // Add new product to array
                         products.push(data.product);
                         
@@ -783,6 +843,12 @@
                         
                         // Reset form
                         document.getElementById('addProductForm').reset();
+                        document.querySelectorAll('#addProductModal .size-checkbox').forEach(checkbox => {
+                            checkbox.checked = false;
+                            const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                            stockInput.disabled = true;
+                            stockInput.value = '';
+                        });
                         
                         // Show success notification
                         showNotification('Success', 'Product added successfully!', 'success');
@@ -792,8 +858,16 @@
                     }
                 })
                 .catch(error => {
+                    // Reset button state
+                    addProductBtn.disabled = false;
+                    addProductBtn.innerHTML = 'Add Product';
+                    
+                    // Re-enable close and cancel buttons
+                    if (closeBtn) closeBtn.disabled = false;
+                    if (cancelBtn) cancelBtn.disabled = false;
+                    
                     console.error('Error:', error);
-                    showNotification('Error', 'An error occurred while adding the product', 'error');
+                    showNotification('Error', error.message || 'An error occurred while adding the product', 'error');
                 });
             });
         
@@ -819,13 +893,35 @@
                 const selectedSizes = [];
                 document.querySelectorAll('#editProductModal .size-checkbox:checked').forEach(checkbox => {
                     const stockInput = checkbox.parentElement.querySelector('.size-stock');
-                    if (stockInput && stockInput.value && parseInt(stockInput.value) > 0) {
+                    if (stockInput) {
+                        // Always include the size if checked, even if stock is 0
                         selectedSizes.push({
                             id: parseInt(checkbox.value),
-                            stock: parseInt(stockInput.value)
+                            stock: parseInt(stockInput.value) || 0
                         });
                     }
                 });
+                
+                // Validate form data
+                if (!formData.get('name')) {
+                    showNotification('Error', 'Product name is required', 'error');
+                    return;
+                }
+
+                if (!formData.get('category_id')) {
+                    showNotification('Error', 'Category is required', 'error');
+                    return;
+                }
+
+                if (!formData.get('price')) {
+                    showNotification('Error', 'Price is required', 'error');
+                    return;
+                }
+
+                if (selectedSizes.length === 0) {
+                    showNotification('Error', 'At least one size must be selected', 'error');
+                    return;
+                }
 
                 // Log the sizes data for debugging
                 console.log('Selected sizes for edit:', selectedSizes);
@@ -833,6 +929,18 @@
                 
                 // Append sizes as JSON string
                 formData.append('sizes', JSON.stringify(selectedSizes));
+                
+                // Show loading state
+                saveEditBtn.disabled = true;
+                saveEditBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+                
+                // Disable close button during update
+                const closeBtn = document.querySelector('#editProductModal .btn-close');
+                if (closeBtn) closeBtn.disabled = true;
+                
+                // Disable cancel button during update
+                const cancelBtn = document.querySelector('#editProductModal .btn-secondary');
+                if (cancelBtn) cancelBtn.disabled = true;
 
                 // Send request
                 fetch(`/admin/api/products/${id}`, {
@@ -842,9 +950,26 @@
                     },
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || `Error: ${response.status} ${response.statusText}`);
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    // Reset button state
+                    saveEditBtn.disabled = false;
+                    saveEditBtn.innerHTML = 'Save Changes';
+                    
+                    // Re-enable close and cancel buttons
+                    if (closeBtn) closeBtn.disabled = false;
+                    if (cancelBtn) cancelBtn.disabled = false;
+                    
                     if (data.success) {
+                        console.log('Update successful, received data:', data);
+                        
                         // Update the product in the products array
                         const index = products.findIndex(p => p.id == id);
                         if (index !== -1) {
@@ -866,8 +991,16 @@
                     }
                 })
                 .catch(error => {
+                    // Reset button state
+                    saveEditBtn.disabled = false;
+                    saveEditBtn.innerHTML = 'Save Changes';
+                    
+                    // Re-enable close and cancel buttons
+                    if (closeBtn) closeBtn.disabled = false;
+                    if (cancelBtn) cancelBtn.disabled = false;
+                    
                     console.error('Error:', error);
-                    showNotification('Error', 'An error occurred while updating the product', 'error');
+                    showNotification('Error', error.message || 'An error occurred while updating the product', 'error');
                 });
             });
             
@@ -1011,23 +1144,41 @@
                 numberSizes.style.display = '';
             }
 
+            // Debug size data
+            console.log('Populating form with product:', product);
+            
             // Set existing sizes and stock
-            if (product.sizes) {
-                Object.values(product.sizes).forEach(sizeData => {
-                    const checkbox = document.querySelector(`#editProductModal .size-checkbox[value="${sizeData.id}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                        const stockInput = checkbox.parentElement.querySelector('.size-stock');
-                        stockInput.disabled = false;
-                        stockInput.value = sizeData.stock;
+            if (product.sizes && product.sizes.length > 0) {
+                console.log('Processing sizes:', product.sizes);
+                
+                product.sizes.forEach(size => {
+                    console.log('Processing size:', size);
+                    
+                    if (size.id) {
+                        console.log(`Looking for checkbox with value ${size.id}`);
+                        const checkbox = document.querySelector(`#editProductModal .size-checkbox[value="${size.id}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                            const stockInput = checkbox.parentElement.querySelector('.size-stock');
+                            stockInput.disabled = false;
+                            stockInput.value = size.pivot.stock;
+                            console.log(`Set stock input value to ${size.pivot.stock} for size ${size.name}`);
+                        } else {
+                            console.warn(`Checkbox not found for size ID: ${size.id}`);
+                        }
                     }
                 });
+            } else {
+                console.warn('No sizes data available for product:', product.id);
             }
 
             // Display current image if available
             const currentImagePreview = document.getElementById('currentImagePreview');
             const currentImage = document.getElementById('currentImage');
-            if (product.image_url) {
+            if (product.db_image_url) {
+                currentImage.src = product.db_image_url;
+                currentImagePreview.style.display = 'block';
+            } else if (product.image_url) {
                 currentImage.src = product.image_url;
                 currentImagePreview.style.display = 'block';
             } else {
@@ -1103,7 +1254,10 @@
 
             // Set image
             const detailImage = document.getElementById('detailCurrentImage');
-            if (product.image_url) {
+            if (product.db_image_url) {
+                detailImage.src = product.db_image_url;
+                document.getElementById('detailImagePreview').style.display = 'block';
+            } else if (product.image_url) {
                 detailImage.src = product.image_url;
                 document.getElementById('detailImagePreview').style.display = 'block';
             } else {
@@ -1187,7 +1341,18 @@
         }
         
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the product.image route is correctly defined
+            console.log('Checking product.image route...');
+            try {
+                const testRoute = '{{ route("product.image", ["id" => 1]) }}';
+                console.log('Product image route: ' + testRoute);
+            } catch (e) {
+                console.error('Error getting product.image route:', e);
+            }
+            
+            init();
+        });
     </script>
 </body>
 </html> 
