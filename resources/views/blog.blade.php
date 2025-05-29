@@ -263,9 +263,7 @@
                 </div>
             </div>
             
-            <div class="text-center mt-4">
-                <a href="#" class="btn-load-more">LOAD MORE ARTICLES</a>
-            </div>
+
         </div>
     </section>
 
@@ -441,24 +439,6 @@
                                 image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
                                 link: '#'
                             },
-                            { 
-                                title: 'Black Friday Fund 2023', 
-                                category: 'Transparency', 
-                                image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                                link: '#'
-                            },
-                            { 
-                                title: 'What to Wear this Season: Holiday Outfits & Ideas', 
-                                category: 'Style', 
-                                image: 'https://cdn.mos.cms.futurecdn.net/SJ44Y9266PtpReDDNtWQJJ.jpg',
-                                link: '#'
-                            },
-                            { 
-                                title: 'Thanksgiving Outfit Ideas', 
-                                category: 'Style', 
-                                image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-                                link: '#'
-                            }
                         ]
                     },
                     values: {
