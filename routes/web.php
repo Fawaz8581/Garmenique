@@ -150,6 +150,9 @@ Route::get('/product/{id}', function ($id) {
     return redirect('/catalog/product/' . $id);
 });
 
+// Public product image route - accessible to all users
+Route::get('/api/products/{id}/image', [ProductController::class, 'getImage'])->name('public.product.image');
+
 // Admin Routes
 Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
     Route::prefix('admin')->group(function () {
@@ -174,7 +177,6 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         // Settings
         Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'show'])->name('admin.settings');
         Route::post('/users/create', [App\Http\Controllers\Admin\SettingsController::class, 'createAdminUser'])->name('admin.users.create');
-        Route::delete('/users/{id}', [App\Http\Controllers\Admin\SettingsController::class, 'deleteAdminUser'])->name('admin.users.delete');
 
         // Test Image Upload
         Route::get('/test-image-upload', function() {
@@ -297,7 +299,8 @@ Route::get('/debug-routes', function() {
     return [
         'product_image_route' => route('product.image', ['id' => 1]),
         'upload_image_route' => route('upload.image'),
-        'get_image_route' => route('get.image', ['type' => 'product', 'id' => 1])
+        'get_image_route' => route('get.image', ['type' => 'product', 'id' => 1]),
+        'public_product_image_route' => route('public.product.image', ['id' => 1])
     ];
 });
 

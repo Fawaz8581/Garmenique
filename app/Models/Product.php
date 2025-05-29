@@ -75,7 +75,7 @@ class Product extends Model
     public function getDbImageUrlAttribute()
     {
         if ($this->image_data) {
-            return route('product.image', ['id' => $this->id]);
+            return route('public.product.image', ['id' => $this->id]);
         }
         return null;
     }
