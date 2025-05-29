@@ -934,6 +934,248 @@
                     </div>
                 </div>
                 
+                <!-- About Controls -->
+                <div ng-if="currentPage === 'about'">
+                    <!-- About Hero Section Controls -->
+                    <div class="control-card">
+                        <h3>About Hero Section</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="aboutHeroToggle" ng-model="site.about.hero.enabled">
+                            <label class="form-check-label" for="aboutHeroToggle">Show About Hero Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="aboutHeroTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="aboutHeroTitle" ng-model="site.about.hero.title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="aboutHeroSubtitle" class="form-label">Subtitle</label>
+                            <textarea class="form-control" id="aboutHeroSubtitle" rows="3" ng-model="site.about.hero.subtitle"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="aboutHeroBackground" class="form-label">Background Image</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="aboutHeroBackground" ng-model="site.about.hero.backgroundImage">
+                                <button class="btn btn-outline-secondary" type="button">Browse</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ethical Approach Section Controls -->
+                    <div class="control-card">
+                        <h3>Our Ethical Approach Section</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="ethicalApproachToggle" ng-model="site.about.ethicalApproach.enabled">
+                            <label class="form-check-label" for="ethicalApproachToggle">Show Ethical Approach Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ethicalApproachTitle" class="form-label">Section Title</label>
+                            <input type="text" class="form-control" id="ethicalApproachTitle" ng-model="site.about.ethicalApproach.title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ethicalApproachDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="ethicalApproachDescription" rows="3" ng-model="site.about.ethicalApproach.description"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ethicalApproachImage" class="form-label">Image</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="ethicalApproachImage" ng-model="site.about.ethicalApproach.image">
+                                <button class="btn btn-outline-secondary" type="button">Browse</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Factory Images Section Controls -->
+                    <div class="control-card">
+                        <h3>Factory Images Section</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="factoryImagesToggle" ng-model="site.about.factoryImages.enabled">
+                            <label class="form-check-label" for="factoryImagesToggle">Show Factory Images Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Factory Images</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Alt Text</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="image in site.about.factoryImages.images">
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" ng-model="image.url">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" ng-model="image.alt">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="removeFactoryImage($index)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" ng-click="addFactoryImage()">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Designed to Last Section Controls -->
+                    <div class="control-card">
+                        <h3>Designed to last</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="designedToLastToggle" ng-model="site.about.designedToLast.enabled">
+                            <label class="form-check-label" for="designedToLastToggle">Show Designed to Last Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="designedToLastTitle" class="form-label">Section Title</label>
+                            <input type="text" class="form-control" id="designedToLastTitle" ng-model="site.about.designedToLast.title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="designedToLastDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="designedToLastDescription" rows="3" ng-model="site.about.designedToLast.description"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Images</label>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Left Image</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="site.about.designedToLast.images[0].url">
+                                        <button class="btn btn-outline-secondary" type="button">Browse</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Right Image</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="site.about.designedToLast.images[1].url">
+                                        <button class="btn btn-outline-secondary" type="button">Browse</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Radically Transparent Section Controls -->
+                    <div class="control-card">
+                        <h3>Radically Transparent Section</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="transparentToggle" ng-model="site.about.transparent.enabled">
+                            <label class="form-check-label" for="transparentToggle">Show Radically Transparent Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transparentTitle" class="form-label">Section Title</label>
+                            <input type="text" class="form-control" id="transparentTitle" ng-model="site.about.transparent.title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transparentDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="transparentDescription" rows="3" ng-model="site.about.transparent.description"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Color Swatches</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Color</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="color in site.about.transparent.colors">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="color" class="form-control form-control-sm me-2" style="width: 50px;" ng-model="color.hex">
+                                                    <span>{% color.hex %}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="removeColor($index)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" ng-click="addColor()">
+                                <i class="fas fa-plus"></i> Add Color
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Meet Our Experts Section Controls -->
+                    <div class="control-card">
+                        <h3>Meet Our Explore Section</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="exploreToggle" ng-model="site.about.explore.enabled">
+                            <label class="form-check-label" for="exploreToggle">Show Meet Our Explore Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="exploreTitle" class="form-label">Section Title</label>
+                            <input type="text" class="form-control" id="exploreTitle" ng-model="site.about.explore.title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Explore Categories</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Image</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="category in site.about.explore.categories">
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" ng-model="category.title">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" ng-model="category.image">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="removeExploreCategory($index)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" ng-click="addExploreCategory()">
+                                <i class="fas fa-plus"></i> Add Category
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Save Changes Button -->
                 <div class="text-end mb-4">
                     <button class="btn btn-danger me-2" ng-click="confirmReset()">
@@ -1073,6 +1315,87 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- About Preview -->
+                    <div ng-if="currentPage === 'about'">
+                        <!-- About Hero Section -->
+                        <div ng-if="site.about.hero.enabled" style="background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('{% site.about.hero.backgroundImage %}'); background-size: cover; background-position: center; padding: 60px 15px; text-align: center;">
+                            <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase;">{% site.about.hero.title %}</h1>
+                            <p style="font-size: 1rem; line-height: 1.6; max-width: 700px; margin: 0 auto; color: #555;">{% site.about.hero.subtitle %}</p>
+                        </div>
+
+                        <!-- Our Ethical Approach Section -->
+                        <div ng-if="site.about.ethicalApproach.enabled" style="padding: 40px 15px;">
+                            <div style="display: grid; grid-template-columns: 55% 45%; gap: 40px; align-items: center;">
+                                <div style="padding-right: 15px;">
+                                    <h2 style="font-size: 1.3rem; margin-bottom: 15px;">{% site.about.ethicalApproach.title %}</h2>
+                                    <p style="font-size: 0.9rem; line-height: 1.6; color: #555;">{% site.about.ethicalApproach.description %}</p>
+                                </div>
+                                <div style="padding-left: 30px; display: flex; justify-content: flex-end;">
+                                    <img ng-src="{% site.about.ethicalApproach.image %}" style="max-width: 100%; height: auto; object-fit: cover;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Factory Images Section -->
+                        <div ng-if="site.about.factoryImages.enabled" style="padding: 40px 0;">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                                <div style="height: 400px; overflow: hidden;">
+                                    <img ng-src="{% site.about.factoryImages.images[0].url %}" alt="{% site.about.factoryImages.images[0].alt %}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div style="height: 400px; overflow: hidden;">
+                                    <img ng-src="{% site.about.factoryImages.images[1].url %}" alt="{% site.about.factoryImages.images[1].alt %}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Designed to Last Section -->
+                        <div ng-if="site.about.designedToLast.enabled" style="padding: 40px 15px;">
+                            <div class="container">
+                                <div style="display: grid; grid-template-columns: 45% 55%; gap: 40px; align-items: center;">
+                                    <div style="padding-right: 15px;">
+                                        <h2 style="font-size: 1.3rem; margin-bottom: 15px;">{% site.about.designedToLast.title %}</h2>
+                                        <p style="font-size: 0.9rem; line-height: 1.6; color: #555;">{% site.about.designedToLast.description %}</p>
+                                    </div>
+                                    <div style="padding-left: 15px;">
+                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; height: 350px;">
+                                            <div style="height: 100%;">
+                                                <img ng-src="{% site.about.designedToLast.images[0].url %}" alt="{% site.about.designedToLast.images[0].alt %}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            </div>
+                                            <div style="height: 100%;">
+                                                <img ng-src="{% site.about.designedToLast.images[1].url %}" alt="{% site.about.designedToLast.images[1].alt %}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Radically Transparent Section -->
+                        <div ng-if="site.about.transparent.enabled" style="padding: 40px 15px;">
+                            <h2 style="font-size: 1.3rem; margin-bottom: 15px;">{% site.about.transparent.title %}</h2>
+                            <p style="font-size: 0.9rem; line-height: 1.6; color: #555; margin-bottom: 20px;">{% site.about.transparent.description %}</p>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <div ng-repeat="color in site.about.transparent.colors" style="width: 50px; height: 50px;" ng-style="{'background-color': color.hex}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Meet Our Experts Section -->
+                        <div ng-if="site.about.explore.enabled" style="padding: 40px 15px;">
+                            <h2 style="font-size: 1.3rem; margin-bottom: 25px; text-align: center;">{% site.about.explore.title %}</h2>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                                <div ng-repeat="category in site.about.explore.categories" style="text-align: center;">
+                                    <div style="margin-bottom: 15px; position: relative; overflow: hidden; padding-top: 75%;">
+                                        <img ng-src="{% category.image %}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <p style="font-size: 0.9rem; margin-top: 10px;">{% category.title %}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
                 </div>
             </div>
         </div>
@@ -1200,6 +1523,118 @@
                             { platform: 'facebook', url: 'facebook.com/Garmenique' },
                             { platform: 'twitter', url: 'twitter.com/Garmenique' },
                             { platform: 'pinterest', url: 'pinterest.com/Garmenique' }
+                        ]
+                    }
+                },
+                // About page customization settings
+                about: {
+                    hero: {
+                        enabled: true,
+                        title: 'WE BELIEVE WE CAN ALL MAKE A DIFFERENCE',
+                        subtitle: 'We\'re on a mission to create beautiful, durable clothing while minimizing our environmental impact and maximizing our positive social impact. We believe in transparency, ethical practices, and creating garments that stand the test of time.',
+                        backgroundImage: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80'
+                    },
+                    ethicalApproach: {
+                        enabled: true,
+                        title: 'Our ethical approach',
+                        description: 'We partner with ethical factories around the world, ensuring safe working conditions and fair wages for all workers involved in creating our garments. We believe that quality clothing starts with quality treatment of the people who make it.',
+                        image: 'https://images.unsplash.com/photo-1551232864-3f0890e580d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'
+                    },
+                    designedToLast: {
+                        enabled: true,
+                        title: 'Designed to last',
+                        description: 'We design our garments with longevity in mind, using high-quality materials and timeless designs. Our products are meant to be worn for years, not seasons, reducing the need for constant replacement and minimizing waste.',
+                        images: [
+                            {
+                                url: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+                                alt: 'Clothing Rack'
+                            },
+                            {
+                                url: 'https://images.unsplash.com/photo-1523380677598-64d85d015339?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+                                alt: 'Colorful Textile'
+                            }
+                        ]
+                    },
+                    transparent: {
+                        enabled: true,
+                        title: 'Radically Transparent',
+                        description: 'We believe in full transparency about our materials, costs, and manufacturing processes. We want you to know exactly what goes into making your clothes and why they cost what they do.',
+                        colors: [
+                            { hex: '#E6D9B8' },
+                            { hex: '#999999' }
+                        ]
+                    },
+                    experts: {
+                        enabled: true,
+                        title: 'Meet our Experts',
+                        profiles: [
+                            { 
+                                name: 'Sarah Johnson', 
+                                role: 'Design Director', 
+                                image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
+                            },
+                            { 
+                                name: 'Michael Chen', 
+                                role: 'Sustainability Lead', 
+                                image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
+                            },
+                            { 
+                                name: 'Elena Rodriguez', 
+                                role: 'Production Manager', 
+                                image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80'
+                            }
+                        ]
+                    },
+                    explore: {
+                        enabled: true,
+                        title: 'Meet our Explore',
+                        categories: [
+                            { 
+                                title: 'Fabric Selection', 
+                                image: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                            },
+                            { 
+                                title: 'Design Process', 
+                                image: 'https://images.unsplash.com/photo-1604881988758-f76ad2f7aac1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                            },
+                            { 
+                                title: 'Production', 
+                                image: 'https://images.unsplash.com/photo-1581873372796-635b67ca2008?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                            },
+                            { 
+                                title: 'Quality Control', 
+                                image: 'https://images.unsplash.com/photo-1617419250411-98aa962b070f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
+                            }
+                        ]
+                    },
+                    factoryImages: {
+                        enabled: true,
+                        title: 'Factory Images',
+                        description: 'Our factory facilities',
+                        images: [
+                            { 
+                                url: 'https://images.unsplash.com/photo-1525171254930-643fc658b64e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80', 
+                                alt: 'Factory detail' 
+                            },
+                            { 
+                                url: 'https://images.unsplash.com/photo-1675176785803-bffbbb0cd2f4?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z2FybWVudCUyMGZhY3Rvcnl8ZW58MHx8MHx8fDA%3D', 
+                                alt: 'Worker closeup' 
+                            }
+                        ]
+                    },
+                    tes: {
+                        enabled: true,
+                        title: 'tes',
+                        description: 'tes',
+                        images: [
+                            { 
+                                url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80', 
+                                alt: 'Nature Landscape' 
+                            },
+                            { 
+                                url: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80', 
+                                alt: 'Clothing Rack' 
+                            }
                         ]
                     }
                 }
@@ -1350,6 +1785,90 @@
                                         }
                                         if (savedSettings.blog.social.settings.links && savedSettings.blog.social.settings.links.length > 0) {
                                             $scope.site.blog.social.links = savedSettings.blog.social.settings.links;
+                                        }
+                                    }
+                                }
+                            }
+                            // About page settings
+                            else if ($scope.currentPage === 'about') {
+                                if (savedSettings.about && savedSettings.about.hero) {
+                                    $scope.site.about.hero.enabled = savedSettings.about.hero.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.about.hero.settings) {
+                                        if (savedSettings.about.hero.settings.title) {
+                                            $scope.site.about.hero.title = savedSettings.about.hero.settings.title;
+                                        }
+                                        if (savedSettings.about.hero.settings.subtitle) {
+                                            $scope.site.about.hero.subtitle = savedSettings.about.hero.settings.subtitle;
+                                        }
+                                        if (savedSettings.about.hero.settings.backgroundImage) {
+                                            $scope.site.about.hero.backgroundImage = savedSettings.about.hero.settings.backgroundImage;
+                                        }
+                                    }
+                                }
+                                
+                                if (savedSettings.about && savedSettings.about.ethicalApproach) {
+                                    $scope.site.about.ethicalApproach.enabled = savedSettings.about.ethicalApproach.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.about.ethicalApproach.settings) {
+                                        if (savedSettings.about.ethicalApproach.settings.title) {
+                                            $scope.site.about.ethicalApproach.title = savedSettings.about.ethicalApproach.settings.title;
+                                        }
+                                        if (savedSettings.about.ethicalApproach.settings.description) {
+                                            $scope.site.about.ethicalApproach.description = savedSettings.about.ethicalApproach.settings.description;
+                                        }
+                                        if (savedSettings.about.ethicalApproach.settings.image) {
+                                            $scope.site.about.ethicalApproach.image = savedSettings.about.ethicalApproach.settings.image;
+                                        }
+                                    }
+                                }
+                                
+                                if (savedSettings.about && savedSettings.about.designedToLast) {
+                                    $scope.site.about.designedToLast.enabled = savedSettings.about.designedToLast.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.about.designedToLast.settings) {
+                                        if (savedSettings.about.designedToLast.settings.title) {
+                                            $scope.site.about.designedToLast.title = savedSettings.about.designedToLast.settings.title;
+                                        }
+                                        if (savedSettings.about.designedToLast.settings.description) {
+                                            $scope.site.about.designedToLast.description = savedSettings.about.designedToLast.settings.description;
+                                        }
+                                        if (savedSettings.about.designedToLast.settings.images && savedSettings.about.designedToLast.settings.images.length > 0) {
+                                            $scope.site.about.designedToLast.images = savedSettings.about.designedToLast.settings.images;
+                                        }
+                                    }
+                                }
+                                
+                                if (savedSettings.about && savedSettings.about.transparent) {
+                                    $scope.site.about.transparent.enabled = savedSettings.about.transparent.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.about.transparent.settings) {
+                                        if (savedSettings.about.transparent.settings.title) {
+                                            $scope.site.about.transparent.title = savedSettings.about.transparent.settings.title;
+                                        }
+                                        if (savedSettings.about.transparent.settings.description) {
+                                            $scope.site.about.transparent.description = savedSettings.about.transparent.settings.description;
+                                        }
+                                        if (savedSettings.about.transparent.settings.colors && savedSettings.about.transparent.settings.colors.length > 0) {
+                                            $scope.site.about.transparent.colors = savedSettings.about.transparent.settings.colors;
+                                        }
+                                    }
+                                }
+                                
+                                if (savedSettings.about && savedSettings.about.experts) {
+                                    $scope.site.about.experts.enabled = savedSettings.about.experts.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.about.experts.settings) {
+                                        if (savedSettings.about.experts.settings.title) {
+                                            $scope.site.about.experts.title = savedSettings.about.experts.settings.title;
+                                        }
+                                        if (savedSettings.about.experts.settings.profiles && savedSettings.about.experts.settings.profiles.length > 0) {
+                                            $scope.site.about.experts.profiles = savedSettings.about.experts.settings.profiles;
                                         }
                                     }
                                 }
@@ -1529,6 +2048,74 @@
                         }
                     };
                 }
+                else if ($scope.currentPage === 'about') {
+                    settingsToSave = {
+                        about: {
+                            hero: {
+                                enabled: $scope.site.about.hero.enabled,
+                                settings: {
+                                    title: $scope.site.about.hero.title,
+                                    subtitle: $scope.site.about.hero.subtitle,
+                                    backgroundImage: $scope.site.about.hero.backgroundImage
+                                }
+                            },
+                            ethicalApproach: {
+                                enabled: $scope.site.about.ethicalApproach.enabled,
+                                settings: {
+                                    title: $scope.site.about.ethicalApproach.title,
+                                    description: $scope.site.about.ethicalApproach.description,
+                                    image: $scope.site.about.ethicalApproach.image
+                                }
+                            },
+                            designedToLast: {
+                                enabled: $scope.site.about.designedToLast.enabled,
+                                settings: {
+                                    title: $scope.site.about.designedToLast.title,
+                                    description: $scope.site.about.designedToLast.description,
+                                    images: $scope.site.about.designedToLast.images
+                                }
+                            },
+                            transparent: {
+                                enabled: $scope.site.about.transparent.enabled,
+                                settings: {
+                                    title: $scope.site.about.transparent.title,
+                                    description: $scope.site.about.transparent.description,
+                                    colors: $scope.site.about.transparent.colors
+                                }
+                            },
+                            experts: {
+                                enabled: $scope.site.about.experts.enabled,
+                                settings: {
+                                    title: $scope.site.about.experts.title,
+                                    profiles: $scope.site.about.experts.profiles
+                                }
+                            },
+                            explore: {
+                                enabled: $scope.site.about.explore.enabled,
+                                settings: {
+                                    title: $scope.site.about.explore.title,
+                                    categories: $scope.site.about.explore.categories
+                                }
+                            },
+                            factoryImages: {
+                                enabled: $scope.site.about.factoryImages.enabled,
+                                settings: {
+                                    title: $scope.site.about.factoryImages.title,
+                                    description: $scope.site.about.factoryImages.description,
+                                    images: $scope.site.about.factoryImages.images
+                                }
+                            },
+                            tes: {
+                                enabled: $scope.site.about.tes.enabled,
+                                settings: {
+                                    title: $scope.site.about.tes.title,
+                                    description: $scope.site.about.tes.description,
+                                    images: $scope.site.about.tes.images
+                                }
+                            }
+                        }
+                    };
+                }
                 
                 // Send to server
                 $http.post('/admin/api/page-settings', {
@@ -1596,7 +2183,7 @@
                                 buttonLink: $scope.site.mission.buttonLink
                             }
                         }
-                    } : {
+                    } : $scope.currentPage === 'blog' ? {
                         blog: {
                             hero: {
                                 enabled: $scope.site.blog.hero.enabled,
@@ -1634,7 +2221,72 @@
                                 }
                             }
                         }
-                    }
+                    } : $scope.currentPage === 'about' ? {
+                        about: {
+                            hero: {
+                                enabled: $scope.site.about.hero.enabled,
+                                settings: {
+                                    title: $scope.site.about.hero.title,
+                                    subtitle: $scope.site.about.hero.subtitle,
+                                    backgroundImage: $scope.site.about.hero.backgroundImage
+                                }
+                            },
+                            ethicalApproach: {
+                                enabled: $scope.site.about.ethicalApproach.enabled,
+                                settings: {
+                                    title: $scope.site.about.ethicalApproach.title,
+                                    description: $scope.site.about.ethicalApproach.description,
+                                    image: $scope.site.about.ethicalApproach.image
+                                }
+                            },
+                            designedToLast: {
+                                enabled: $scope.site.about.designedToLast.enabled,
+                                settings: {
+                                    title: $scope.site.about.designedToLast.title,
+                                    description: $scope.site.about.designedToLast.description,
+                                    images: $scope.site.about.designedToLast.images
+                                }
+                            },
+                            transparent: {
+                                enabled: $scope.site.about.transparent.enabled,
+                                settings: {
+                                    title: $scope.site.about.transparent.title,
+                                    description: $scope.site.about.transparent.description,
+                                    colors: $scope.site.about.transparent.colors
+                                }
+                            },
+                            experts: {
+                                enabled: $scope.site.about.experts.enabled,
+                                settings: {
+                                    title: $scope.site.about.experts.title,
+                                    profiles: $scope.site.about.experts.profiles
+                                }
+                            },
+                            explore: {
+                                enabled: $scope.site.about.explore.enabled,
+                                settings: {
+                                    title: $scope.site.about.explore.title,
+                                    categories: $scope.site.about.explore.categories
+                                }
+                            },
+                            factoryImages: {
+                                enabled: $scope.site.about.factoryImages.enabled,
+                                settings: {
+                                    title: $scope.site.about.factoryImages.title,
+                                    description: $scope.site.about.factoryImages.description,
+                                    images: $scope.site.about.factoryImages.images
+                                }
+                            },
+                            tes: {
+                                enabled: $scope.site.about.tes.enabled,
+                                settings: {
+                                    title: $scope.site.about.tes.title,
+                                    description: $scope.site.about.tes.description,
+                                    images: $scope.site.about.tes.images
+                                }
+                            }
+                        }
+                    } : {}
                 })
                 .then(function(response) {
                     if (response.data.success) {
@@ -1669,6 +2321,84 @@
                     default:
                         return 'https://cdn-icons-png.flaticon.com/512/3601/3601569.png'; // Default icon
                 }
+            };
+
+            // Functions for about page
+            // Add expert
+            $scope.addExpert = function() {
+                $scope.site.about.experts.profiles.push({
+                    name: 'New Expert',
+                    role: 'Position',
+                    image: 'https://via.placeholder.com/300x300'
+                });
+            };
+            
+            // Remove expert
+            $scope.removeExpert = function(index) {
+                $scope.site.about.experts.profiles.splice(index, 1);
+            };
+            
+            // Add color
+            $scope.addColor = function() {
+                $scope.site.about.transparent.colors.push({
+                    hex: '#CCCCCC'
+                });
+            };
+            
+            // Remove color
+            $scope.removeColor = function(index) {
+                $scope.site.about.transparent.colors.splice(index, 1);
+            };
+            
+            // Add explore category
+            $scope.addExploreCategory = function() {
+                $scope.site.about.explore.categories.push({
+                    title: 'New Category',
+                    image: 'https://via.placeholder.com/300x300'
+                });
+            };
+            
+            // Remove explore category
+            $scope.removeExploreCategory = function(index) {
+                $scope.site.about.explore.categories.splice(index, 1);
+            };
+
+            // Add factory image
+            $scope.addFactoryImage = function() {
+                $scope.site.about.factoryImages.images.push({
+                    url: 'https://via.placeholder.com/300x200',
+                    alt: 'New Factory Image'
+                });
+            };
+            
+            // Remove factory image
+            $scope.removeFactoryImage = function(index) {
+                $scope.site.about.factoryImages.images.splice(index, 1);
+            };
+            
+            // Add color
+            $scope.addColor = function() {
+                $scope.site.about.transparent.colors.push({
+                    hex: '#CCCCCC'
+                });
+            };
+            
+            // Remove color
+            $scope.removeColor = function(index) {
+                $scope.site.about.transparent.colors.splice(index, 1);
+            };
+
+            // Add Tes image
+            $scope.addTesImage = function() {
+                $scope.site.about.tes.images.push({
+                    url: 'https://via.placeholder.com/300x200',
+                    alt: 'New Tes Image'
+                });
+            };
+            
+            // Remove Tes image
+            $scope.removeTesImage = function(index) {
+                $scope.site.about.tes.images.splice(index, 1);
             };
         });
     </script>

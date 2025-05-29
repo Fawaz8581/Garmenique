@@ -142,6 +142,152 @@ class PageSettingController extends Controller
                 );
             }
             
+            // Process about page sections
+            if ($page === 'about') {
+                // Process about hero section
+                if (isset($settings['about']['hero'])) {
+                    $heroSettings = null;
+                    
+                    if (isset($settings['about']['hero']['settings'])) {
+                        $heroSettings = [
+                            'title' => $settings['about']['hero']['settings']['title'] ?? '',
+                            'subtitle' => $settings['about']['hero']['settings']['subtitle'] ?? '',
+                            'backgroundImage' => $settings['about']['hero']['settings']['backgroundImage'] ?? ''
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.hero'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['hero']['enabled'] ?? true,
+                            'settings' => $heroSettings
+                        ]
+                    );
+                }
+                
+                // Process ethical approach section
+                if (isset($settings['about']['ethicalApproach'])) {
+                    $ethicalSettings = null;
+                    
+                    if (isset($settings['about']['ethicalApproach']['settings'])) {
+                        $ethicalSettings = [
+                            'title' => $settings['about']['ethicalApproach']['settings']['title'] ?? '',
+                            'description' => $settings['about']['ethicalApproach']['settings']['description'] ?? '',
+                            'image' => $settings['about']['ethicalApproach']['settings']['image'] ?? ''
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.ethicalApproach'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['ethicalApproach']['enabled'] ?? true,
+                            'settings' => $ethicalSettings
+                        ]
+                    );
+                }
+                
+                // Process factory images section
+                if (isset($settings['about']['factoryImages'])) {
+                    $factorySettings = null;
+                    
+                    if (isset($settings['about']['factoryImages']['settings'])) {
+                        $factorySettings = [
+                            'title' => $settings['about']['factoryImages']['settings']['title'] ?? '',
+                            'description' => $settings['about']['factoryImages']['settings']['description'] ?? '',
+                            'images' => $settings['about']['factoryImages']['settings']['images'] ?? []
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.factoryImages'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['factoryImages']['enabled'] ?? true,
+                            'settings' => $factorySettings
+                        ]
+                    );
+                }
+                
+                // Process designed to last section
+                if (isset($settings['about']['designedToLast'])) {
+                    $designedSettings = null;
+                    
+                    if (isset($settings['about']['designedToLast']['settings'])) {
+                        $designedSettings = [
+                            'title' => $settings['about']['designedToLast']['settings']['title'] ?? '',
+                            'description' => $settings['about']['designedToLast']['settings']['description'] ?? '',
+                            'images' => $settings['about']['designedToLast']['settings']['images'] ?? []
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.designedToLast'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['designedToLast']['enabled'] ?? true,
+                            'settings' => $designedSettings
+                        ]
+                    );
+                }
+                
+                // Process transparent section
+                if (isset($settings['about']['transparent'])) {
+                    $transparentSettings = null;
+                    
+                    if (isset($settings['about']['transparent']['settings'])) {
+                        $transparentSettings = [
+                            'title' => $settings['about']['transparent']['settings']['title'] ?? '',
+                            'description' => $settings['about']['transparent']['settings']['description'] ?? '',
+                            'colors' => $settings['about']['transparent']['settings']['colors'] ?? []
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.transparent'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['transparent']['enabled'] ?? true,
+                            'settings' => $transparentSettings
+                        ]
+                    );
+                }
+                
+                // Process explore section
+                if (isset($settings['about']['explore'])) {
+                    $exploreSettings = null;
+                    
+                    if (isset($settings['about']['explore']['settings'])) {
+                        $exploreSettings = [
+                            'title' => $settings['about']['explore']['settings']['title'] ?? '',
+                            'categories' => $settings['about']['explore']['settings']['categories'] ?? []
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.explore'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['explore']['enabled'] ?? true,
+                            'settings' => $exploreSettings
+                        ]
+                    );
+                }
+            }
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Settings saved successfully'

@@ -127,101 +127,85 @@
             </div>
         </div>
         
-        <!-- Hero Section -->
-        <section class="hero-about" style="background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://images.unsplash.com/photo-1556905055-8f358a7a47b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">We believe we can all make a difference</h1>
-                    <div class="hero-description">
-                        <p>At Garmenique, we truly believe that what we make matters. That's why we're native with the land, ethical factories around the world, and our suppliers. When we're open about our practices, we inspire others to share their own stories with you—down to the raw materials, production partner, and little defining details. We call it Radical Transparency.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Ethical Approach Section -->
-        <section class="ethical-approach">
-            <div class="container">
-                <div class="approach-grid">
-                    <div class="approach-content">
-                        <h2>Our ethical approach</h2>
-                        <p>We're committed to creating beautiful, quality clothing while minimizing our environmental impact and ensuring the well-being of the people who make our products.</p>
-                    </div>
-                    <div class="approach-image">
-                        <img src="https://images.unsplash.com/photo-1559582798-678dfc71ccd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Worker in ethical factory">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Factory Images Section -->
-        <section class="factory-images">
-            <div class="factory-grid">
-                <div class="factory-image">
-                    <img src="https://images.unsplash.com/photo-1525171254930-643fc658b64e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Factory detail">
-                </div>
-                <div class="factory-image">
-                    <img src="https://images.unsplash.com/photo-1675176785803-bffbbb0cd2f4?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z2FybWVudCUyMGZhY3Rvcnl8ZW58MHx8MHx8fDA%3D" alt="Worker closeup">
-                </div>
-            </div>
-        </section>
-
-        <!-- Designed Section -->
-        <section class="designed-section">
-            <div class="container">
-                <div class="designed-grid">
-                    <div class="designed-content">
-                        <h2>Designed to last</h2>
-                        <p>Our designs focus on timeless style and durability. We create pieces that transcend seasons, made with quality materials and expert craftsmanship that stand the test of time.</p>
-                    </div>
-                    <div class="designed-images">
-                        <div class="fabric-sample">
-                            <img src="https://images.unsplash.com/photo-1551537482-f2075a1d41f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Fabric sample">
-                        </div>
-                        <div class="pattern-image">
-                            <img src="https://images.unsplash.com/photo-1594040226829-7f251ab46d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Pattern design">
+        <!-- About Page Content -->
+        <div ng-controller="AboutController">
+            <!-- Hero Section -->
+            <section class="hero-about" ng-if="pageSettings.about.hero.enabled" ng-style="{'background-image': 'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(' + pageSettings.about.hero.backgroundImage + ')'}">
+                <div class="container">
+                    <div class="hero-content">
+                        <h1 class="hero-title">@{{ pageSettings.about.hero.title }}</h1>
+                        <div class="hero-description">
+                            <p>@{{ pageSettings.about.hero.subtitle }}</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Transparency Section -->
-        <section class="transparency-section">
-            <div class="container">
-                <h2>Radically Transparent</h2>
-                <p>We believe in full transparency about our materials, manufacturing process, and pricing. This approach allows you to make informed choices and understand the true value of what you're purchasing.</p>
-                <div class="color-palette">
-                    <div class="color-swatch beige"></div>
-                    <div class="color-swatch gray"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Meet Our Explore Section -->
-        <section class="meet-explore">
-            <div class="container">
-                <h2>Meet our Explore</h2>
-                <div class="explore-grid">
-                    <div class="explore-item">
-                        <img src="https://images.unsplash.com/photo-1586075010923-2dd4570fb338?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Explore item 1">
-                        <p>Fabric Selection</p>
-                    </div>
-                    <div class="explore-item">
-                        <img src="https://images.unsplash.com/photo-1604881988758-f76ad2f7aac1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Explore item 2">
-                        <p>Design Process</p>
-                    </div>
-                    <div class="explore-item">
-                        <img src="https://images.unsplash.com/photo-1581873372796-635b67ca2008?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Explore item 3">
-                        <p>Production</p>
-                    </div>
-                    <div class="explore-item">
-                        <img src="https://images.unsplash.com/photo-1617419250411-98aa962b070f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Explore item 4">
-                        <p>Quality Control</p>
+            <!-- Ethical Approach Section -->
+            <section class="ethical-approach" ng-if="pageSettings.about.ethicalApproach.enabled">
+                <div class="container">
+                    <div class="approach-grid">
+                        <div class="approach-content">
+                            <h2>@{{ pageSettings.about.ethicalApproach.title }}</h2>
+                            <p>@{{ pageSettings.about.ethicalApproach.description }}</p>
+                        </div>
+                        <div class="approach-image" style="padding-left: 30px; display: flex; justify-content: flex-end;">
+                            <img ng-src="@{{ pageSettings.about.ethicalApproach.image }}" alt="Ethical Approach" style="max-width: 100%; height: auto;">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- Factory Images Section -->
+            <section class="factory-images" ng-if="pageSettings.about.factoryImages.enabled">
+                <div class="factory-grid">
+                    <div class="factory-image" ng-repeat="image in pageSettings.about.factoryImages.images">
+                        <img ng-src="@{{ image.url }}" alt="@{{ image.alt }}">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Designed Section -->
+            <section class="designed-section" ng-if="pageSettings.about.designedToLast.enabled">
+                <div class="container">
+                    <div class="designed-grid">
+                        <div class="designed-content">
+                            <h2>@{{ pageSettings.about.designedToLast.title }}</h2>
+                            <p>@{{ pageSettings.about.designedToLast.description }}</p>
+                        </div>
+                        <div class="designed-images">
+                            <div ng-repeat="image in pageSettings.about.designedToLast.images">
+                                <img ng-src="@{{ image.url }}" alt="@{{ image.alt }}" style="width: 100%; height: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transparency Section -->
+            <section class="transparency-section" ng-if="pageSettings.about.transparent.enabled">
+                <div class="container">
+                    <h2>@{{ pageSettings.about.transparent.title }}</h2>
+                    <p>@{{ pageSettings.about.transparent.description }}</p>
+                    <div class="color-palette">
+                        <div class="color-swatch" ng-repeat="color in pageSettings.about.transparent.colors" ng-style="{'background-color': color.hex}"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Meet Our Explore Section -->
+            <section class="meet-explore" ng-if="pageSettings.about.explore.enabled">
+                <div class="container">
+                    <h2>@{{ pageSettings.about.explore.title }}</h2>
+                    <div class="explore-grid">
+                        <div class="explore-item" ng-repeat="category in pageSettings.about.explore.categories">
+                            <img ng-src="@{{ category.image }}" alt="@{{ category.title }}">
+                            <p>@{{ category.title }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
 
         <!-- Include Sliding Cart Partial -->
         @include('partials.sliding-cart')

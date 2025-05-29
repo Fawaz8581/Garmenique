@@ -160,6 +160,127 @@ class PageSettingController extends Controller
                     
                     // Skip the main foreach loop's PageSetting::updateOrCreate for 'blog'
                     continue;
+                } elseif ($sectionName === 'about' && isset($sectionData)) {
+                    // Handle about settings which have a nested structure
+                    $processedSettings = [];
+                    
+                    // Process about hero section
+                    if (isset($sectionData['hero'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.hero'
+                            ],
+                            [
+                                'settings' => [
+                                    'title' => $sectionData['hero']['settings']['title'] ?? null,
+                                    'subtitle' => $sectionData['hero']['settings']['subtitle'] ?? null,
+                                    'backgroundImage' => $sectionData['hero']['settings']['backgroundImage'] ?? null
+                                ],
+                                'is_enabled' => $sectionData['hero']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process about ethical approach section
+                    if (isset($sectionData['ethicalApproach'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.ethicalApproach'
+                            ],
+                            [
+                                'settings' => $sectionData['ethicalApproach']['settings'] ?? null,
+                                'is_enabled' => $sectionData['ethicalApproach']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process about designed to last section
+                    if (isset($sectionData['designedToLast'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.designedToLast'
+                            ],
+                            [
+                                'settings' => $sectionData['designedToLast']['settings'] ?? [
+                                    'title' => 'Designed to last',
+                                    'description' => 'We design our garments with longevity in mind, using high-quality materials and timeless designs. Our products are meant to be worn for years, not seasons, reducing the need for constant replacement and minimizing waste.',
+                                    'images' => [
+                                        [
+                                            'url' => 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                            'alt' => 'Clothing Rack'
+                                        ],
+                                        [
+                                            'url' => 'https://images.unsplash.com/photo-1523380677598-64d85d015339?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                            'alt' => 'Colorful Textile'
+                                        ]
+                                    ]
+                                ],
+                                'is_enabled' => $sectionData['designedToLast']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process about transparent section
+                    if (isset($sectionData['transparent'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.transparent'
+                            ],
+                            [
+                                'settings' => $sectionData['transparent']['settings'] ?? null,
+                                'is_enabled' => $sectionData['transparent']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process about experts section
+                    if (isset($sectionData['experts'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.experts'
+                            ],
+                            [
+                                'settings' => $sectionData['experts']['settings'] ?? null,
+                                'is_enabled' => $sectionData['experts']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process about explore section
+                    if (isset($sectionData['explore'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.explore'
+                            ],
+                            [
+                                'settings' => $sectionData['explore']['settings'] ?? null,
+                                'is_enabled' => $sectionData['explore']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process about factory images section
+                    if (isset($sectionData['factoryImages'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'about.factoryImages'
+                            ],
+                            [
+                                'settings' => $sectionData['factoryImages']['settings'] ?? null,
+                                'is_enabled' => $sectionData['factoryImages']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Skip the main foreach loop's PageSetting::updateOrCreate for 'about'
+                    continue;
                 } else {
                     $processedSettings = $sectionData['settings'] ?? null;
                 }
@@ -208,7 +329,19 @@ class PageSettingController extends Controller
                     'enabled' => $setting->is_enabled,
                     'settings' => $setting->settings
                 ];
-            } else {
+            } 
+            // Handle nested about settings
+            else if (strpos($setting->section_name, 'about.') === 0) {
+                $aboutSection = str_replace('about.', '', $setting->section_name);
+                if (!isset($formattedSettings['about'])) {
+                    $formattedSettings['about'] = [];
+                }
+                $formattedSettings['about'][$aboutSection] = [
+                    'enabled' => $setting->is_enabled,
+                    'settings' => $setting->settings
+                ];
+            }
+            else {
                 $formattedSettings[$setting->section_name] = [
                     'enabled' => $setting->is_enabled,
                     'settings' => $setting->settings
