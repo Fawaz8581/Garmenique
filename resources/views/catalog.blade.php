@@ -669,6 +669,8 @@
                         <!-- Reset Filters Button -->
                         <div class="mb-4 mt-4 text-center">
                             <button id="resetFilters" class="btn btn-outline-secondary btn-sm">Reset All Filters</button>
+                            
+                            <button id="debugSizes" class="btn btn-outline-dark btn-sm mt-2" style="font-size: 0.75rem;">Debug Sizes</button>
                         </div>
                     </div>
                             </div>
@@ -904,7 +906,8 @@
                     products.forEach(product => {
                         const productCategory = product.dataset.category;
                         const productPrice = parseInt(product.dataset.price);
-                        const productSizes = JSON.parse(product.dataset.sizes || '[]');
+                        const productSizesData = product.dataset.sizes;
+                        const productSizes = JSON.parse(productSizesData || '{}');
                         
                         // Apply filters
                         let showProduct = true;
@@ -917,7 +920,7 @@
                         // Size filter
                         if (filterState.sizes.length > 0) {
                             const sizeMatch = filterState.sizes.some(selectedSize => {
-                                return productSizes.some(productSize => {
+                                return Object.values(productSizes).some(productSize => {
                                     const match = productSize.id === selectedSize.id && 
                                            productSize.type === selectedSize.type &&
                                            productSize.stock > 0;
@@ -973,43 +976,82 @@
                 
                 // Reset filters
                 const resetButton = document.getElementById('resetFilters');
-                if (resetButton) {
-                    resetButton.addEventListener('click', function() {
-                        // Reset category checkboxes
-                        document.querySelectorAll('.category-filter').forEach(checkbox => {
-                            checkbox.checked = false;
-                        });
-                        
-                        // Reset size buttons
-                        document.querySelectorAll('.size-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        
-                        // Reset price inputs
-                        document.querySelectorAll('.price-input').forEach(input => {
-                            input.value = '';
-                        });
-                        
-                        // Reset filter state
-                        filterState.categories = [];
-                        filterState.sizes = [];
-                        filterState.minPrice = 0;
-                        filterState.maxPrice = Infinity;
-                        
-                        // Reset sort select
-                        const sortSelect = document.getElementById('sortSelect');
-                        if (sortSelect) {
-                            sortSelect.value = 'featured';
-                        }
-                        
-                        // Show all products
-                        filterProducts();
+                function resetFilters() {
+                    // Reset category checkboxes
+                    document.querySelectorAll('.category-filter').forEach(checkbox => {
+                        checkbox.checked = false;
                     });
+                    
+                    // Reset size buttons
+                    document.querySelectorAll('.size-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Reset price inputs
+                    document.querySelectorAll('.price-input').forEach(input => {
+                        input.value = '';
+                    });
+                    
+                    // Reset filter state
+                    filterState.categories = [];
+                    filterState.sizes = [];
+                    filterState.minPrice = 0;
+                    filterState.maxPrice = Infinity;
+                    
+                    // Reset sort select
+                    const sortSelect = document.getElementById('sortSelect');
+                    if (sortSelect) {
+                        sortSelect.value = 'featured';
+                    }
+                    
+                    // Show all products explicitly
+                    document.querySelectorAll('.product-card').forEach(product => {
+                        product.style.display = '';
+                    });
+                    
+                    // Update product count
+                    updateProductCount();
                 }
                 
-                // Initialize filters
-                updateFilterState();
-                filterProducts();
+                if (resetButton) {
+                    resetButton.addEventListener('click', resetFilters);
+                }
+                
+                // Initialize with all products showing
+                resetFilters();
+                
+                // Debug button for sizes
+                const debugButton = document.getElementById('debugSizes');
+                if (debugButton) {
+                    debugButton.addEventListener('click', function() {
+                        console.clear();
+                        console.log('=== DEBUG SIZE FILTERING ===');
+                        
+                        const products = document.querySelectorAll('.product-card');
+                        products.forEach(product => {
+                            const title = product.querySelector('.product-title')?.textContent.trim();
+                            const sizesData = product.dataset.sizes;
+                            const sizes = JSON.parse(sizesData || '{}');
+                            
+                            console.log(`Product: ${title}`);
+                            console.log('Raw size data:', sizesData);
+                            console.log('Parsed sizes:', sizes);
+                            console.log('Size values:', Object.values(sizes));
+                            console.log('-------------------');
+                        });
+                        
+                        const sizeButtons = document.querySelectorAll('.size-btn');
+                        console.log('Available size buttons:');
+                        sizeButtons.forEach(btn => {
+                            console.log({
+                                name: btn.textContent.trim(),
+                                id: parseInt(btn.dataset.sizeId),
+                                type: btn.dataset.sizeType,
+                                isActive: btn.classList.contains('active')
+                            });
+                        });
+                    });
+                }
             });
 
             function toggleSize(button) {
@@ -1033,24 +1075,29 @@
                 
                 // Filter products based on selected sizes
                 products.forEach(product => {
-                    const productSizes = JSON.parse(product.dataset.sizes || '[]');
-                    console.log('Product Sizes:', productSizes); // Debug log
+                    const productSizesData = product.dataset.sizes;
+                    const productSizes = JSON.parse(productSizesData || '{}');
+                    console.log('Product Sizes data:', productSizesData); // Debug log
+                    console.log('Product Sizes parsed:', productSizes); // Debug log
                     
                     // Check if product has any of the selected sizes with stock > 0
                     const hasSelectedSize = Array.from(activeSizes).some(sizeBtn => {
                         const selectedSizeId = parseInt(sizeBtn.dataset.sizeId);
                         const selectedSizeType = sizeBtn.dataset.sizeType;
+                        const selectedSizeName = sizeBtn.textContent.trim();
                         
                         console.log('Checking size:', { // Debug log
                             selectedSizeId,
                             selectedSizeType,
-                            buttonText: sizeBtn.textContent.trim()
+                            selectedSizeName
                         });
                         
-                        const match = productSizes.some(productSize => {
-                            const sizeMatch = productSize.id === selectedSizeId &&
-                                            productSize.type === selectedSizeType &&
-                                            productSize.stock > 0;
+                        // Check in all size values
+                        return Object.values(productSizes).some(productSize => {
+                            // Check if this size matches the selected one
+                            const sizeMatch = productSize.id === selectedSizeId && 
+                                           productSize.type === selectedSizeType &&
+                                           productSize.stock > 0;
                             
                             console.log('Size comparison:', { // Debug log
                                 productSize,
@@ -1061,8 +1108,6 @@
                             
                             return sizeMatch;
                         });
-                        
-                        return match;
                     });
                     
                     console.log('Product visibility:', { // Debug log
@@ -1080,17 +1125,17 @@
                 // Debug log of current filter state
                 console.log('Current filter state:', {
                     activeSizes: Array.from(activeSizes).map(btn => ({
-                        id: btn.dataset.sizeId,
+                        id: parseInt(btn.dataset.sizeId),
                         type: btn.dataset.sizeType,
                         name: btn.textContent.trim()
                     })),
-                    visibleProducts: document.querySelectorAll('.product-card[style="display: "]').length,
+                    visibleProducts: document.querySelectorAll('.product-card:not([style*="display: none"])').length,
                     totalProducts: products.length
                 });
             }
             
             function updateProductCount() {
-                const visibleProducts = document.querySelectorAll('.product-card[style="display: "]').length;
+                const visibleProducts = document.querySelectorAll('.product-card:not([style*="display: none"])').length;
                 const totalProducts = document.querySelectorAll('.product-card').length;
                 
                 const visibleProductCountEl = document.getElementById('visibleProductCount');
