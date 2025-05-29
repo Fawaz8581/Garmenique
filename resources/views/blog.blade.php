@@ -309,7 +309,7 @@
             <h2 class="section-title">@{{ pageSettings.blog.social.title }}</h2>
             
             <div class="social-links">
-                <a ng-repeat="link in pageSettings.blog.social.links" href="@{{ link.url }}" class="social-link">
+                <a ng-repeat="link in pageSettings.blog.social.links" ng-href="@{{ link.url.startsWith('http') ? link.url : 'https://' + link.url }}" class="social-link" target="_blank">
                     <i class="fab" ng-class="'fa-' + link.platform"></i>
                 </a>
             </div>
@@ -495,10 +495,10 @@
                         enabled: true,
                         title: 'Follow us on social for more',
                         links: [
-                            { platform: 'instagram', url: '#' },
-                            { platform: 'facebook', url: '#' },
-                            { platform: 'twitter', url: '#' },
-                            { platform: 'pinterest', url: '#' }
+                            { platform: 'instagram', url: 'instagram.com/Garmenique' },
+                            { platform: 'facebook', url: 'facebook.com/Garmenique' },
+                            { platform: 'twitter', url: 'twitter.com/Garmenique' },
+                            { platform: 'pinterest', url: 'pinterest.com/Garmenique' }
                         ]
                     }
                 }

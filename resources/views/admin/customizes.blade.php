@@ -947,7 +947,7 @@
             
             <!-- Right Column: Preview -->
             <div class="col-lg-6">
-                <div class="preview-container">
+                <div class="preview-container" style="height: auto; margin-bottom: 40px;">
                     <!-- Homepage Preview -->
                     <div ng-if="currentPage === 'homepage'">
                         <!-- Hero Section -->
@@ -993,7 +993,7 @@
                     </div>
                     
                     <!-- Blog Preview -->
-                    <div ng-if="currentPage === 'blog'" style="max-height: 600px; overflow-y: auto;">
+                    <div ng-if="currentPage === 'blog'">
                         <!-- Blog Hero Section -->
                         <div class="blog-hero" ng-if="site.blog.hero.enabled" ng-style="{'background-image': 'url(' + site.blog.hero.backgroundImage + ')', 'background-size': 'cover', 'background-position': 'center', 'position': 'relative', 'padding': '80px 0', 'color': '#fff'}">
                             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);"></div>
@@ -1067,7 +1067,7 @@
                             <h2 style="font-size: 1.5rem; margin-bottom: 20px;">{% site.blog.social.title %}</h2>
                             
                             <div style="display: flex; justify-content: center; gap: 15px;">
-                                <a ng-repeat="link in site.blog.social.links" href="#" style="width: 40px; height: 40px; border-radius: 50%; background-color: #333; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;">
+                                <a ng-repeat="link in site.blog.social.links" ng-href="{% link.url.startsWith('http') ? link.url : 'https://' + link.url %}" target="_blank" style="width: 40px; height: 40px; border-radius: 50%; background-color: #333; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;">
                                     <i class="fab" ng-class="'fa-' + link.platform"></i>
                                 </a>
                             </div>
@@ -1196,10 +1196,10 @@
                         enabled: true,
                         title: 'Follow us on social for more',
                         links: [
-                            { platform: 'instagram', url: '#' },
-                            { platform: 'facebook', url: '#' },
-                            { platform: 'twitter', url: '#' },
-                            { platform: 'pinterest', url: '#' }
+                            { platform: 'instagram', url: 'instagram.com/Garmenique' },
+                            { platform: 'facebook', url: 'facebook.com/Garmenique' },
+                            { platform: 'twitter', url: 'twitter.com/Garmenique' },
+                            { platform: 'pinterest', url: 'pinterest.com/Garmenique' }
                         ]
                     }
                 }
