@@ -104,7 +104,7 @@
     <div class="sidebar" id="sidebar">
         <div class="brand">
             <div class="brand-logo"><img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Garmenique Logo" style="width: 100%; height: 100%; object-fit: contain;"></div>
-            <div class="brand-text">GARMENIQUE</div>
+            <div class="brand-text"><a href="/" style="text-decoration: none; color: inherit;">GARMENIQUE</a></div>
         </div>
         
         <ul class="sidebar-menu">

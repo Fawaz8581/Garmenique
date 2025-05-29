@@ -35,6 +35,20 @@
             overflow: hidden;
         }
         
+        /* Sidebar menu link styles */
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
         /* Hero Section */
         .hero-section {
             position: relative;
@@ -360,41 +374,60 @@
     <div class="sidebar" id="sidebar">
         <div class="brand">
             <div class="brand-logo"><img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Garmenique Logo" style="width: 100%; height: 100%; object-fit: contain;"></div>
-            <div class="brand-text">GARMENIQUE</div>
+            <div class="brand-text"><a href="/" style="text-decoration: none; color: inherit;">GARMENIQUE</a></div>
         </div>
         
         <ul class="sidebar-menu">
             <li class="menu-item">
-                <i class="fas fa-th-large"></i>
-                <span>Dashboard</span>
+                <a href="{{ route('admin.dashboard') }}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
             </li>
             <li class="menu-item">
-                <i class="fas fa-box"></i>
-                <span>Products</span>
+                <a href="{{ route('admin.products') }}">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
             </li>
             <li class="menu-item">
-                <i class="fas fa-tags"></i>
-                <span>Categories</span>
+                <a href="{{ route('admin.categories') }}">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
             </li>
             <li class="menu-item">
-                <i class="fas fa-ruler"></i>
-                <span>Sizes</span>
+                <a href="{{ route('admin.sizes') }}">
+                    <i class="fas fa-ruler"></i>
+                    <span>Sizes</span>
+                </a>
             </li>
             <li class="menu-item">
-                <i class="fas fa-envelope"></i>
-                <span>Messages</span>
+                <a href="{{ route('admin.messages') }}">
+                    <i class="fas fa-envelope"></i>
+                    <span>Messages</span>
+                </a>
             </li>
             <li class="menu-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
+                <a href="{{ route('admin.settings') }}">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
             </li>
             <li class="menu-item active">
-                <i class="fas fa-paint-brush"></i>
-                <span>Customizes</span>
+                <a href="{{ route('admin.customizes') }}">
+                    <i class="fas fa-paint-brush"></i>
+                    <span>Customizes</span>
+                </a>
             </li>
             <li class="menu-item">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
+                <a href="javascript:void(0)" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </li>
         </ul>
     </div>
