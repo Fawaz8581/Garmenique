@@ -180,8 +180,8 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         
         // Customizes
         Route::get('/customizes/{page?}', [App\Http\Controllers\Admin\PageSettingController::class, 'index'])->name('admin.customizes');
-        Route::post('/api/page-settings', [App\Http\Controllers\PageSettingController::class, 'saveSettings'])->name('admin.page-settings.save');
-        Route::get('/api/page-settings', [App\Http\Controllers\PageSettingController::class, 'getSettings'])->name('admin.page-settings.get');
+        Route::post('/api/page-settings', [App\Http\Controllers\Admin\PageSettingController::class, 'save'])->name('admin.page-settings.save');
+        Route::get('/api/page-settings', [App\Http\Controllers\Admin\PageSettingController::class, 'getSettings'])->name('admin.page-settings.get');
 
         // Test Image Upload
         Route::get('/test-image-upload', function() {

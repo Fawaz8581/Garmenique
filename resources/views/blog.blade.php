@@ -78,6 +78,60 @@
         .admin-icon-link:hover {
             transform: scale(1.1);
         }
+
+        /* Values Section Styling */
+        .blog-values {
+            background-color: #f8f9fa;
+            padding: 60px 0;
+            margin: 40px 0;
+        }
+
+        .values-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .value-item {
+            text-align: center;
+            padding: 0 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .value-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .value-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .value-icon i {
+            color: #14387F !important;
+        }
+
+        .value-item h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .values-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
     </style>
 </head>
 <body ng-app="garmeniqueApp" ng-controller="BlogController">
@@ -85,7 +139,10 @@
     <header class="header" ng-controller="HeaderController">
         <div class="container nav-container">
             <div class="logo-container">
-                <a href="/" class="logo">GARMENIQUE</a>
+                <a href="/" class="logo">
+                    <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Garmenique Logo" style="height: 30px; width: auto; margin-right: 10px; vertical-align: middle;">
+                    GARMENIQUE
+                </a>
             </div>
             
             <nav class="main-nav" ng-class="{'active': isNavActive}">
@@ -157,104 +214,51 @@
     </div>
     
     <!-- Blog Header Section -->
-    <section class="blog-hero">
-        <div class="container">
+    <section class="blog-hero" ng-if="pageSettings.blog.hero.enabled" ng-style="{'background-image': 'url(' + pageSettings.blog.hero.backgroundImage + ')', 'background-size': 'cover', 'background-position': 'center', 'position': 'relative', 'padding': '80px 0', 'color': '#fff'}">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);"></div>
+        <div class="container" style="position: relative; z-index: 1;">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto blog-header-content">
-                    <h1>Garmenique</h1>
-                    <p class="mission-statement">We're on a mission to change the fashion industry.<br>These are the people, stories, and ideas that will help us get there.</p>
+                    <h1 style="font-size: 2.8rem; font-weight: 700; margin-bottom: 1.5rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">@{{ pageSettings.blog.hero.title }}</h1>
+                    <p class="mission-statement" style="font-size: 1.2rem; line-height: 1.8; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">@{{ pageSettings.blog.hero.subtitle }}</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Latest Articles Section -->
-    <section class="blog-latest">
+    <section class="blog-latest" ng-if="pageSettings.blog.latestArticles.enabled">
         <div class="container">
             <div class="text-center mb-4">
-                <h2 class="section-title">The Latest</h2>
+                <h2 class="section-title">@{{ pageSettings.blog.latestArticles.title }}</h2>
                 <div class="section-title-underline"></div>
             </div>
             
             <!-- Featured Articles Grid (First Row) -->
             <div class="blog-grid">
-                <!-- How To Style Winter Whites -->
-                <div class="blog-card">
-                    <a href="#" class="blog-card-link">
+                <div class="blog-card" ng-repeat="article in pageSettings.blog.latestArticles.articles | limitTo:3">
+                    <a href="@{{ article.link }}" class="blog-card-link">
                         <div class="blog-img-container">
-                            <img src="https://images.unsplash.com/photo-1603808033192-082d6919d3e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="How To Style Winter Whites" class="blog-card-img">
+                            <img ng-src="@{{ article.image }}" alt="@{{ article.title }}" class="blog-card-img">
                         </div>
                         <div class="blog-card-content">
-                            <span class="blog-category">Style</span>
-                            <h3 class="blog-title">How To Style Winter Whites</h3>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- We Won A Glossy Award -->
-                <div class="blog-card">
-                    <a href="#" class="blog-card-link">
-                        <div class="blog-img-container">
-                            <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="We Won A Glossy Award" class="blog-card-img">
-                        </div>
-                        <div class="blog-card-content">
-                            <span class="blog-category">Transparency</span>
-                            <h3 class="blog-title">We Won A Glossy Award</h3>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Coordinate Your Style -->
-                <div class="blog-card">
-                    <a href="#" class="blog-card-link">
-                        <div class="blog-img-container">
-                            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Coordinate Your Style" class="blog-card-img">
-                        </div>
-                        <div class="blog-card-content">
-                            <span class="blog-category">Style</span>
-                            <h3 class="blog-title">Coordinate Your Style: Matching Outfits for Everyone</h3>
+                            <span class="blog-category">@{{ article.category }}</span>
+                            <h3 class="blog-title">@{{ article.title }}</h3>
                         </div>
                     </a>
                 </div>
             </div>
 
             <!-- Regular Articles Grid (Second Row) -->
-            <div class="blog-grid">
-                <!-- Black Friday Fund 2023 -->
-                <div class="blog-card">
-                    <a href="#" class="blog-card-link">
+            <div class="blog-grid" ng-if="pageSettings.blog.latestArticles.articles.length > 3">
+                <div class="blog-card" ng-repeat="article in pageSettings.blog.latestArticles.articles | limitTo:3:3">
+                    <a href="@{{ article.link }}" class="blog-card-link">
                         <div class="blog-img-container">
-                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Black Friday Fund 2023" class="blog-card-img">
+                            <img ng-src="@{{ article.image }}" alt="@{{ article.title }}" class="blog-card-img">
                         </div>
                         <div class="blog-card-content">
-                            <span class="blog-category">Transparency</span>
-                            <h3 class="blog-title">Black Friday Fund 2023</h3>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- What to Wear this Season -->
-                <div class="blog-card">
-                    <a href="#" class="blog-card-link">
-                        <div class="blog-img-container">
-                            <img src="https://cdn.mos.cms.futurecdn.net/SJ44Y9266PtpReDDNtWQJJ.jpg" alt="Holiday Outfits & Ideas" class="blog-card-img">
-                        </div>
-                        <div class="blog-card-content">
-                            <span class="blog-category">Style</span>
-                            <h3 class="blog-title">What to Wear this Season: Holiday Outfits & Ideas</h3>
-                        </div>
-                    </a>
-                </div>
-                
-                <!-- Thanksgiving Outfit Ideas -->
-                <div class="blog-card">
-                    <a href="#" class="blog-card-link">
-                        <div class="blog-img-container">
-                            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Thanksgiving Outfit Ideas" class="blog-card-img">
-                        </div>
-                        <div class="blog-card-content">
-                            <span class="blog-category">Style</span>
-                            <h3 class="blog-title">Thanksgiving Outfit Ideas</h3>
+                            <span class="blog-category">@{{ article.category }}</span>
+                            <h3 class="blog-title">@{{ article.title }}</h3>
                         </div>
                     </a>
                 </div>
@@ -267,79 +271,47 @@
     </section>
 
     <!-- Values Section -->
-    <section class="blog-values">
+    <section class="blog-values" ng-if="pageSettings.blog.values.enabled">
         <div class="container">
             <div class="values-container">
-                <div class="value-item">
+                <div class="value-item" ng-repeat="value in pageSettings.blog.values.items">
                     <div class="value-icon">
-                        <img src="{{ asset('images/icons/keep-clean.svg') }}" alt="Keep it Clean">
+                        <img ng-src="@{{ value.iconUrl || getDefaultIconUrl(value.title) }}" alt="@{{ value.title }}" style="width: 40px; height: 40px;">
                     </div>
-                    <h3>Keep it Clean</h3>
-                </div>
-                
-                <div class="value-item">
-                    <div class="value-icon">
-                        <img src="{{ asset('images/icons/do-right.svg') }}" alt="Do right by people">
-                    </div>
-                    <h3>Do right by people</h3>
-                </div>
-                
-                <div class="value-item">
-                    <div class="value-icon">
-                        <img src="{{ asset('images/icons/keep-circular.svg') }}" alt="Keep it Circular">
-                    </div>
-                    <h3>Keep it Circular</h3>
+                    <h3>@{{ value.title }}</h3>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Progress Section -->
-    <section class="blog-progress">
+    <section class="blog-progress" ng-if="pageSettings.blog.progress.enabled">
         <div class="container">
             <div class="text-center mb-4">
-                <h2 class="section-title">Our Progress</h2>
+                <h2 class="section-title">@{{ pageSettings.blog.progress.title }}</h2>
                 <div class="section-title-underline"></div>
             </div>
             
             <div class="progress-grid">
-                <!-- Carbon Commitment -->
-                <div class="progress-card">
+                <div class="progress-card" ng-repeat="item in pageSettings.blog.progress.items">
                     <div class="progress-img-container">
-                        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Carbon Commitment" class="progress-img">
+                        <img ng-src="@{{ item.image }}" alt="@{{ item.title }}" class="progress-img">
                     </div>
-                    <h3 class="progress-title">Carbon Commitment</h3>
-                </div>
-                
-                <!-- Environmental Initiatives -->
-                <div class="progress-card">
-                    <div class="progress-img-container">
-                        <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Environmental Initiatives" class="progress-img">
-                    </div>
-                    <h3 class="progress-title">Environmental Initiatives</h3>
-                </div>
-                
-                <!-- Better Factories -->
-                <div class="progress-card">
-                    <div class="progress-img-container">
-                        <img src="https://images.unsplash.com/photo-1529720317453-c8da503f2051?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Better Factories" class="progress-img">
-                    </div>
-                    <h3 class="progress-title">Better Factories</h3>
+                    <h3 class="progress-title">@{{ item.title }}</h3>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Social Media Section -->
-    <section class="blog-social">
+    <section class="blog-social" ng-if="pageSettings.blog.social.enabled">
         <div class="container">
-            <h2 class="section-title">Follow us on social for more</h2>
+            <h2 class="section-title">@{{ pageSettings.blog.social.title }}</h2>
             
             <div class="social-links">
-                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-pinterest-p"></i></a>
+                <a ng-repeat="link in pageSettings.blog.social.links" href="@{{ link.url }}" class="social-link">
+                    <i class="fab" ng-class="'fa-' + link.platform"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -413,5 +385,244 @@
     <script src="{{ asset('js/landingpage.js') }}"></script>
     <script src="{{ asset('js/blog.js') }}"></script>
     <script src="{{ asset('js/cart.js') }}"></script>
+    <script>
+        // Initialize AngularJS app
+        var app = angular.module('garmeniqueApp', []);
+        
+        // Configure AngularJS to work with Laravel
+        app.config(function($interpolateProvider) {
+            $interpolateProvider.startSymbol('@{{');
+            $interpolateProvider.endSymbol('}}');
+        });
+        
+        // Blog Controller
+        app.controller('BlogController', function($scope, $http) {
+            // Helper function to get default icon URL based on value title
+            $scope.getDefaultIconUrl = function(title) {
+                switch(title) {
+                    case 'Keep it Clean':
+                        return 'https://cdn-icons-png.flaticon.com/512/2313/2313878.png';
+                    case 'Do right by people':
+                        return 'https://cdn-icons-png.flaticon.com/512/1006/1006657.png';
+                    case 'Keep it Circular':
+                        return 'https://cdn-icons-png.flaticon.com/512/3299/3299668.png';
+                    default:
+                        return 'https://cdn-icons-png.flaticon.com/512/3601/3601569.png'; // Default icon
+                }
+            };
+            
+            // Default page settings
+            $scope.pageSettings = {
+                blog: {
+                    hero: {
+                        enabled: true,
+                        title: 'Garmenique',
+                        subtitle: 'We\'re on a mission to change the fashion industry. These are the people, stories, and ideas that will help us get there.',
+                        backgroundImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80'
+                    },
+                    latestArticles: {
+                        enabled: true,
+                        title: 'The Latest',
+                        articles: [
+                            { 
+                                title: 'How To Style Winter Whites', 
+                                category: 'Style', 
+                                image: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            },
+                            { 
+                                title: 'We Won A Glossy Award', 
+                                category: 'Transparency', 
+                                image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            },
+                            { 
+                                title: 'Coordinate Your Style: Matching Outfits for Everyone', 
+                                category: 'Style', 
+                                image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            },
+                            { 
+                                title: 'Black Friday Fund 2023', 
+                                category: 'Transparency', 
+                                image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            },
+                            { 
+                                title: 'What to Wear this Season: Holiday Outfits & Ideas', 
+                                category: 'Style', 
+                                image: 'https://cdn.mos.cms.futurecdn.net/SJ44Y9266PtpReDDNtWQJJ.jpg',
+                                link: '#'
+                            },
+                            { 
+                                title: 'Thanksgiving Outfit Ideas', 
+                                category: 'Style', 
+                                image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            }
+                        ]
+                    },
+                    values: {
+                        enabled: true,
+                        items: [
+                            { title: 'Keep it Clean', iconUrl: 'https://cdn-icons-png.flaticon.com/512/2313/2313878.png' },
+                            { title: 'Do right by people', iconUrl: 'https://cdn-icons-png.flaticon.com/512/1006/1006657.png' },
+                            { title: 'Keep it Circular', iconUrl: 'https://cdn-icons-png.flaticon.com/512/3299/3299668.png' }
+                        ]
+                    },
+                    progress: {
+                        enabled: true,
+                        title: 'Our Progress',
+                        items: [
+                            { 
+                                title: 'Carbon Commitment', 
+                                image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            },
+                            { 
+                                title: 'Environmental Initiatives', 
+                                image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            },
+                            { 
+                                title: 'Better Factories', 
+                                image: 'https://images.unsplash.com/photo-1529720317453-c8da503f2051?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                                link: '#'
+                            }
+                        ]
+                    },
+                    social: {
+                        enabled: true,
+                        title: 'Follow us on social for more',
+                        links: [
+                            { platform: 'instagram', url: '#' },
+                            { platform: 'facebook', url: '#' },
+                            { platform: 'twitter', url: '#' },
+                            { platform: 'pinterest', url: '#' }
+                        ]
+                    }
+                }
+            };
+            
+            // Load page settings from the server
+            $http.get('/admin/api/page-settings?page=blog')
+                .then(function(response) {
+                    if (response.data.success && response.data.settings && response.data.settings.blog) {
+                        // Merge saved settings with defaults
+                        var savedSettings = response.data.settings;
+                        
+                        // Hero section
+                        if (savedSettings.blog.hero) {
+                            $scope.pageSettings.blog.hero.enabled = savedSettings.blog.hero.enabled;
+                            
+                            if (savedSettings.blog.hero.settings) {
+                                if (savedSettings.blog.hero.settings.title) {
+                                    $scope.pageSettings.blog.hero.title = savedSettings.blog.hero.settings.title;
+                                }
+                                if (savedSettings.blog.hero.settings.subtitle) {
+                                    $scope.pageSettings.blog.hero.subtitle = savedSettings.blog.hero.settings.subtitle;
+                                }
+                                if (savedSettings.blog.hero.settings.backgroundImage) {
+                                    $scope.pageSettings.blog.hero.backgroundImage = savedSettings.blog.hero.settings.backgroundImage;
+                                }
+                            }
+                        }
+                        
+                        // Latest articles section
+                        if (savedSettings.blog.latestArticles) {
+                            $scope.pageSettings.blog.latestArticles.enabled = savedSettings.blog.latestArticles.enabled;
+                            
+                            if (savedSettings.blog.latestArticles.settings) {
+                                if (savedSettings.blog.latestArticles.settings.title) {
+                                    $scope.pageSettings.blog.latestArticles.title = savedSettings.blog.latestArticles.settings.title;
+                                }
+                                if (savedSettings.blog.latestArticles.settings.articles && savedSettings.blog.latestArticles.settings.articles.length > 0) {
+                                    $scope.pageSettings.blog.latestArticles.articles = savedSettings.blog.latestArticles.settings.articles;
+                                }
+                            }
+                        }
+                        
+                        // Values section
+                        if (savedSettings.blog.values) {
+                            $scope.pageSettings.blog.values.enabled = savedSettings.blog.values.enabled;
+                            
+                            if (savedSettings.blog.values.settings && savedSettings.blog.values.settings.items && savedSettings.blog.values.settings.items.length > 0) {
+                                $scope.pageSettings.blog.values.items = savedSettings.blog.values.settings.items;
+                            }
+                        }
+                        
+                        // Progress section
+                        if (savedSettings.blog.progress) {
+                            $scope.pageSettings.blog.progress.enabled = savedSettings.blog.progress.enabled;
+                            
+                            if (savedSettings.blog.progress.settings) {
+                                if (savedSettings.blog.progress.settings.title) {
+                                    $scope.pageSettings.blog.progress.title = savedSettings.blog.progress.settings.title;
+                                }
+                                if (savedSettings.blog.progress.settings.items && savedSettings.blog.progress.settings.items.length > 0) {
+                                    $scope.pageSettings.blog.progress.items = savedSettings.blog.progress.settings.items;
+                                }
+                            }
+                        }
+                        
+                        // Social section
+                        if (savedSettings.blog.social) {
+                            $scope.pageSettings.blog.social.enabled = savedSettings.blog.social.enabled;
+                            
+                            if (savedSettings.blog.social.settings) {
+                                if (savedSettings.blog.social.settings.title) {
+                                    $scope.pageSettings.blog.social.title = savedSettings.blog.social.settings.title;
+                                }
+                                if (savedSettings.blog.social.settings.links && savedSettings.blog.social.settings.links.length > 0) {
+                                    $scope.pageSettings.blog.social.links = savedSettings.blog.social.settings.links;
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading page settings:', error);
+                });
+        });
+        
+        // Header Controller
+        app.controller('HeaderController', function($scope) {
+            $scope.isNavActive = false;
+            
+            $scope.toggleNav = function() {
+                $scope.isNavActive = !$scope.isNavActive;
+            };
+        });
+        
+        // Search Controller
+        app.controller('SearchController', function($scope) {
+            $scope.isSearchActive = false;
+            $scope.searchQuery = '';
+            
+            $scope.popularCategories = [
+                { name: 'TOPS', image: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80', isHovered: false },
+                { name: 'PANTS', image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80', isHovered: false },
+                { name: 'DRESSES', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80', isHovered: false },
+                { name: 'OUTERWEAR', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80', isHovered: false }
+            ];
+            
+            $scope.openSearch = function() {
+                $scope.isSearchActive = true;
+            };
+            
+            $scope.closeSearch = function() {
+                $scope.isSearchActive = false;
+                $scope.searchQuery = '';
+            };
+            
+            $scope.hover = function(category) {
+                category.isHovered = true;
+            };
+            
+            $scope.unhover = function(category) {
+                category.isHovered = false;
+            };
+        });
+    </script>
 </body>
 </html>

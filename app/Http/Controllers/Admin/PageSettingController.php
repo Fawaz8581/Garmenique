@@ -84,6 +84,82 @@ class PageSettingController extends Controller
                         'buttonText' => $sectionData['settings']['buttonText'] ?? '',
                         'buttonLink' => $sectionData['settings']['buttonLink'] ?? ''
                     ];
+                } elseif ($sectionName === 'blog' && isset($sectionData)) {
+                    // Handle blog settings which have a nested structure
+                    $processedSettings = [];
+                    
+                    // Process blog hero section
+                    if (isset($sectionData['hero'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'blog.hero'
+                            ],
+                            [
+                                'settings' => $sectionData['hero']['settings'] ?? null,
+                                'is_enabled' => $sectionData['hero']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process blog latest articles section
+                    if (isset($sectionData['latestArticles'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'blog.latestArticles'
+                            ],
+                            [
+                                'settings' => $sectionData['latestArticles']['settings'] ?? null,
+                                'is_enabled' => $sectionData['latestArticles']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process blog values section
+                    if (isset($sectionData['values'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'blog.values'
+                            ],
+                            [
+                                'settings' => $sectionData['values']['settings'] ?? null,
+                                'is_enabled' => $sectionData['values']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process blog progress section
+                    if (isset($sectionData['progress'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'blog.progress'
+                            ],
+                            [
+                                'settings' => $sectionData['progress']['settings'] ?? null,
+                                'is_enabled' => $sectionData['progress']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process blog social section
+                    if (isset($sectionData['social'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'blog.social'
+                            ],
+                            [
+                                'settings' => $sectionData['social']['settings'] ?? null,
+                                'is_enabled' => $sectionData['social']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Skip the main foreach loop's PageSetting::updateOrCreate for 'blog'
+                    continue;
                 } else {
                     $processedSettings = $sectionData['settings'] ?? null;
                 }
@@ -118,14 +194,26 @@ class PageSettingController extends Controller
     public function getSettings(Request $request)
     {
         $page = $request->input('page', 'homepage');
-        $settings = PageSetting::getPageSettings($page);
+        $settings = PageSetting::where('page_name', $page)->get();
         
         $formattedSettings = [];
         foreach ($settings as $setting) {
-            $formattedSettings[$setting->section_name] = [
-                'enabled' => $setting->is_enabled,
-                'settings' => $setting->settings
-            ];
+            // Handle nested blog settings
+            if (strpos($setting->section_name, 'blog.') === 0) {
+                $blogSection = str_replace('blog.', '', $setting->section_name);
+                if (!isset($formattedSettings['blog'])) {
+                    $formattedSettings['blog'] = [];
+                }
+                $formattedSettings['blog'][$blogSection] = [
+                    'enabled' => $setting->is_enabled,
+                    'settings' => $setting->settings
+                ];
+            } else {
+                $formattedSettings[$setting->section_name] = [
+                    'enabled' => $setting->is_enabled,
+                    'settings' => $setting->settings
+                ];
+            }
         }
         
         return response()->json(['success' => true, 'settings' => $formattedSettings]);
