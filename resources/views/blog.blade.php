@@ -140,7 +140,6 @@
         <div class="container nav-container">
             <div class="logo-container">
                 <a href="/" class="logo">
-                    <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Garmenique Logo" style="height: 30px; width: auto; margin-right: 10px; vertical-align: middle;">
                     GARMENIQUE
                 </a>
             </div>

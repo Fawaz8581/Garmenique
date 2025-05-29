@@ -49,6 +49,11 @@
             .admin-icon-link:hover {
                 transform: scale(1.1);
             }
+
+            /* Hide Angular content until it's loaded */
+            [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+                display: none !important;
+            }
         </style>
     </head>
     <body ng-app="garmeniqueApp">
@@ -128,83 +133,101 @@
         </div>
         
         <!-- About Page Content -->
-        <div ng-controller="AboutController">
-            <!-- Hero Section -->
-            <section class="hero-about" ng-if="pageSettings.about.hero.enabled" ng-style="{'background-image': 'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(' + pageSettings.about.hero.backgroundImage + ')'}">
+        <!-- Server-rendered content -->
+        @if($pageSettings['about']['hero']['enabled'])
+            <section class="hero-about" style="background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('{{ $pageSettings['about']['hero']['backgroundImage'] }}')">
                 <div class="container">
                     <div class="hero-content">
-                        <h1 class="hero-title">@{{ pageSettings.about.hero.title }}</h1>
+                        <h1 class="hero-title">{{ $pageSettings['about']['hero']['title'] }}</h1>
                         <div class="hero-description">
-                            <p>@{{ pageSettings.about.hero.subtitle }}</p>
+                            <p>{{ $pageSettings['about']['hero']['subtitle'] }}</p>
                         </div>
                     </div>
                 </div>
             </section>
+        @endif
 
-            <!-- Ethical Approach Section -->
-            <section class="ethical-approach" ng-if="pageSettings.about.ethicalApproach.enabled">
+        @if($pageSettings['about']['ethicalApproach']['enabled'])
+            <section class="ethical-approach">
                 <div class="container">
                     <div class="approach-grid">
                         <div class="approach-content">
-                            <h2>@{{ pageSettings.about.ethicalApproach.title }}</h2>
-                            <p>@{{ pageSettings.about.ethicalApproach.description }}</p>
+                            <h2>{{ $pageSettings['about']['ethicalApproach']['title'] }}</h2>
+                            <p>{{ $pageSettings['about']['ethicalApproach']['description'] }}</p>
                         </div>
                         <div class="approach-image" style="padding-left: 30px; display: flex; justify-content: flex-end;">
-                            <img ng-src="@{{ pageSettings.about.ethicalApproach.image }}" alt="Ethical Approach" style="max-width: 100%; height: auto;">
+                            <img src="{{ $pageSettings['about']['ethicalApproach']['image'] }}" alt="Ethical Approach" style="max-width: 100%; height: auto;">
                         </div>
                     </div>
                 </div>
             </section>
+        @endif
 
-            <!-- Factory Images Section -->
-            <section class="factory-images" ng-if="pageSettings.about.factoryImages.enabled">
+        @if($pageSettings['about']['factoryImages']['enabled'])
+            <section class="factory-images">
                 <div class="factory-grid">
-                    <div class="factory-image" ng-repeat="image in pageSettings.about.factoryImages.images">
-                        <img ng-src="@{{ image.url }}" alt="@{{ image.alt }}">
-                    </div>
+                    @foreach($pageSettings['about']['factoryImages']['images'] as $image)
+                        <div class="factory-image">
+                            <img src="{{ $image['url'] }}" alt="{{ $image['alt'] }}">
+                        </div>
+                    @endforeach
                 </div>
             </section>
+        @endif
 
-            <!-- Designed Section -->
-            <section class="designed-section" ng-if="pageSettings.about.designedToLast.enabled">
+        @if($pageSettings['about']['designedToLast']['enabled'])
+            <section class="designed-section">
                 <div class="container">
                     <div class="designed-grid">
                         <div class="designed-content">
-                            <h2>@{{ pageSettings.about.designedToLast.title }}</h2>
-                            <p>@{{ pageSettings.about.designedToLast.description }}</p>
+                            <h2>{{ $pageSettings['about']['designedToLast']['title'] }}</h2>
+                            <p>{{ $pageSettings['about']['designedToLast']['description'] }}</p>
                         </div>
                         <div class="designed-images">
-                            <div ng-repeat="image in pageSettings.about.designedToLast.images">
-                                <img ng-src="@{{ image.url }}" alt="@{{ image.alt }}" style="width: 100%; height: 100%;">
-                            </div>
+                            @foreach($pageSettings['about']['designedToLast']['images'] as $image)
+                                <div>
+                                    <img src="{{ $image['url'] }}" alt="{{ $image['alt'] }}" style="width: 100%; height: 100%;">
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
             </section>
+        @endif
 
-            <!-- Transparency Section -->
-            <section class="transparency-section" ng-if="pageSettings.about.transparent.enabled">
+        @if($pageSettings['about']['transparent']['enabled'])
+            <section class="transparency-section">
                 <div class="container">
-                    <h2>@{{ pageSettings.about.transparent.title }}</h2>
-                    <p>@{{ pageSettings.about.transparent.description }}</p>
+                    <h2>{{ $pageSettings['about']['transparent']['title'] }}</h2>
+                    <p>{{ $pageSettings['about']['transparent']['description'] }}</p>
                     <div class="color-palette">
-                        <div class="color-swatch" ng-repeat="color in pageSettings.about.transparent.colors" ng-style="{'background-color': color.hex}"></div>
+                        @foreach($pageSettings['about']['transparent']['colors'] as $color)
+                            <div class="color-swatch" style="background-color: {{ $color['hex'] }}"></div>
+                        @endforeach
                     </div>
                 </div>
             </section>
+        @endif
 
-            <!-- Meet Our Explore Section -->
-            <section class="meet-explore" ng-if="pageSettings.about.explore.enabled">
+        @if($pageSettings['about']['explore']['enabled'])
+            <section class="meet-explore">
                 <div class="container">
-                    <h2>@{{ pageSettings.about.explore.title }}</h2>
+                    <h2>{{ $pageSettings['about']['explore']['title'] }}</h2>
                     <div class="explore-grid">
-                        <div class="explore-item" ng-repeat="category in pageSettings.about.explore.categories">
-                            <img ng-src="@{{ category.image }}" alt="@{{ category.title }}">
-                            <p>@{{ category.title }}</p>
-                        </div>
+                        @foreach($pageSettings['about']['explore']['categories'] as $category)
+                            <div class="explore-item">
+                                <img src="{{ $category['image'] }}" alt="{{ $category['title'] }}">
+                                <p>{{ $category['title'] }}</p>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </section>
+        @endif
+
+        <!-- Angular-controlled content (hidden until loaded) -->
+        <div ng-controller="AboutController" class="ng-cloak" style="display: none;">
+            <!-- Content will be loaded by Angular but not visible -->
         </div>
 
         <!-- Include Sliding Cart Partial -->
@@ -248,31 +271,32 @@
                         <h4>Connect With Us</h4>
                         <div class="social-email-section">
                             <div class="social-icons">
-                                <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                                <a href="#"><i class="fab fa-pinterest"></i></a>
                             </div>
-                            <p class="email-title">Sign Up for Updates</p>
-                            <form class="email-form">
-                                <input type="email" placeholder="Enter your email" class="email-input" required>
-                                <button type="submit" class="email-button">
-                                    <i class="fas fa-arrow-right"></i>
-                                </button>
-                            </form>
+                            
+                            <!-- Email Subscription Form -->
+                            <div class="email-subscription">
+                                <h5>Join Our Newsletter</h5>
+                                <p>Get exclusive offers and updates</p>
+                                <form class="subscription-form">
+                                    <input type="email" placeholder="Your email address" required>
+                                    <button type="submit">Subscribe</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="footer-bottom">
-                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
+                    <p>&copy; 2025 Garmenique. All rights reserved.</p>
                 </div>
             </div>
         </footer>
-
+        
         <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/about.js') }}"></script>
-        <script src="{{ asset('js/cart.js') }}"></script>
     </body>
 </html>

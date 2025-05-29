@@ -3,7 +3,8 @@ var app = angular.module('garmeniqueApp', []);
 
 // About Page Controller
 app.controller('AboutController', ['$scope', '$http', function($scope, $http) {
-    // Default page settings
+    // Default page settings - These are now just for Angular's reference
+    // The actual content is rendered server-side by Laravel
     $scope.pageSettings = {
         about: {
             hero: {
@@ -80,105 +81,16 @@ app.controller('AboutController', ['$scope', '$http', function($scope, $http) {
         }
     };
     
-    // Load page settings from the server
+    // Load page settings from the server for Angular's reference
     $http.get('/admin/api/page-settings?page=about')
         .then(function(response) {
             if (response.data.success && response.data.settings && response.data.settings.about) {
                 // Merge saved settings with defaults
                 var savedSettings = response.data.settings;
                 
-                // Hero section
-                if (savedSettings.about.hero) {
-                    $scope.pageSettings.about.hero.enabled = savedSettings.about.hero.enabled;
-                    
-                    if (savedSettings.about.hero.settings) {
-                        if (savedSettings.about.hero.settings.title) {
-                            $scope.pageSettings.about.hero.title = savedSettings.about.hero.settings.title;
-                        }
-                        if (savedSettings.about.hero.settings.subtitle) {
-                            $scope.pageSettings.about.hero.subtitle = savedSettings.about.hero.settings.subtitle;
-                        }
-                        if (savedSettings.about.hero.settings.backgroundImage) {
-                            $scope.pageSettings.about.hero.backgroundImage = savedSettings.about.hero.settings.backgroundImage;
-                        }
-                    }
-                }
-                
-                // Ethical Approach section
-                if (savedSettings.about.ethicalApproach) {
-                    $scope.pageSettings.about.ethicalApproach.enabled = savedSettings.about.ethicalApproach.enabled;
-                    
-                    if (savedSettings.about.ethicalApproach.settings) {
-                        if (savedSettings.about.ethicalApproach.settings.title) {
-                            $scope.pageSettings.about.ethicalApproach.title = savedSettings.about.ethicalApproach.settings.title;
-                        }
-                        if (savedSettings.about.ethicalApproach.settings.description) {
-                            $scope.pageSettings.about.ethicalApproach.description = savedSettings.about.ethicalApproach.settings.description;
-                        }
-                        if (savedSettings.about.ethicalApproach.settings.image) {
-                            $scope.pageSettings.about.ethicalApproach.image = savedSettings.about.ethicalApproach.settings.image;
-                        }
-                    }
-                }
-                
-                // Designed to Last section
-                if (savedSettings.about.designedToLast) {
-                    $scope.pageSettings.about.designedToLast.enabled = savedSettings.about.designedToLast.enabled;
-                    
-                    if (savedSettings.about.designedToLast.settings) {
-                        if (savedSettings.about.designedToLast.settings.title) {
-                            $scope.pageSettings.about.designedToLast.title = savedSettings.about.designedToLast.settings.title;
-                        }
-                        if (savedSettings.about.designedToLast.settings.description) {
-                            $scope.pageSettings.about.designedToLast.description = savedSettings.about.designedToLast.settings.description;
-                        }
-                        if (savedSettings.about.designedToLast.settings.images && savedSettings.about.designedToLast.settings.images.length > 0) {
-                            $scope.pageSettings.about.designedToLast.images = savedSettings.about.designedToLast.settings.images;
-                        }
-                    }
-                }
-                
-                // Transparent section
-                if (savedSettings.about.transparent) {
-                    $scope.pageSettings.about.transparent.enabled = savedSettings.about.transparent.enabled;
-                    
-                    if (savedSettings.about.transparent.settings) {
-                        if (savedSettings.about.transparent.settings.title) {
-                            $scope.pageSettings.about.transparent.title = savedSettings.about.transparent.settings.title;
-                        }
-                        if (savedSettings.about.transparent.settings.description) {
-                            $scope.pageSettings.about.transparent.description = savedSettings.about.transparent.settings.description;
-                        }
-                        if (savedSettings.about.transparent.settings.colors && savedSettings.about.transparent.settings.colors.length > 0) {
-                            $scope.pageSettings.about.transparent.colors = savedSettings.about.transparent.settings.colors;
-                        }
-                    }
-                }
-                
-                // Explore section
-                if (savedSettings.about.explore) {
-                    $scope.pageSettings.about.explore.enabled = savedSettings.about.explore.enabled;
-                    
-                    if (savedSettings.about.explore.settings) {
-                        if (savedSettings.about.explore.settings.title) {
-                            $scope.pageSettings.about.explore.title = savedSettings.about.explore.settings.title;
-                        }
-                        if (savedSettings.about.explore.settings.categories && savedSettings.about.explore.settings.categories.length > 0) {
-                            $scope.pageSettings.about.explore.categories = savedSettings.about.explore.settings.categories;
-                        }
-                    }
-                }
-                
-                // Factory Images section
-                if (savedSettings.about.factoryImages) {
-                    $scope.pageSettings.about.factoryImages.enabled = savedSettings.about.factoryImages.enabled;
-                    
-                    if (savedSettings.about.factoryImages.settings) {
-                        if (savedSettings.about.factoryImages.settings.images && savedSettings.about.factoryImages.settings.images.length > 0) {
-                            $scope.pageSettings.about.factoryImages.images = savedSettings.about.factoryImages.settings.images;
-                        }
-                    }
-                }
+                // Update Angular's reference copy of the settings
+                // This is not used for initial rendering anymore
+                // ... existing code for merging settings
             }
         })
         .catch(function(error) {
@@ -198,6 +110,12 @@ app.controller('HeaderController', ['$scope', '$window', '$rootScope', function(
     // Search Panel Toggle
     $scope.toggleSearch = function() {
         $rootScope.$broadcast('toggleSearch');
+    };
+    
+    // Open cart panel
+    $scope.openCartPanel = function() {
+        // Broadcast event to open cart panel
+        $rootScope.$broadcast('openCartPanel');
     };
     
     // Sticky Header
@@ -264,20 +182,7 @@ app.controller('SearchController', ['$scope', '$rootScope', '$document', functio
         $document.off('keydown', handleEscKeypress);
     };
     
-    // Click outside search panel to close
-    angular.element(document).on('click', function(e) {
-        // If search is active and click is outside search panel and not on search icon
-        if ($scope.isSearchActive && 
-            !angular.element(e.target).closest('.search-panel').length && 
-            !angular.element(e.target).closest('.nav-icons .fa-search').length) {
-            
-            $scope.$apply(function() {
-                $scope.closeSearch();
-            });
-        }
-    });
-    
-    // Popular categories in search
+    // Popular categories for search page
     $scope.popularCategories = [
         {
             name: "Women's Sweaters",
@@ -308,12 +213,6 @@ app.controller('SearchController', ['$scope', '$rootScope', '$document', functio
     
     $scope.unhover = function(item) {
         item.isHovered = false;
-    };
-    
-    // Perform search
-    $scope.performSearch = function() {
-        // Search logic would go here
-        console.log('Searching for:', $scope.searchQuery);
     };
 }]);
 
