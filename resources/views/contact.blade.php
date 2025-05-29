@@ -94,13 +94,6 @@
                 </nav>
                 
                 <div class="nav-icons">
-                    @auth
-                        @if(Auth::user()->role === 'admin')
-                            <a href="/admin" class="nav-icon admin-icon-link" title="Admin Dashboard">
-                                <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Admin" class="admin-nav-icon">
-                            </a>
-                        @endif
-                    @endauth
                     <a href="{{ route('user.messages') }}" class="nav-icon"><i class="fas fa-envelope"></i></a>
                     @include('partials.account-dropdown')
                     <a href="javascript:void(0)" class="nav-icon" ng-click="openCartPanel()"><i class="fas fa-shopping-cart"></i></a>

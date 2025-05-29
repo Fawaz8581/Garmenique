@@ -1,13 +1,24 @@
 <!-- Account Dropdown -->
 <div class="account-dropdown-wrapper">
-    <a href="javascript:void(0)" class="nav-icon account-toggle" id="accountDropdownToggle">
-        <i class="fas fa-user"></i>
+    <a href="@auth @if(Auth::user()->role === 'admin') /admin @else javascript:void(0) @endif @else javascript:void(0) @endauth" class="nav-icon account-toggle" id="accountDropdownToggle">
+        @auth
+            @if(Auth::user()->role === 'admin')
+                <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Admin" class="admin-nav-icon">
+            @else
+                <i class="fas fa-user"></i>
+            @endif
+        @else
+            <i class="fas fa-user"></i>
+        @endauth
     </a>
     <div class="account-dropdown" id="accountDropdownMenu">
         @auth
             <div class="dropdown-header">
                 <p>Hello, {{ Auth::user()->name }}</p>
             </div>
+            @if(Auth::user()->role === 'admin')
+                <a href="/admin" class="dropdown-item">Admin Dashboard</a>
+            @endif
             <a href="/account/settings" class="dropdown-item">My Account</a>
             <a href="/account/orders" class="dropdown-item">My Orders</a>
             <div class="dropdown-divider"></div>
@@ -101,6 +112,17 @@
 .dropdown-item-form button:hover {
     background-color: #f7f7f7;
 }
+
+/* Admin icon styling */
+.admin-nav-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 2px solid #14387F;
+    padding: 2px;
+    background-color: white;
+}
 </style>
 
 <script>
@@ -111,10 +133,19 @@
         
         // Toggle dropdown when clicking the account icon
         if (accountToggle && accountMenu) {
-            accountToggle.addEventListener('click', function(e) {
-                e.stopPropagation();
-                accountMenu.classList.toggle('show');
-            });
+            @auth
+                @if(Auth::user()->role !== 'admin')
+                    accountToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        accountMenu.classList.toggle('show');
+                    });
+                @endif
+            @else
+                accountToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    accountMenu.classList.toggle('show');
+                });
+            @endauth
             
             // Close dropdown when clicking elsewhere on the page
             document.addEventListener('click', function(e) {
