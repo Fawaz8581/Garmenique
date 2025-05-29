@@ -178,6 +178,11 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'show'])->name('admin.settings');
         Route::post('/users/create', [App\Http\Controllers\Admin\SettingsController::class, 'createAdminUser'])->name('admin.users.create');
         Route::delete('/users/{id}', [App\Http\Controllers\Admin\SettingsController::class, 'deleteAdminUser'])->name('admin.users.delete');
+        
+        // Customizes
+        Route::get('/customizes', function() {
+            return view('admin.customizes');
+        })->name('admin.customizes');
 
         // Test Image Upload
         Route::get('/test-image-upload', function() {

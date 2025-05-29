@@ -60,6 +60,10 @@
                 <span>Settings</span>
             </li>
             <li class="menu-item">
+                <i class="fas fa-paint-brush"></i>
+                <span>Customizes</span>
+            </li>
+            <li class="menu-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </li>
@@ -269,6 +273,9 @@
                         break;
                     case 'Settings':
                         window.location.href = '/admin/settings';
+                        break;
+                    case 'Customizes':
+                        window.location.href = '/admin/customizes';
                         break;
                     case 'Logout':
                         // Create a logout form and submit it
