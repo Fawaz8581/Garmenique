@@ -302,18 +302,23 @@
                             
                             <!-- Product Meta Info -->
                             <div class="product-meta mb-4">
+                                @php
+                                $productFeatures = \App\Models\PageSetting::getSectionSettings('products_detailed', 'products_detailed.features');
+                                $featureItems = $productFeatures && $productFeatures->settings && isset($productFeatures->settings['items']) ? 
+                                    $productFeatures->settings['items'] : 
+                                    [
+                                        ['title' => 'Free shipping on orders over IDR 1.500.000', 'iconUrl' => 'https://cdn-icons-png.flaticon.com/512/2830/2830312.png'],
+                                        ['title' => '30-day easy returns', 'iconUrl' => 'https://cdn-icons-png.flaticon.com/512/1554/1554401.png'],
+                                        ['title' => '2-year warranty', 'iconUrl' => 'https://cdn-icons-png.flaticon.com/512/2910/2910791.png']
+                                    ];
+                                @endphp
+                                
+                                @foreach($featureItems as $feature)
                                 <div class="meta-item">
-                                    <i class="fas fa-truck"></i>
-                                    <span>Free shipping on orders over IDR 1.500.000</span>
+                                    <img src="{{ $feature['iconUrl'] }}" alt="{{ $feature['title'] }}" style="width: 18px; height: 18px; margin-right: 8px;">
+                                    <span>{{ $feature['title'] }}</span>
                                 </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-undo"></i>
-                                    <span>30-day easy returns</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <span>2-year warranty</span>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>

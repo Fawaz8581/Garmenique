@@ -341,6 +341,40 @@ class PageSettingController extends Controller
                     
                     // Skip the main foreach loop's PageSetting::updateOrCreate for 'about'
                     continue;
+                } elseif ($sectionName === 'products_detailed' && isset($sectionData)) {
+                    // Handle products_detailed settings which have a nested structure
+                    $processedSettings = [];
+                    
+                    \Log::debug('Processing products_detailed settings', ['data' => $sectionData]);
+                    
+                    // Process products_detailed features section
+                    if (isset($sectionData['features'])) {
+                        \Log::debug('Processing products_detailed features', ['features' => $sectionData['features']]);
+                        
+                        // Make sure we have the correct structure for the settings
+                        $featureSettings = isset($sectionData['features']['settings']) ? $sectionData['features']['settings'] : [];
+                        
+                        // If items is not set in settings but directly in features, move it to settings
+                        if (!isset($featureSettings['items']) && isset($sectionData['features']['items'])) {
+                            $featureSettings['items'] = $sectionData['features']['items'];
+                        }
+                        
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'products_detailed.features'
+                            ],
+                            [
+                                'settings' => $featureSettings,
+                                'is_enabled' => $sectionData['features']['enabled'] ?? true
+                            ]
+                        );
+                        
+                        \Log::debug('Saved products_detailed features', ['settings' => $featureSettings]);
+                    }
+                    
+                    // Skip the main foreach loop's PageSetting::updateOrCreate for 'products_detailed'
+                    continue;
                 } else {
                     $processedSettings = $sectionData['settings'] ?? null;
                 }
@@ -411,6 +445,27 @@ class PageSettingController extends Controller
                     'enabled' => $setting->is_enabled,
                     'settings' => $setting->settings
                 ];
+            }
+            // Handle nested products_detailed settings
+            else if (strpos($setting->section_name, 'products_detailed.') === 0) {
+                $productsDetailedSection = str_replace('products_detailed.', '', $setting->section_name);
+                \Log::debug('Found products_detailed setting', [
+                    'section' => $productsDetailedSection, 
+                    'enabled' => $setting->is_enabled,
+                    'settings' => $setting->settings
+                ]);
+                
+                if (!isset($formattedSettings['products_detailed'])) {
+                    $formattedSettings['products_detailed'] = [];
+                }
+                $formattedSettings['products_detailed'][$productsDetailedSection] = [
+                    'enabled' => $setting->is_enabled,
+                    'settings' => $setting->settings
+                ];
+                
+                \Log::debug('Formatted products_detailed settings', [
+                    'formatted' => $formattedSettings['products_detailed']
+                ]);
             }
             else {
                 $formattedSettings[$setting->section_name] = [

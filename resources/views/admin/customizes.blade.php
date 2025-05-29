@@ -515,6 +515,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ $page == 'contact' ? 'active' : '' }}" href="{{ route('admin.customizes', 'contact') }}">Contact</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $page == 'products_detailed' ? 'active' : '' }}" href="{{ route('admin.customizes', 'products_detailed') }}">Products Detailed</a>
+                </li>
             </ul>
         </div>
         
@@ -929,6 +932,52 @@
                             </div>
                             <button class="btn btn-sm btn-outline-primary" ng-click="addSocialLink()">
                                 <i class="fas fa-plus"></i> Add Social Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Detailed Controls -->
+                <div ng-if="currentPage === 'products_detailed'">
+                    <!-- Product Features Section Controls -->
+                    <div class="control-card">
+                        <h3>Product Features</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="productFeaturesToggle" ng-model="site.products_detailed.features.enabled">
+                            <label class="form-check-label" for="productFeaturesToggle">Show Product Features Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Features</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Icon URL</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="feature in site.products_detailed.features.items">
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" ng-model="feature.title">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control form-control-sm" ng-model="feature.iconUrl">
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" ng-click="removeProductFeature($index)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" ng-click="addProductFeature()">
+                                <i class="fas fa-plus"></i> Add Feature
                             </button>
                         </div>
                     </div>
@@ -1397,7 +1446,7 @@
                             <h2 style="font-size: 1.5rem; margin-bottom: 20px;">{% site.blog.social.title %}</h2>
                             
                             <div style="display: flex; justify-content: center; gap: 15px;">
-                                <a ng-repeat="link in site.blog.social.links" ng-href="{% link.url.startsWith('http') ? link.url : 'https://' + link.url %}" target="_blank" style="width: 40px; height: 40px; border-radius: 50%; background-color: #333; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;">
+                                <a ng-repeat="link in site.blog.social.links" ng-href="{% link.url.startsWith('http') ? link.url : 'https://' + link.url %}" class="social-link" target="_blank">
                                     <i class="fab" ng-class="'fa-' + link.platform"></i>
                                 </a>
                             </div>
@@ -1405,7 +1454,7 @@
                     </div>
                     
                     <!-- About Preview -->
-                    <div ng-if="currentPage === 'about'">
+                    <div ng-if="currentPage === 'about'" class="about-preview preview-container">
                         <!-- About Hero Section -->
                         <div ng-if="site.about.hero.enabled" style="background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('{% site.about.hero.backgroundImage %}'); background-size: cover; background-position: center; padding: 60px 15px; text-align: center;">
                             <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase;">{% site.about.hero.title %}</h1>
@@ -1483,6 +1532,23 @@
                             </div>
                         </div>
                         
+                    </div>
+                    
+                    <!-- Products Detailed Preview -->
+                    <div ng-if="currentPage === 'products_detailed'" class="products-detailed-preview preview-container">
+                        <!-- Product Features Preview -->
+                        <div ng-if="site.products_detailed.features.enabled" style="background-color: #f8f9fa; padding: 40px 15px; text-align: center;">
+                            <div style="max-width: 800px; margin: 0 auto;">
+                                <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+                                    <div ng-repeat="feature in site.products_detailed.features.items track by $index" style="flex: 1; min-width: 150px; max-width: 200px; text-align: center; margin-bottom: 20px;">
+                                        <div style="width: 80px; height: 80px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; background-color: #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                                            <img ng-src="{% feature.iconUrl %}" alt="{% feature.title %}" style="width: 40px; height: 40px; object-fit: contain;">
+                                        </div>
+                                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 15px; color: #333;">{% feature.title %}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Contact Preview -->
@@ -1780,6 +1846,26 @@
                         ]
                     }
                 },
+                // Products Detailed page customization settings
+                products_detailed: {
+                    features: {
+                        enabled: true,
+                        items: [
+                            { 
+                                title: 'Free shipping on orders over IDR 1.500.000', 
+                                iconUrl: 'https://cdn-icons-png.flaticon.com/512/2830/2830312.png' 
+                            },
+                            { 
+                                title: '30-day easy returns', 
+                                iconUrl: 'https://cdn-icons-png.flaticon.com/512/1554/1554401.png' 
+                            },
+                            { 
+                                title: '2-year warranty', 
+                                iconUrl: 'https://cdn-icons-png.flaticon.com/512/2910/2910791.png' 
+                            }
+                        ]
+                    }
+                },
                 contact: {
                     hero: {
                         enabled: true,
@@ -1818,6 +1904,7 @@
                         if (response.data.success && response.data.settings) {
                             // Merge saved settings with defaults
                             var savedSettings = response.data.settings;
+                            console.log("Loaded settings for page:", $scope.currentPage, savedSettings);
                             
                             // Update each section if it exists in saved settings
                             if ($scope.currentPage === 'homepage') {
@@ -2100,6 +2187,19 @@
                                     }
                                 }
                             }
+                            else if ($scope.currentPage === 'products_detailed') {
+                                console.log("Processing products_detailed settings", savedSettings);
+                                if (savedSettings.products_detailed && savedSettings.products_detailed.features) {
+                                    console.log("Found features section:", savedSettings.products_detailed.features);
+                                    $scope.site.products_detailed.features.enabled = savedSettings.products_detailed.features.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.products_detailed.features.settings && savedSettings.products_detailed.features.settings.items && savedSettings.products_detailed.features.settings.items.length > 0) {
+                                        console.log("Applying feature items:", savedSettings.products_detailed.features.settings.items);
+                                        $scope.site.products_detailed.features.items = savedSettings.products_detailed.features.settings.items;
+                                    }
+                                }
+                            }
                         }
                     })
                     .catch(function(error) {
@@ -2379,6 +2479,24 @@
                         }
                     };
                 }
+                else if ($scope.currentPage === 'products_detailed') {
+                    console.log("Saving products_detailed settings");
+                    console.log("Current features items:", $scope.site.products_detailed.features.items);
+                    
+                    settingsToSave = {
+                        products_detailed: {
+                            features: {
+                                enabled: $scope.site.products_detailed.features.enabled,
+                                settings: {
+                                    items: $scope.site.products_detailed.features.items
+                                },
+                                items: $scope.site.products_detailed.features.items // Also include directly for compatibility
+                            }
+                        }
+                    };
+                    
+                    console.log("Settings to save:", settingsToSave);
+                }
                 
                 // Send to server
                 $http.post('/admin/api/page-settings', {
@@ -2386,6 +2504,7 @@
                     settings: settingsToSave
                 })
                 .then(function(response) {
+                    console.log("Save response:", response.data);
                     if (response.data.success) {
                         alert('Your changes have been saved successfully!');
                     } else {
@@ -2582,6 +2701,15 @@
                                 }
                             }
                         }
+                    } : $scope.currentPage === 'products_detailed' ? {
+                        products_detailed: {
+                            features: {
+                                enabled: $scope.site.products_detailed.features.enabled,
+                                settings: {
+                                    items: $scope.site.products_detailed.features.items
+                                }
+                            }
+                        }
                     } : {}
                 })
                 .then(function(response) {
@@ -2695,6 +2823,42 @@
             // Remove Tes image
             $scope.removeTesImage = function(index) {
                 $scope.site.about.tes.images.splice(index, 1);
+            };
+            
+            // Add product feature
+            $scope.addProductFeature = function() {
+                $scope.site.products_detailed.features.items.push({
+                    title: 'New Feature',
+                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3601/3601569.png'
+                });
+            };
+            
+            // Remove product feature
+            $scope.removeProductFeature = function(index) {
+                $scope.site.products_detailed.features.items.splice(index, 1);
+            };
+            
+            // Debug Products Detailed
+            $scope.debugProductsDetailed = function() {
+                console.log("Current Products Detailed State:", $scope.site.products_detailed);
+                
+                // Try to force update the view
+                if ($scope.site.products_detailed && $scope.site.products_detailed.features) {
+                    // Make a deep copy of the items array to force Angular to update
+                    var tempItems = angular.copy($scope.site.products_detailed.features.items);
+                    $scope.site.products_detailed.features.items = [];
+                    
+                    // Use timeout to ensure digest cycle completes
+                    setTimeout(function() {
+                        $scope.$apply(function() {
+                            $scope.site.products_detailed.features.items = tempItems;
+                        });
+                    }, 100);
+                    
+                    alert("Debug info in console. View refresh attempted.");
+                } else {
+                    alert("Products Detailed section not properly initialized!");
+                }
             };
         });
     </script>

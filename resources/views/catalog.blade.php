@@ -662,8 +662,6 @@
                         <!-- Reset Filters Button -->
                         <div class="mb-4 mt-4 text-center">
                             <button id="resetFilters" class="btn btn-outline-secondary btn-sm">Reset All Filters</button>
-                            
-                            <button id="debugSizes" class="btn btn-outline-dark btn-sm mt-2" style="font-size: 0.75rem;">Debug Sizes</button>
                         </div>
                     </div>
                             </div>
@@ -1014,39 +1012,6 @@
                 
                 // Initialize with all products showing
                 resetFilters();
-                
-                // Debug button for sizes
-                const debugButton = document.getElementById('debugSizes');
-                if (debugButton) {
-                    debugButton.addEventListener('click', function() {
-                        console.clear();
-                        console.log('=== DEBUG SIZE FILTERING ===');
-                        
-                        const products = document.querySelectorAll('.product-card');
-                        products.forEach(product => {
-                            const title = product.querySelector('.product-title')?.textContent.trim();
-                            const sizesData = product.dataset.sizes;
-                            const sizes = JSON.parse(sizesData || '{}');
-                            
-                            console.log(`Product: ${title}`);
-                            console.log('Raw size data:', sizesData);
-                            console.log('Parsed sizes:', sizes);
-                            console.log('Size values:', Object.values(sizes));
-                            console.log('-------------------');
-                        });
-                        
-                        const sizeButtons = document.querySelectorAll('.size-btn');
-                        console.log('Available size buttons:');
-                        sizeButtons.forEach(btn => {
-                            console.log({
-                                name: btn.textContent.trim(),
-                                id: parseInt(btn.dataset.sizeId),
-                                type: btn.dataset.sizeType,
-                                isActive: btn.classList.contains('active')
-                            });
-                        });
-                    });
-                }
             });
 
             function toggleSize(button) {
