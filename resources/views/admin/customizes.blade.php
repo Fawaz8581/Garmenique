@@ -1176,6 +1176,94 @@
                     </div>
                 </div>
                 
+                <!-- Contact Controls -->
+                <div ng-if="currentPage === 'contact'">
+                    <!-- Contact Hero Section Controls -->
+                    <div class="control-card">
+                        <h3>Contact Hero Section</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="contactHeroToggle" ng-model="site.contact.hero.enabled">
+                            <label class="form-check-label" for="contactHeroToggle">Show Contact Hero Section</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactHeroTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="contactHeroTitle" ng-model="site.contact.hero.title">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactHeroSubtitle" class="form-label">Subtitle</label>
+                            <input type="text" class="form-control" id="contactHeroSubtitle" ng-model="site.contact.hero.subtitle">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactHeroDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="contactHeroDescription" rows="3" ng-model="site.contact.hero.description"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Form Controls -->
+                    <div class="control-card">
+                        <h3>Contact Form</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="contactFormToggle" ng-model="site.contact.form.enabled">
+                            <label class="form-check-label" for="contactFormToggle">Show Contact Form</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactFormMessagePlaceholder" class="form-label">Message Placeholder</label>
+                            <textarea class="form-control" id="contactFormMessagePlaceholder" rows="3" ng-model="site.contact.form.messagePlaceholder"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="contactFormButtonText" class="form-label">Button Text</label>
+                            <input type="text" class="form-control" id="contactFormButtonText" ng-model="site.contact.form.buttonText">
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Info Section Controls -->
+                    <div class="control-card">
+                        <h3>Contact Information</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="contactInfoToggle" ng-model="site.contact.info.enabled">
+                            <label class="form-check-label" for="contactInfoToggle">Show Contact Information</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Visit Us</label>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" placeholder="Address Line 1" ng-model="site.contact.info.address.line1">
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" placeholder="Address Line 2" ng-model="site.contact.info.address.line2">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Contact Details</label>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" placeholder="Email" ng-model="site.contact.info.email">
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" placeholder="Phone" ng-model="site.contact.info.phone">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Opening Hours</label>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" placeholder="Weekdays" ng-model="site.contact.info.hours.weekdays">
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" class="form-control" placeholder="Weekends" ng-model="site.contact.info.hours.weekends">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Save Changes Button -->
                 <div class="text-end mb-4">
                     <button class="btn btn-danger me-2" ng-click="confirmReset()">
@@ -1395,6 +1483,60 @@
                             </div>
                         </div>
                         
+                    </div>
+                    
+                    <!-- Contact Preview -->
+                    <div ng-if="currentPage === 'contact'">
+                        <!-- Contact Hero Section -->
+                        <div ng-if="site.contact.hero.enabled" style="padding: 60px 15px; text-align: center; background-color: #f8f8f8;">
+                            <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #666; font-weight: 500; display: block; margin-bottom: 10px;">{% site.contact.hero.title %}</span>
+                            <h1 style="font-size: 42px; font-weight: 600; margin: 15px 0; line-height: 1.2; color: #222;">{% site.contact.hero.subtitle %}</h1>
+                            <p style="font-size: 16px; color: #555; max-width: 500px; margin: 0 auto;">{% site.contact.hero.description %}</p>
+                        </div>
+
+                        <!-- Contact Form -->
+                        <div ng-if="site.contact.form.enabled" style="padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                                <div style="flex: 1;">
+                                    <input type="text" placeholder="First name*" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <input type="text" placeholder="Last name*" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <input type="email" placeholder="Email address*" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <textarea placeholder="{% site.contact.form.messagePlaceholder %}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; min-height: 100px;"></textarea>
+                            </div>
+                            <div style="text-align: center;">
+                                <button style="background-color: #000; color: #fff; border: none; padding: 12px 30px; font-size: 0.9rem; text-transform: uppercase; cursor: pointer;">{% site.contact.form.buttonText %}</button>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info Section -->
+                        <div ng-if="site.contact.info.enabled" style="padding: 30px 15px; background-color: #f9f9f9;">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                <div style="text-align: center;">
+                                    <h3 style="font-size: 1.1rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">VISIT US</h3>
+                                    <p style="font-size: 0.9rem; color: #555; margin-bottom: 5px;">{% site.contact.info.address.line1 %}</p>
+                                    <p style="font-size: 0.9rem; color: #555;">{% site.contact.info.address.line2 %}</p>
+                                </div>
+                                
+                                <div style="text-align: center;">
+                                    <h3 style="font-size: 1.1rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">CONTACT</h3>
+                                    <p style="font-size: 0.9rem; color: #555; margin-bottom: 5px;">{% site.contact.info.email %}</p>
+                                    <p style="font-size: 0.9rem; color: #555;">{% site.contact.info.phone %}</p>
+                                </div>
+                                
+                                <div style="text-align: center;">
+                                    <h3 style="font-size: 1.1rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">OPENING HOURS</h3>
+                                    <p style="font-size: 0.9rem; color: #555; margin-bottom: 5px;">{% site.contact.info.hours.weekdays %}</p>
+                                    <p style="font-size: 0.9rem; color: #555;">{% site.contact.info.hours.weekends %}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1637,6 +1779,32 @@
                             }
                         ]
                     }
+                },
+                contact: {
+                    hero: {
+                        enabled: true,
+                        title: 'CONTACT US',
+                        subtitle: 'Let\'s talk about your question',
+                        description: 'Drop us a line through the form below and we\'ll get back to you'
+                    },
+                    form: {
+                        enabled: true,
+                        messagePlaceholder: 'Your message...',
+                        buttonText: 'Send'
+                    },
+                    info: {
+                        enabled: true,
+                        address: {
+                            line1: '123 Main St',
+                            line2: 'Suite 404'
+                        },
+                        email: 'info@garmenique.com',
+                        phone: '+1 (555) 123-4567',
+                        hours: {
+                            weekdays: '9:00 AM - 5:00 PM',
+                            weekends: '10:00 AM - 3:00 PM'
+                        }
+                    }
                 }
             };
 
@@ -1869,6 +2037,65 @@
                                         }
                                         if (savedSettings.about.experts.settings.profiles && savedSettings.about.experts.settings.profiles.length > 0) {
                                             $scope.site.about.experts.profiles = savedSettings.about.experts.settings.profiles;
+                                        }
+                                    }
+                                }
+                            }
+                            // Contact page settings
+                            else if ($scope.currentPage === 'contact') {
+                                if (savedSettings.contact && savedSettings.contact.hero) {
+                                    $scope.site.contact.hero.enabled = savedSettings.contact.hero.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.contact.hero.settings) {
+                                        if (savedSettings.contact.hero.settings.title) {
+                                            $scope.site.contact.hero.title = savedSettings.contact.hero.settings.title;
+                                        }
+                                        if (savedSettings.contact.hero.settings.subtitle) {
+                                            $scope.site.contact.hero.subtitle = savedSettings.contact.hero.settings.subtitle;
+                                        }
+                                        if (savedSettings.contact.hero.settings.description) {
+                                            $scope.site.contact.hero.description = savedSettings.contact.hero.settings.description;
+                                        }
+                                    }
+                                }
+                                
+                                if (savedSettings.contact && savedSettings.contact.form) {
+                                    $scope.site.contact.form.enabled = savedSettings.contact.form.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.contact.form.settings) {
+                                        if (savedSettings.contact.form.settings.messagePlaceholder) {
+                                            $scope.site.contact.form.messagePlaceholder = savedSettings.contact.form.settings.messagePlaceholder;
+                                        }
+                                        if (savedSettings.contact.form.settings.buttonText) {
+                                            $scope.site.contact.form.buttonText = savedSettings.contact.form.settings.buttonText;
+                                        }
+                                    }
+                                }
+                                
+                                if (savedSettings.contact && savedSettings.contact.info) {
+                                    $scope.site.contact.info.enabled = savedSettings.contact.info.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.contact.info.settings) {
+                                        if (savedSettings.contact.info.settings.address && savedSettings.contact.info.settings.address.line1) {
+                                            $scope.site.contact.info.address.line1 = savedSettings.contact.info.settings.address.line1;
+                                        }
+                                        if (savedSettings.contact.info.settings.address && savedSettings.contact.info.settings.address.line2) {
+                                            $scope.site.contact.info.address.line2 = savedSettings.contact.info.settings.address.line2;
+                                        }
+                                        if (savedSettings.contact.info.settings.email) {
+                                            $scope.site.contact.info.email = savedSettings.contact.info.settings.email;
+                                        }
+                                        if (savedSettings.contact.info.settings.phone) {
+                                            $scope.site.contact.info.phone = savedSettings.contact.info.settings.phone;
+                                        }
+                                        if (savedSettings.contact.info.settings.hours && savedSettings.contact.info.settings.hours.weekdays) {
+                                            $scope.site.contact.info.hours.weekdays = savedSettings.contact.info.settings.hours.weekdays;
+                                        }
+                                        if (savedSettings.contact.info.settings.hours && savedSettings.contact.info.settings.hours.weekends) {
+                                            $scope.site.contact.info.hours.weekends = savedSettings.contact.info.settings.hours.weekends;
                                         }
                                     }
                                 }
@@ -2116,6 +2343,42 @@
                         }
                     };
                 }
+                else if ($scope.currentPage === 'contact') {
+                    settingsToSave = {
+                        contact: {
+                            hero: {
+                                enabled: $scope.site.contact.hero.enabled,
+                                settings: {
+                                    title: $scope.site.contact.hero.title,
+                                    subtitle: $scope.site.contact.hero.subtitle,
+                                    description: $scope.site.contact.hero.description
+                                }
+                            },
+                            form: {
+                                enabled: $scope.site.contact.form.enabled,
+                                settings: {
+                                    messagePlaceholder: $scope.site.contact.form.messagePlaceholder,
+                                    buttonText: $scope.site.contact.form.buttonText
+                                }
+                            },
+                            info: {
+                                enabled: $scope.site.contact.info.enabled,
+                                settings: {
+                                    address: {
+                                        line1: $scope.site.contact.info.address.line1,
+                                        line2: $scope.site.contact.info.address.line2
+                                    },
+                                    email: $scope.site.contact.info.email,
+                                    phone: $scope.site.contact.info.phone,
+                                    hours: {
+                                        weekdays: $scope.site.contact.info.hours.weekdays,
+                                        weekends: $scope.site.contact.info.hours.weekends
+                                    }
+                                }
+                            }
+                        }
+                    };
+                }
                 
                 // Send to server
                 $http.post('/admin/api/page-settings', {
@@ -2283,6 +2546,39 @@
                                     title: $scope.site.about.tes.title,
                                     description: $scope.site.about.tes.description,
                                     images: $scope.site.about.tes.images
+                                }
+                            }
+                        }
+                    } : $scope.currentPage === 'contact' ? {
+                        contact: {
+                            hero: {
+                                enabled: $scope.site.contact.hero.enabled,
+                                settings: {
+                                    title: $scope.site.contact.hero.title,
+                                    subtitle: $scope.site.contact.hero.subtitle,
+                                    description: $scope.site.contact.hero.description
+                                }
+                            },
+                            form: {
+                                enabled: $scope.site.contact.form.enabled,
+                                settings: {
+                                    messagePlaceholder: $scope.site.contact.form.messagePlaceholder,
+                                    buttonText: $scope.site.contact.form.buttonText
+                                }
+                            },
+                            info: {
+                                enabled: $scope.site.contact.info.enabled,
+                                settings: {
+                                    address: {
+                                        line1: $scope.site.contact.info.address.line1,
+                                        line2: $scope.site.contact.info.address.line2
+                                    },
+                                    email: $scope.site.contact.info.email,
+                                    phone: $scope.site.contact.info.phone,
+                                    hours: {
+                                        weekdays: $scope.site.contact.info.hours.weekdays,
+                                        weekends: $scope.site.contact.info.hours.weekends
+                                    }
                                 }
                             }
                         }

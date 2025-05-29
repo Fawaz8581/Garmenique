@@ -151,81 +151,90 @@
             </div>
         </div>
         
-            <!-- Contact Section -->
-            <section class="contact-section">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-10 col-md-12">
-                            <div class="contact-content text-center">
-                                <div class="contact-header">
-                                    <span class="section-subtitle">CONTACT US</span>
-                                    <h1 class="contact-title">Let's talk about<br>your question</h1>
-                                    <p class="contact-description">Drop us a line through the form below and we'll get back to you</p>
-                                </div>
-                                
-                                @if (session('status'))
-                                <div class="alert alert-success">
-                                    {{ session('status') }}
-                                </div>
-                                @endif
-                                
-                                <div class="contact-form-container">
-                                    <form name="contactForm" class="contact-form" ng-controller="ContactFormController" ng-submit="submitForm()" novalidate>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <input type="text" id="firstName" name="firstName" placeholder="First name*" ng-model="formData.firstName" required>
-                                                <div ng-show="contactForm.firstName.$touched && contactForm.firstName.$invalid" class="error-message">First name is required</div>
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" id="lastName" name="lastName" placeholder="Last name*" ng-model="formData.lastName" required>
-                                                <div ng-show="contactForm.lastName.$touched && contactForm.lastName.$invalid" class="error-message">Last name is required</div>
-                                            </div>
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10 col-md-12">
+                        <div class="contact-content text-center">
+                            <div class="contact-header">
+                                <span class="section-subtitle">{{ $contactSettings['hero']['title'] }}</span>
+                                <h1 class="contact-title">{{ $contactSettings['hero']['subtitle'] }}</h1>
+                                <p class="contact-description">{{ $contactSettings['hero']['description'] }}</p>
+                            </div>
+                            
+                            @if (session('status'))
+                            <div class="alert alert-success">
+                                {{ session('status') }}
+                            </div>
+                            @endif
+                            
+                            <div class="contact-form-container">
+                                <form name="contactForm" class="contact-form" action="{{ route('contact.submit') }}" method="POST">
+                                    @csrf
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <input type="text" id="firstName" name="firstName" placeholder="First name*" required>
+                                            @error('firstName')
+                                                <div class="error-message">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                        <div class="form-row">
-                                            <div class="form-group full-width">
-                                                <input type="email" id="email" name="email" placeholder="Email address*" ng-model="formData.email" required>
-                                                <div ng-show="contactForm.email.$touched && contactForm.email.$invalid" class="error-message">Valid email is required</div>
-                                            </div>
+                                        <div class="form-group">
+                                            <input type="text" id="lastName" name="lastName" placeholder="Last name*" required>
+                                            @error('lastName')
+                                                <div class="error-message">{{ $message }}</div>
+                                            @enderror
                                         </div>
+                                    </div>
+                                    <div class="form-row">
                                         <div class="form-group full-width">
-                                            <textarea id="message" name="message" placeholder="Tell us what you're hoping to achieve with Garmenique. We're here to help bring your fashion needs to life!" ng-model="formData.message" rows="5" required></textarea>
-                                            <div ng-show="contactForm.message.$touched && contactForm.message.$invalid" class="error-message">Message is required</div>
+                                            <input type="email" id="email" name="email" placeholder="Email address*" required>
+                                            @error('email')
+                                                <div class="error-message">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-submit" ng-disabled="contactForm.$invalid">SEND MESSAGE</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <textarea id="message" name="message" placeholder="{{ $contactSettings['form']['messagePlaceholder'] }}" rows="5" required></textarea>
+                                        @error('message')
+                                            <div class="error-message">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-submit">{{ $contactSettings['form']['buttonText'] }}</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
         
-        <!-- Additional Information Section -->
-        <section class="contact-info-section">
+        <!-- Contact Info Bar -->
+        <div class="contact-info-bar">
             <div class="container">
                 <div class="info-grid">
-                    <div class="info-item">
-                        <h3>Visit Us</h3>
-                        <p>Jl. Bogor Raya No. 1</p>
-                        <p>Bogor, NY 16110</p>
+                    <div class="info-column">
+                        <h3>VISIT US</h3>
+                        <p>{{ $contactSettings['info']['address']['line1'] }}</p>
+                        <p>{{ $contactSettings['info']['address']['line2'] }}</p>
                     </div>
                     
-                    <div class="info-item">
-                        <h3>Contact</h3>
-                        <p>info@garmenique.com</p>
-                        <p>+62 012345678</p>
+                    <div class="info-column">
+                        <h3>CONTACT</h3>
+                        <p>{{ $contactSettings['info']['email'] }}</p>
+                        <p>{{ $contactSettings['info']['phone'] }}</p>
                     </div>
                     
-                    <div class="info-item">
-                        <h3>Opening Hours</h3>
-                        <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
-                        <p>Sat: 10:00 AM - 5:00 PM</p>
+                    <div class="info-column">
+                        <h3>OPENING HOURS</h3>
+                        <p>{{ $contactSettings['info']['hours']['weekdays'] }}</p>
+                        <p>{{ $contactSettings['info']['hours']['weekends'] }}</p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- Include Sliding Cart Partial -->
         @include('partials.sliding-cart')
@@ -248,51 +257,49 @@
                         <h4>Our Store</h4>
                         <ul class="footer-links">
                             <li><a href="#">Store Locator</a></li>
+                            <li><a href="#">Shipping & Returns</a></li>
+                            <li><a href="#">FAQ</a></li>
                             <li><a href="#">Gift Cards</a></li>
-                            <li><a href="#">Student Discount</a></li>
-                            <li><a href="#">Refer a Friend</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-col">
-                        <h4>Customer Care</h4>
+                        <h4>Customer Service</h4>
                         <ul class="footer-links">
                             <li><a href="/contact">Contact Us</a></li>
-                            <li><a href="#">Shipping & Returns</a></li>
-                            <li><a href="#">Track Order</a></li>
-                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Track Your Order</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms & Conditions</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-col">
-                        <h4>Our Social Media</h4>
-                        <div class="social-email-section">
-                            <div class="social-icons">
-                                <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-youtube"></i></a>
-                            </div>
-                            <p class="email-title">Stay in Touch</p>
-                            <form class="email-form">
-                                <input type="email" placeholder="Email Address" class="email-input" required>
-                                <button type="submit" class="email-button">
-                                    <i class="fas fa-arrow-right"></i>
-                                </button>
+                        <h4>Connect With Us</h4>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-pinterest"></i></a>
+                        </div>
+                        
+                        <div class="newsletter">
+                            <h5>Join Our Newsletter</h5>
+                            <p>Get exclusive offers and updates</p>
+                            <form class="newsletter-form">
+                                <input type="email" placeholder="Your email address" required>
+                                <button type="submit">Subscribe</button>
                             </form>
                         </div>
                     </div>
                 </div>
+                
                 <div class="footer-bottom">
-                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
+                    <p>&copy; 2025 Garmenique. All rights reserved.</p>
                 </div>
             </div>
         </footer>
-
+        
         <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/contact.js') }}"></script>
-        <script src="{{ asset('js/cart.js') }}"></script>
     </body>
 </html>

@@ -192,30 +192,6 @@ class PageSettingController extends Controller
                     );
                 }
                 
-                // Process factory images section
-                if (isset($settings['about']['factoryImages'])) {
-                    $factorySettings = null;
-                    
-                    if (isset($settings['about']['factoryImages']['settings'])) {
-                        $factorySettings = [
-                            'title' => $settings['about']['factoryImages']['settings']['title'] ?? '',
-                            'description' => $settings['about']['factoryImages']['settings']['description'] ?? '',
-                            'images' => $settings['about']['factoryImages']['settings']['images'] ?? []
-                        ];
-                    }
-                    
-                    PageSetting::updateOrCreate(
-                        [
-                            'page_name' => $page,
-                            'section_name' => 'about.factoryImages'
-                        ],
-                        [
-                            'is_enabled' => $settings['about']['factoryImages']['enabled'] ?? true,
-                            'settings' => $factorySettings
-                        ]
-                    );
-                }
-                
                 // Process designed to last section
                 if (isset($settings['about']['designedToLast'])) {
                     $designedSettings = null;
@@ -282,7 +258,112 @@ class PageSettingController extends Controller
                         ],
                         [
                             'is_enabled' => $settings['about']['explore']['enabled'] ?? true,
-                            'settings' => $exploreSettings
+                            'settings' => $exploreSettings ? json_encode($exploreSettings) : null
+                        ]
+                    );
+                }
+                
+                // Process factory images section
+                if (isset($settings['about']['factoryImages'])) {
+                    $factoryImagesSettings = null;
+                    
+                    if (isset($settings['about']['factoryImages']['settings'])) {
+                        $factoryImagesSettings = [
+                            'title' => $settings['about']['factoryImages']['settings']['title'] ?? '',
+                            'description' => $settings['about']['factoryImages']['settings']['description'] ?? '',
+                            'images' => $settings['about']['factoryImages']['settings']['images'] ?? []
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'about.factoryImages'
+                        ],
+                        [
+                            'is_enabled' => $settings['about']['factoryImages']['enabled'] ?? true,
+                            'settings' => $factoryImagesSettings ? json_encode($factoryImagesSettings) : null
+                        ]
+                    );
+                }
+            }
+            
+            // Contact page settings
+            if ($page === 'contact' && isset($settings['contact'])) {
+                // Process hero section
+                if (isset($settings['contact']['hero'])) {
+                    $heroSettings = null;
+                    
+                    if (isset($settings['contact']['hero']['settings'])) {
+                        $heroSettings = [
+                            'title' => $settings['contact']['hero']['settings']['title'] ?? '',
+                            'subtitle' => $settings['contact']['hero']['settings']['subtitle'] ?? '',
+                            'description' => $settings['contact']['hero']['settings']['description'] ?? ''
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'contact.hero'
+                        ],
+                        [
+                            'is_enabled' => $settings['contact']['hero']['enabled'] ?? true,
+                            'settings' => $heroSettings ? json_encode($heroSettings) : null
+                        ]
+                    );
+                }
+                
+                // Process form section
+                if (isset($settings['contact']['form'])) {
+                    $formSettings = null;
+                    
+                    if (isset($settings['contact']['form']['settings'])) {
+                        $formSettings = [
+                            'messagePlaceholder' => $settings['contact']['form']['settings']['messagePlaceholder'] ?? '',
+                            'buttonText' => $settings['contact']['form']['settings']['buttonText'] ?? ''
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'contact.form'
+                        ],
+                        [
+                            'is_enabled' => $settings['contact']['form']['enabled'] ?? true,
+                            'settings' => $formSettings ? json_encode($formSettings) : null
+                        ]
+                    );
+                }
+                
+                // Process info section
+                if (isset($settings['contact']['info'])) {
+                    $infoSettings = null;
+                    
+                    if (isset($settings['contact']['info']['settings'])) {
+                        $infoSettings = [
+                            'address' => [
+                                'line1' => $settings['contact']['info']['settings']['address']['line1'] ?? '',
+                                'line2' => $settings['contact']['info']['settings']['address']['line2'] ?? ''
+                            ],
+                            'email' => $settings['contact']['info']['settings']['email'] ?? '',
+                            'phone' => $settings['contact']['info']['settings']['phone'] ?? '',
+                            'hours' => [
+                                'weekdays' => $settings['contact']['info']['settings']['hours']['weekdays'] ?? '',
+                                'weekends' => $settings['contact']['info']['settings']['hours']['weekends'] ?? ''
+                            ]
+                        ];
+                    }
+                    
+                    PageSetting::updateOrCreate(
+                        [
+                            'page_name' => $page,
+                            'section_name' => 'contact.info'
+                        ],
+                        [
+                            'is_enabled' => $settings['contact']['info']['enabled'] ?? true,
+                            'settings' => $infoSettings ? json_encode($infoSettings) : null
                         ]
                     );
                 }

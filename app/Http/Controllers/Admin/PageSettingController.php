@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PageSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class PageSettingController extends Controller
 {
@@ -159,6 +160,65 @@ class PageSettingController extends Controller
                     }
                     
                     // Skip the main foreach loop's PageSetting::updateOrCreate for 'blog'
+                    continue;
+                } elseif ($sectionName === 'contact' && isset($sectionData)) {
+                    // Handle contact settings which have a nested structure
+                    $processedSettings = [];
+                    
+                    // Process contact hero section
+                    if (isset($sectionData['hero'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'contact.hero'
+                            ],
+                            [
+                                'settings' => $sectionData['hero']['settings'] ?? null,
+                                'is_enabled' => $sectionData['hero']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process contact form section
+                    if (isset($sectionData['form'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'contact.form'
+                            ],
+                            [
+                                'settings' => $sectionData['form']['settings'] ?? null,
+                                'is_enabled' => $sectionData['form']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Process contact info section
+                    if (isset($sectionData['info'])) {
+                        PageSetting::updateOrCreate(
+                            [
+                                'page_name' => $page,
+                                'section_name' => 'contact.info'
+                            ],
+                            [
+                                'settings' => $sectionData['info']['settings'] ?? [
+                                    'address' => [
+                                        'line1' => '123 Main St',
+                                        'line2' => 'Suite 404'
+                                    ],
+                                    'email' => 'info@garmenique.com',
+                                    'phone' => '+1 (555) 123-4567',
+                                    'hours' => [
+                                        'weekdays' => '9:00 AM - 5:00 PM',
+                                        'weekends' => '10:00 AM - 3:00 PM'
+                                    ]
+                                ],
+                                'is_enabled' => $sectionData['info']['enabled'] ?? true
+                            ]
+                        );
+                    }
+                    
+                    // Skip the main foreach loop's PageSetting::updateOrCreate for 'contact'
                     continue;
                 } elseif ($sectionName === 'about' && isset($sectionData)) {
                     // Handle about settings which have a nested structure
@@ -337,6 +397,17 @@ class PageSettingController extends Controller
                     $formattedSettings['about'] = [];
                 }
                 $formattedSettings['about'][$aboutSection] = [
+                    'enabled' => $setting->is_enabled,
+                    'settings' => $setting->settings
+                ];
+            }
+            // Handle nested contact settings
+            else if (strpos($setting->section_name, 'contact.') === 0) {
+                $contactSection = str_replace('contact.', '', $setting->section_name);
+                if (!isset($formattedSettings['contact'])) {
+                    $formattedSettings['contact'] = [];
+                }
+                $formattedSettings['contact'][$contactSection] = [
                     'enabled' => $setting->is_enabled,
                     'settings' => $setting->settings
                 ];

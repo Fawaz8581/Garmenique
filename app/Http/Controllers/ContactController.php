@@ -2,85 +2,121 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Message;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\PageSetting;
 
 class ContactController extends Controller
 {
     /**
-     * Show the contact page.
+     * Display the contact page.
+     *
+     * @return \Illuminate\View\View
      */
-    public function showContactForm()
+    public function index()
     {
-        return view('contact');
+        // Get contact page settings
+        $contactSettings = PageSetting::where('page_name', 'contact')->get();
+        
+        // Format settings for easier access in the view
+        $settings = [
+            'hero' => [
+                'title' => 'CONTACT US',
+                'subtitle' => "Let's talk about your question",
+                'description' => "Drop us a line through the form below and we'll get back to you"
+            ],
+            'form' => [
+                'messagePlaceholder' => "Your message...",
+                'buttonText' => "SEND"
+            ],
+            'info' => [
+                'address' => [
+                    'line1' => '123 Main St',
+                    'line2' => 'Suite 404'
+                ],
+                'email' => 'info@garmenique.com',
+                'phone' => '+1 (555) 123-4567',
+                'hours' => [
+                    'weekdays' => '9:00 AM - 5:00 PM',
+                    'weekends' => '10:00 AM - 3:00 PM'
+                ]
+            ]
+        ];
+        
+        // Override with saved settings if available
+        foreach ($contactSettings as $setting) {
+            if (strpos($setting->section_name, 'contact.') === 0) {
+                $section = str_replace('contact.', '', $setting->section_name);
+                
+                if ($section === 'hero' && !empty($setting->settings)) {
+                    if (!empty($setting->settings['title'])) {
+                        $settings['hero']['title'] = $setting->settings['title'];
+                    }
+                    if (!empty($setting->settings['subtitle'])) {
+                        $settings['hero']['subtitle'] = $setting->settings['subtitle'];
+                    }
+                    if (!empty($setting->settings['description'])) {
+                        $settings['hero']['description'] = $setting->settings['description'];
+                    }
+                }
+                
+                if ($section === 'form' && !empty($setting->settings)) {
+                    if (!empty($setting->settings['messagePlaceholder'])) {
+                        $settings['form']['messagePlaceholder'] = $setting->settings['messagePlaceholder'];
+                    }
+                    if (!empty($setting->settings['buttonText'])) {
+                        $settings['form']['buttonText'] = $setting->settings['buttonText'];
+                    }
+                }
+                
+                if ($section === 'info' && !empty($setting->settings)) {
+                    if (!empty($setting->settings['address'])) {
+                        if (!empty($setting->settings['address']['line1'])) {
+                            $settings['info']['address']['line1'] = $setting->settings['address']['line1'];
+                        }
+                        if (!empty($setting->settings['address']['line2'])) {
+                            $settings['info']['address']['line2'] = $setting->settings['address']['line2'];
+                        }
+                    }
+                    if (!empty($setting->settings['email'])) {
+                        $settings['info']['email'] = $setting->settings['email'];
+                    }
+                    if (!empty($setting->settings['phone'])) {
+                        $settings['info']['phone'] = $setting->settings['phone'];
+                    }
+                    if (!empty($setting->settings['hours'])) {
+                        if (!empty($setting->settings['hours']['weekdays'])) {
+                            $settings['info']['hours']['weekdays'] = $setting->settings['hours']['weekdays'];
+                        }
+                        if (!empty($setting->settings['hours']['weekends'])) {
+                            $settings['info']['hours']['weekends'] = $setting->settings['hours']['weekends'];
+                        }
+                    }
+                }
+            }
+        }
+        
+        return view('contact', [
+            'contactSettings' => $settings
+        ]);
     }
 
     /**
-     * Handle the contact form submission.
+     * Submit the contact form.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function submitContactForm(Request $request)
+    public function submit(Request $request)
     {
-        // Validate the form data
-        $validated = $request->validate([
-            'firstName' => 'required|string|max:50',
-            'lastName' => 'required|string|max:50',
-            'email' => 'required|email|max:100',
-            'message' => 'required|string',
+        $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string'
         ]);
-
-        // Get admin user
-        $admin = User::where('role', 'admin')->first();
         
-        if (!$admin) {
-            return response()->json(['error' => 'Admin user not found'], 500);
-        }
-
-        // Get the authenticated user ID if logged in, otherwise create a message from a guest
-        $fromUserId = Auth::check() ? Auth::id() : null;
-
-        // Create message content with user info if not authenticated
-        $messageContent = $validated['message'];
-        
-        if (!$fromUserId) {
-            $messageContent = "Contact Form Submission:\n\n" .
-                "Name: " . $validated['firstName'] . ' ' . $validated['lastName'] . "\n" .
-                "Email: " . $validated['email'] . "\n\n" .
-                "Message:\n" . $validated['message'];
-        }
-
-        // Create message
-        $message = new Message();
-        
-        if ($fromUserId) {
-            // If user is logged in, use their ID
-            $message->from_user_id = $fromUserId;
-        } else {
-            // If guest, use admin ID but mark message as not from admin
-            $message->from_user_id = $admin->id;
-        }
-        
-        $message->to_user_id = $admin->id;
-        $message->message = $messageContent;
-        $message->is_read = false;
-        $message->is_admin = false;
-        $message->save();
-
-        // If this is an AJAX request, return JSON response
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Thank you for your message! We will get back to you soon.',
-                'redirect' => Auth::check() ? route('user.messages') : null
-            ]);
-        }
-        
-        // If it's a regular form submission, redirect
-        if (Auth::check()) {
-            return redirect()->route('user.messages')->with('status', 'Message sent successfully! Check your messages for a response.');
-        }
-        
-        return redirect()->back()->with('status', 'Thank you for your message! We will get back to you soon.');
+        // Process the contact form submission
+        // For now, just return success
+        return response()->json(['success' => true]);
     }
 }

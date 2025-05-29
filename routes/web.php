@@ -79,8 +79,8 @@ Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('/contact', [App\Http\Controllers\ContactController::class, 'showContactForm']);
-Route::post('/contact/submit', [App\Http\Controllers\ContactController::class, 'submitContactForm']);
+Route::get('/contact', [App\Http\Controllers\ContactController::class, 'index'])->name('contact');
+Route::post('/contact/submit', [App\Http\Controllers\ContactController::class, 'submit'])->name('contact.submit');
 
 Route::get('/catalog', [\App\Http\Controllers\CatalogController::class, 'index']);
 
