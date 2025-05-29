@@ -15,9 +15,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 
-Route::get('/', function () {
-    return view('landing_page');
-});
+// Update to use the controller
+Route::get('/', [App\Http\Controllers\LandingPageController::class, 'index']);
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -180,9 +179,9 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
         Route::delete('/users/{id}', [App\Http\Controllers\Admin\SettingsController::class, 'deleteAdminUser'])->name('admin.users.delete');
         
         // Customizes
-        Route::get('/customizes', function() {
-            return view('admin.customizes');
-        })->name('admin.customizes');
+        Route::get('/customizes/{page?}', [App\Http\Controllers\Admin\PageSettingController::class, 'index'])->name('admin.customizes');
+        Route::post('/api/page-settings', [App\Http\Controllers\PageSettingController::class, 'saveSettings'])->name('admin.page-settings.save');
+        Route::get('/api/page-settings', [App\Http\Controllers\PageSettingController::class, 'getSettings'])->name('admin.page-settings.get');
 
         // Test Image Upload
         Route::get('/test-image-upload', function() {

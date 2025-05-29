@@ -134,49 +134,52 @@
         </div>
         
         <!-- Hero Section -->
-        <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1490725263030-1f0521cec8ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');">
+        <section class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ $pageSettings['hero']['backgroundImage'] }}');">
             <div class="container">
                 <div class="hero-content">
-                    <h1 class="hero-title">GARMENIQUE</h1>
-                    <p class="hero-description">Elegance in every stitch. Premium clothing crafted for those who appreciate quality and style.</p>
-                    <a href="/catalog" class="btn">SHOP NOW</a>
+                    <h1 class="hero-title">{{ $pageSettings['hero']['title'] }}</h1>
+                    <p class="hero-description">{{ $pageSettings['hero']['subtitle'] }}</p>
+                    <a href="{{ $pageSettings['hero']['buttonLink'] }}" class="btn">{{ $pageSettings['hero']['buttonText'] }}</a>
                 </div>
             </div>
         </section>
 
         <!-- Category Section -->
-        <section class="category-section" ng-controller="CategoryController">
+        <section class="category-section">
             <div class="container">
-                <h2 class="section-title">Shop by Category</h2>
+                <h2 class="section-title">{{ $pageSettings['categories']['title'] }}</h2>
                 <div class="category-grid">
-                    <div class="category-item" ng-repeat="category in categories" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
-                        <img ng-src="@{{ category.imageUrl }}" alt="@{{ category.name }}" class="category-img">
-                        <h3 class="category-name">@{{ category.name }}</h3>
+                    @foreach($pageSettings['categories']['items'] as $category)
+                    <div class="category-item">
+                        <img src="{{ $category['image'] }}" alt="{{ $category['name'] }}" class="category-img">
+                        <h3 class="category-name">{{ $category['name'] }}</h3>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </section>
 
         <!-- Featured Section -->
-        <section class="featured-section" ng-controller="FeaturedController">
+        <section class="featured-section">
             <div class="container">
                 <div class="featured-grid">
-                    <div class="featured-item" ng-repeat="feature in featuredItems" ng-mouseenter="hover(feature)" ng-mouseleave="unhover(feature)" ng-class="{'hovered': feature.isHovered}">
-                        <img ng-src="@{{ feature.imageUrl }}" alt="@{{ feature.title }}" class="featured-img">
+                    @foreach($pageSettings['featured']['items'] as $item)
+                    <div class="featured-item" style="background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)), url('{{ $item['image'] }}');">
                         <div class="featured-content">
-                            <h3 class="featured-title">@{{ feature.title }}</h3>
-                            <a href="@{{ feature.link }}" class="btn">SHOP NOW</a>
+                            <h3 class="featured-title">{{ $item['title'] }}</h3>
+                            <a href="{{ $item['link'] }}" class="btn">SHOP NOW</a>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </section>
 
         <!-- Mission Section -->
-        <section class="mission-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1553413077-190dd305871c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=70');">
+        <section class="mission-section" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ $pageSettings['mission']['backgroundImage'] }}');">
             <div class="container">
-                <h2 class="mission-title">We're on a Mission To Clean Up the Industry</h2>
-                <a href="/about" class="btn">LEARN MORE</a>
+                <h2 class="mission-title">{{ $pageSettings['mission']['title'] }}</h2>
+                <a href="{{ $pageSettings['mission']['buttonLink'] }}" class="btn">{{ $pageSettings['mission']['buttonText'] }}</a>
             </div>
         </section>
 
