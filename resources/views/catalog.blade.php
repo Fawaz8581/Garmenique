@@ -653,6 +653,10 @@
                                                 @endif
                                             @endforeach
                                         </div>
+                                        <!-- Stock Information -->
+                                        <div class="product-stock mt-2">
+                                            <small class="text-muted">Stock: {{ $product->total_stock }}</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

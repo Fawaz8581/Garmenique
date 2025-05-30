@@ -35,6 +35,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
     
+    // Function to handle successful payment
+    function handleSuccessfulPayment(orderId) {
+        console.log('Payment successful, redirecting to order success page', orderId);
+        window.location.href = '/order-success?order_id=' + orderId;
+    }
+    
+    // Function to handle pending payment
+    function handlePendingPayment(orderId) {
+        console.log('Payment pending, redirecting to order success page with pending status', orderId);
+        window.location.href = '/order-success?order_id=' + orderId + '&status=pending';
+    }
+    
     // If snap token already exists, trigger payment directly
     if (snapTokenField && snapTokenField.value) {
         console.log('Snap token exists:', snapTokenField.value);
@@ -56,12 +68,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     onSuccess: function(result) {
                         console.log('Payment success:', result);
                         alert('Payment successful! You will be redirected to the order success page.');
-                        window.location.href = '/order-success?order_id=' + (document.getElementById('order-id') ? document.getElementById('order-id').value : '');
+                        const orderId = document.getElementById('order-id') ? document.getElementById('order-id').value : '';
+                        handleSuccessfulPayment(orderId);
                     },
                     onPending: function(result) {
                         console.log('Payment pending:', result);
                         alert('Payment is pending. Please complete your payment according to the instructions.');
-                        window.location.href = '/order-success?order_id=' + (document.getElementById('order-id') ? document.getElementById('order-id').value : '') + '&status=pending';
+                        const orderId = document.getElementById('order-id') ? document.getElementById('order-id').value : '';
+                        handlePendingPayment(orderId);
                     },
                     onError: function(result) {
                         console.error('Payment error:', result);
@@ -132,12 +146,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 onSuccess: function(result) {
                                     console.log('Payment success:', result);
                                     alert('Payment successful! You will be redirected to the order success page.');
-                                    window.location.href = '/order-success?order_id=' + data.order_id;
+                                    handleSuccessfulPayment(data.order_id);
                                 },
                                 onPending: function(result) {
                                     console.log('Payment pending:', result);
                                     alert('Payment is pending. Please complete your payment according to the instructions.');
-                                    window.location.href = '/order-success?order_id=' + data.order_id + '&status=pending';
+                                    handlePendingPayment(data.order_id);
                                 },
                                 onError: function(result) {
                                     console.error('Payment error:', result);

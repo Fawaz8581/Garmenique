@@ -97,12 +97,39 @@ class OrderController extends Controller
                 continue;
             }
             
-            // Find the product size relationship
+            // Find the product size relationship using the exact size string from the cart item
             $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
                 ->where('size', $item['size'])
                 ->first();
+                
+            // If not found, try to find it via the Size model for translation
+            if (!$productSize) {
+                \Log::info('Admin: Trying to find size via alternative method', [
+                    'product_id' => $item['id'],
+                    'size_name' => $item['size']
+                ]);
+                
+                // Try to find the size in the sizes table
+                $size = \App\Models\Size::where('name', $item['size'])->first();
+                
+                if ($size) {
+                    $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
+                        ->where('size', $size->name)
+                        ->first();
+                    
+                    \Log::info('Admin: Found via alternative method', [
+                        'size_id' => $size->id,
+                        'size_name' => $size->name,
+                        'product_size_found' => $productSize ? 'yes' : 'no'
+                    ]);
+                }
+            }
             
             if (!$productSize) {
+                \Log::warning('Admin: Product size not found', [
+                    'product_id' => $item['id'],
+                    'size' => $item['size']
+                ]);
                 continue;
             }
             
@@ -115,6 +142,16 @@ class OrderController extends Controller
             
             $productSize->stock = $newStock;
             $productSize->save();
+            
+            // Log the stock update
+            \Log::info('Admin: Product stock updated', [
+                'product_id' => $item['id'],
+                'product_name' => $product->name,
+                'size' => $item['size'],
+                'action' => $action,
+                'new_stock' => $newStock,
+                'quantity_change' => $item['quantity']
+            ]);
         }
     }
 

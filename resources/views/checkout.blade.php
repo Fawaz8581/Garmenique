@@ -466,7 +466,7 @@
                     </div>
                     
                     <!-- Hidden fields for Midtrans -->
-                    <input type="hidden" name="total" id="total-input" value="{{ isset($order) ? $order->total : '218000' }}">
+                    <input type="hidden" name="total" id="total-input" value="{{ isset($order) ? $order->total : '618000' }}">
                     <input type="hidden" name="snap_token" id="snap-token" value="{{ isset($order) ? $order->snap_token : '' }}">
                     <input type="hidden" name="order_id" id="order-id" value="{{ isset($order) ? $order->id : '' }}">
                 </form>
@@ -519,7 +519,7 @@
                                     Size: XL
                                 </div>
                                 <div class="cart-item-price">
-                                    <span class="quantity">1x</span>
+                                    <span class="quantity">3x</span>
                                     <span class="price">IDR 200.000</span>
                                 </div>
                             </div>
@@ -531,15 +531,15 @@
                 <div class="summary-calculations mt-4">
                     <div class="summary-item">
                         <span>Subtotal</span>
-                        <span>IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : '200.000' }}</span>
+                        <span>IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : number_format(600000, 0, ',', '.') }}</span>
                     </div>
                     <div class="summary-item">
                         <span>Shipping</span>
-                        <span>IDR {{ isset($order) ? number_format($order->shipping_cost, 0, ',', '.') : '18.000' }}</span>
+                        <span>IDR {{ isset($order) ? number_format($order->shipping_cost, 0, ',', '.') : number_format(18000, 0, ',', '.') }}</span>
                     </div>
                     <div class="summary-item summary-total">
                         <span>Total</span>
-                        <span>IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : '218.000' }}</span>
+                        <span>IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : number_format(618000, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>

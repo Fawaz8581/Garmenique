@@ -132,7 +132,8 @@ class Product extends Model
      */
     public function getTotalStockAttribute()
     {
-        return $this->sizes()->sum('stock');
+        // Always get fresh data from the database
+        return $this->sizes()->withPivot('stock')->sum('product_sizes.stock');
     }
 
     /**

@@ -244,6 +244,7 @@ class MidtransController extends Controller
             
             // Simpan status pembayaran sebelumnya untuk log
             $previousStatus = $order->status;
+            $stockUpdated = false;
             
             if ($transaction == 'capture') {
                 if ($type == 'credit_card') {
@@ -251,12 +252,21 @@ class MidtransController extends Controller
                         $order->status = 'challenge';
                     } else {
                         $order->status = 'success';
+                        // Update product stock on successful payment
+                        $this->updateProductStock($order);
+                        $stockUpdated = true;
                     }
                 } else {
                     $order->status = 'success';
+                    // Update product stock on successful payment
+                    $this->updateProductStock($order);
+                    $stockUpdated = true;
                 }
             } else if ($transaction == 'settlement') {
                 $order->status = 'success';
+                // Update product stock on successful payment
+                $this->updateProductStock($order);
+                $stockUpdated = true;
             } else if ($transaction == 'pending') {
                 $order->status = 'pending';
             } else if ($transaction == 'deny') {
@@ -289,7 +299,8 @@ class MidtransController extends Controller
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
                 'previous_status' => $previousStatus,
-                'new_status' => $order->status
+                'new_status' => $order->status,
+                'stock_updated' => $stockUpdated
             ]);
             
             return response()->json(['status' => 'success']);
@@ -318,6 +329,9 @@ class MidtransController extends Controller
             $order->status = 'success';
             $order->save();
             
+            // Update product stock on manual status update
+            $this->updateProductStock($order);
+            
             Log::info('Order status manually updated to success', [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number
@@ -334,5 +348,135 @@ class MidtransController extends Controller
             
             return redirect()->back()->with('error', 'Failed to update order status: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Update product stock based on cart items in the order
+     * 
+     * @param Order $order
+     */
+    private function updateProductStock($order)
+    {
+        if (!$order || empty($order->cart_items)) {
+            Log::warning('Cannot update stock: Order has no cart items', ['order_id' => $order->id ?? 'null']);
+            return;
+        }
+        
+        // Log cart items for debugging
+        Log::info('MidtransController: Processing cart items for stock update', [
+            'order_id' => $order->id,
+            'cart_items' => $order->cart_items
+        ]);
+        
+        $successCount = 0;
+        $failedCount = 0;
+        
+        foreach ($order->cart_items as $item) {
+            if (!isset($item['id']) || !isset($item['size']) || !isset($item['quantity'])) {
+                Log::warning('Skipping stock update for incomplete cart item', ['item' => $item]);
+                $failedCount++;
+                continue;
+            }
+            
+            $product = \App\Models\Product::find($item['id']);
+            
+            if (!$product) {
+                Log::warning('Product not found for stock update', ['product_id' => $item['id']]);
+                $failedCount++;
+                continue;
+            }
+            
+            // Log product found
+            Log::info('MidtransController: Found product for stock update', [
+                'product_id' => $item['id'],
+                'product_name' => $product->name,
+                'size_to_update' => $item['size']
+            ]);
+            
+            // Find the product size relationship using the exact size string from the cart item
+            $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
+                ->where('size', $item['size'])
+                ->first();
+                
+            // If not found, try to find it via the Size model for translation
+            if (!$productSize) {
+                Log::info('MidtransController: Trying to find size via alternative method', [
+                    'product_id' => $item['id'],
+                    'size_name' => $item['size']
+                ]);
+                
+                // Try to find the size in the sizes table
+                $size = \App\Models\Size::where('name', $item['size'])->first();
+                
+                if ($size) {
+                    $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
+                        ->where('size', $size->name)
+                        ->first();
+                    
+                    Log::info('MidtransController: Found via alternative method', [
+                        'size_id' => $size->id,
+                        'size_name' => $size->name,
+                        'product_size_found' => $productSize ? 'yes' : 'no'
+                    ]);
+                }
+            }
+            
+            if (!$productSize) {
+                Log::warning('Product size not found', [
+                    'product_id' => $item['id'],
+                    'size' => $item['size']
+                ]);
+                $failedCount++;
+                continue;
+            }
+            
+            // Log current stock
+            Log::info('MidtransController: Current product stock', [
+                'product_id' => $item['id'],
+                'size' => $item['size'],
+                'current_stock' => $productSize->stock,
+                'quantity_to_reduce' => $item['quantity']
+            ]);
+            
+            // Decrease stock
+            $oldStock = $productSize->stock;
+            $newStock = max(0, $oldStock - $item['quantity']);
+            $productSize->stock = $newStock;
+            $result = $productSize->save();
+            
+            // Log save result
+            Log::info('MidtransController: Stock update result', [
+                'success' => $result ? 'true' : 'false',
+                'old_stock' => $oldStock,
+                'new_stock' => $newStock
+            ]);
+            
+            if ($result) {
+                $successCount++;
+            } else {
+                $failedCount++;
+            }
+            
+            // Update the product's cache if needed
+            $product->refresh();
+            
+            Log::info('Product stock updated successfully from payment confirmation', [
+                'order_id' => $order->id,
+                'product_id' => $item['id'],
+                'product_name' => $product->name,
+                'size' => $item['size'],
+                'old_stock' => $oldStock,
+                'new_stock' => $newStock,
+                'quantity_purchased' => $item['quantity'],
+                'total_stock_remaining' => $product->total_stock
+            ]);
+        }
+        
+        Log::info('Stock update operation completed', [
+            'order_id' => $order->id,
+            'successful_updates' => $successCount,
+            'failed_updates' => $failedCount,
+            'total_items' => count($order->cart_items)
+        ]);
     }
 } 

@@ -316,3 +316,66 @@ Route::get('/api/images/{type}/{id}', [App\Http\Controllers\ImageController::cla
 Route::post('/get-snap-token', [App\Http\Controllers\MidtransController::class, 'getSnapToken'])->name('get.snap.token');
 Route::post('/midtrans/notification', [App\Http\Controllers\MidtransController::class, 'notificationHandler'])->name('midtrans.notification');
 Route::get('/manual-update-status/{orderId}', [App\Http\Controllers\MidtransController::class, 'manualUpdateStatus'])->name('manual.update.status');
+
+// Test route to verify stock reduction (for testing purposes only)
+Route::get('/test-stock-reduction/{orderId}', function($orderId) {
+    if (!Auth::check() || !Auth::user()->is_admin) {
+        return redirect('/')->with('error', 'Unauthorized');
+    }
+    
+    $order = \App\Models\Order::find($orderId);
+    if (!$order) {
+        return redirect('/')->with('error', 'Order not found');
+    }
+    
+    $controller = new \App\Http\Controllers\MidtransController();
+    $stockBeforeUpdate = [];
+    
+    // Record stock before update
+    foreach ($order->cart_items as $item) {
+        if (isset($item['id']) && isset($item['size'])) {
+            $productSize = \App\Models\ProductSize::where('product_id', $item['id'])
+                ->where('size', $item['size'])
+                ->first();
+            
+            if ($productSize) {
+                $stockBeforeUpdate[] = [
+                    'product_id' => $item['id'],
+                    'size' => $item['size'],
+                    'stock_before' => $productSize->stock,
+                    'qty_to_reduce' => $item['quantity']
+                ];
+            }
+        }
+    }
+    
+    // Call the method using reflection to access the private method
+    $reflectionMethod = new \ReflectionMethod('\App\Http\Controllers\MidtransController', 'updateProductStock');
+    $reflectionMethod->setAccessible(true);
+    $reflectionMethod->invoke($controller, $order);
+    
+    // Get stock after update
+    $stockAfterUpdate = [];
+    foreach ($stockBeforeUpdate as $item) {
+        $productSize = \App\Models\ProductSize::where('product_id', $item['product_id'])
+            ->where('size', $item['size'])
+            ->first();
+        
+        if ($productSize) {
+            $stockAfterUpdate[] = [
+                'product_id' => $item['product_id'],
+                'size' => $item['size'],
+                'stock_before' => $item['stock_before'],
+                'stock_after' => $productSize->stock,
+                'qty_reduced' => $item['stock_before'] - $productSize->stock,
+                'qty_requested' => $item['qty_to_reduce']
+            ];
+        }
+    }
+    
+    return [
+        'order_id' => $orderId,
+        'order_number' => $order->order_number,
+        'stock_changes' => $stockAfterUpdate
+    ];
+});
