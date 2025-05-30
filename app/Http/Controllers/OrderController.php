@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+require_once dirname(__DIR__, 3) . '/vendor/midtrans/midtrans-php/Midtrans.php';
+
 use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
@@ -16,25 +18,20 @@ class OrderController extends Controller
         try {
             // Validate the request
             $request->validate([
-                'shippingInfo.firstName' => 'required|string|max:255',
-                'shippingInfo.lastName' => 'required|string|max:255',
-                'shippingInfo.email' => 'required|email|max:255',
-                'shippingInfo.address' => 'required|string|max:255',
-                'shippingInfo.city' => 'nullable|string|max:255',
-                'shippingInfo.postalCode' => 'nullable|string|max:20',
-                'shippingInfo.countryCode' => 'nullable|string|max:10',
-                'shippingInfo.phoneNumber' => 'nullable|string|max:20',
-                'paymentInfo.method' => 'required|in:credit,paypal',
-                'cart' => 'required|array|min:1',
-                'subtotal' => 'required|numeric',
-                'shipping' => 'required|numeric',
+                'firstName' => 'required|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'address' => 'required|string|max:255',
+                'city' => 'nullable|string|max:255',
+                'postalCode' => 'nullable|string|max:20',
+                'phoneNumber' => 'nullable|string|max:20',
+                'expedition' => 'required|string',
                 'total' => 'required|numeric'
             ]);
             
             Log::info('Order validation passed', [
-                'shipping' => $request->shippingInfo,
-                'payment_method' => $request->paymentInfo['method'],
-                'cart_count' => count($request->cart),
+                'shipping' => $request->only('firstName', 'lastName', 'email', 'address', 'city', 'postalCode', 'phoneNumber'),
+                'expedition' => $request->expedition,
                 'total' => $request->total
             ]);
 
@@ -47,35 +44,113 @@ class OrderController extends Controller
                 ], 401);
             }
 
+            // Get cart items from session
+            $userId = Auth::id();
+            $cartItems = session("user_cart_{$userId}", []);
+            
+            if (empty($cartItems)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your cart is empty'
+                ], 400);
+            }
+            
+            // Calculate totals
+            $subtotal = 0;
+            foreach ($cartItems as $item) {
+                $subtotal += $item['price'] * $item['quantity'];
+            }
+            
+            $shippingCost = 18000; // Default shipping cost
+            $total = $subtotal + $shippingCost;
+
+            // Create shipping info array
+            $shippingInfo = [
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'email' => $request->email,
+                'address' => $request->address,
+                'city' => $request->city,
+                'postalCode' => $request->postalCode,
+                'phoneNumber' => $request->phoneNumber,
+                'expedition' => $request->expedition
+            ];
+            
             // Create the order
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_number' => 'ORD-' . strtoupper(uniqid()),
-                'shipping_info' => $request->shippingInfo,
-                'payment_info' => $request->paymentInfo,
-                'cart_items' => $request->cart,
-                'subtotal' => $request->subtotal,
-                'shipping_cost' => $request->shipping,
-                'total' => $request->total,
+                'shipping_info' => $shippingInfo,
+                'payment_info' => ['method' => 'midtrans'],
+                'cart_items' => $cartItems,
+                'subtotal' => $subtotal,
+                'shipping_cost' => $shippingCost,
+                'total' => $total,
                 'status' => 'pending'
             ]);
             
-            Log::info('Order created successfully', [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number
-            ]);
+            // Set up Midtrans configuration
+            \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
+            \Midtrans\Config::$clientKey = 'SB-Mid-client-61XuGAwQ8Bj8LxSS';
+            \Midtrans\Config::$isProduction = false;
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+            \Midtrans\Config::$appendNotifUrl = "https://webhook.site/c7e81171-dbde-43aa-bd9a-c7e6e6f3d506";
+            \Midtrans\Config::$overrideNotifUrl = "https://webhook.site/c7e81171-dbde-43aa-bd9a-c7e6e6f3d506";
 
+            // Set up transaction parameters
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->order_number,
+                    'gross_amount' => (int)$total,
+                ],
+                'customer_details' => [
+                    'first_name' => $request->firstName,
+                    'last_name' => $request->lastName,
+                    'email' => $request->email,
+                    'phone' => $request->phoneNumber,
+                    'billing_address' => [
+                        'first_name' => $request->firstName,
+                        'last_name' => $request->lastName,
+                        'email' => $request->email,
+                        'phone' => $request->phoneNumber,
+                        'address' => $request->address,
+                        'city' => $request->city,
+                        'postal_code' => $request->postalCode,
+                        'country_code' => 'IDN'
+                    ],
+                ],
+                'item_details' => []
+            ];
+
+            // Add items to transaction params
+            foreach ($cartItems as $item) {
+                $params['item_details'][] = [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity']
+                ];
+            }
+
+            // Add shipping cost to item details
+            $params['item_details'][] = [
+                'id' => 'SHIPPING',
+                'name' => 'Shipping Cost',
+                'price' => $shippingCost,
+                'quantity' => 1
+            ];
+
+            // Generate snap token
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+            $order->snap_token = $snapToken;
+            $order->save();
+            
             // Decrease product stock for each cart item
             $this->updateProductStock($order->cart_items);
             
-            // Process payment (in a real application, you would integrate with a payment gateway here)
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Order placed successfully',
-                'order_id' => $order->id,
-                'order' => $order
-            ], 201);
+            return redirect()->route('checkout', $order->id);
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Order validation failed', [
                 'errors' => $e->errors(),
@@ -96,6 +171,64 @@ class OrderController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    
+    /**
+     * Display order success page
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function success(Request $request)
+    {
+        $orderId = $request->input('order_id');
+        $status = $request->input('status', 'success');
+        
+        Log::info('Order success page accessed', [
+            'order_id' => $orderId,
+            'status' => $status,
+            'user_id' => Auth::id()
+        ]);
+        
+        if (!$orderId) {
+            return redirect('/')->with('error', 'No order specified');
+        }
+        
+        $order = Order::find($orderId);
+        
+        // Check if order exists and belongs to current user
+        if (!$order || $order->user_id !== Auth::id()) {
+            return redirect('/')->with('error', 'Order not found');
+        }
+        
+        // If status is pending, update order status
+        if ($status === 'pending') {
+            $order->status = 'payment_pending';
+            $order->save();
+            
+            Log::info('Order status updated to payment_pending', [
+                'order_id' => $orderId,
+                'user_id' => Auth::id()
+            ]);
+        } else {
+            // Success status - mark order as completed
+            $order->status = 'completed';
+            $order->save();
+            
+            Log::info('Order status updated to completed', [
+                'order_id' => $orderId,
+                'user_id' => Auth::id()
+            ]);
+        }
+        
+        // Clear cart after successful order
+        $userId = Auth::id();
+        session()->forget("user_cart_{$userId}");
+        
+        return view('order-success', [
+            'order' => $order,
+            'status' => $status
+        ]);
     }
     
     /**
@@ -150,4 +283,4 @@ class OrderController extends Controller
             ]);
         }
     }
-} 
+}

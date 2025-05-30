@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Order Success - Garmenique</title>
+    <title>Garmenique - Order Success</title>
     <meta name="keyword" content="Garmenique">
     <meta name="description" content="Garmenique - Premium Clothing Brand">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -24,154 +24,405 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .success-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 40px;
-            text-align: center;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            max-width: 800px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
 
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: #28a745;
-            border-radius: 50%;
+        .header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
+            margin-bottom: 30px;
         }
-
-        .success-icon i {
-            font-size: 40px;
-            color: white;
-        }
-
-        .success-title {
+        
+        .logo {
             font-size: 24px;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: #28a745;
-        }
-
-        .success-message {
-            font-size: 16px;
-            color: #6c757d;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .btn-continue {
-            background: #000;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 4px;
             text-decoration: none;
+            color: #000;
+        }
+
+        .order-status {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 500;
-            transition: all 0.3s ease;
             display: inline-block;
         }
-
-        .btn-continue:hover {
-            background: #333;
-            color: white;
+        
+        .status-pending {
+            background-color: #FFF8E1;
+            color: #FF9800;
         }
 
-        .order-details {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid #dee2e6;
-            text-align: left;
+        .status-success {
+            background-color: #E8F5E9;
+            color: #4CAF50;
         }
-
-        .detail-item {
-            margin-bottom: 10px;
+        
+        .status-failed {
+            background-color: #FFEBEE;
+            color: #F44336;
+        }
+        
+        .order-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .order-number {
             color: #6c757d;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
         }
 
-        .detail-label {
+        .order-info {
+            margin-bottom: 30px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .info-label {
+            width: 150px;
             font-weight: 500;
-            color: #333;
+        }
+        
+        .info-value {
+            flex-grow: 1;
+        }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 15px;
+            border-radius: 5px;
+        }
+        
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        
+        .cart-item-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-meta {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-price {
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .order-summary {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .summary-total {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn-back {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #000;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #000;
+            border: 1px solid #dee2e6;
+        }
+        
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+        
+        .pending-instructions {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #E8F5E9;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .pending-instructions h4 {
+            color: #2E7D32;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .pending-instructions p {
+            margin-bottom: 10px;
+        }
+        
+        .refresh-status {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: #E8F5E9;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .refresh-status:hover {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+        }
+        
+        .alert-info {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
         }
     </style>
 </head>
 <body>
     <div class="success-container">
-        <div class="success-icon">
-            <i class="fas fa-check"></i>
+        <div class="header">
+            <a href="/" class="logo">GARMENIQUE</a>
+            
+            @if(isset($order))
+                @php
+                    $statusClass = '';
+                    $statusText = 'Unknown';
+                    
+                    if ($order->status === 'pending' || $order->status === 'payment_pending') {
+                        $statusClass = 'status-pending';
+                        $statusText = 'Payment Pending';
+                    } elseif ($order->status === 'success' || $order->status === 'completed') {
+                        $statusClass = 'status-success';
+                        $statusText = 'Payment Success';
+                    } elseif ($order->status === 'failed' || $order->status === 'expired') {
+                        $statusClass = 'status-failed';
+                        $statusText = 'Payment Failed';
+                    }
+                @endphp
+                
+                <span class="order-status {{ $statusClass }}">{{ $statusText }}</span>
+            @endif
         </div>
-        <h1 class="success-title">Order Placed Successfully!</h1>
-        <p class="success-message">
-            Thank you for shopping with Garmenique. Your order has been received and is being processed.
-            We'll send you an email confirmation with your order details and tracking information.
-        </p>
-        <div class="order-details">
-            <div class="detail-item">
-                <span class="detail-label">Order Number:</span>
-                <span>#{{ str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT) }}</span>
+        
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
             </div>
-            <div class="detail-item">
-                <span class="detail-label">Estimated Delivery:</span>
-                <span>{{ now()->addDays(5)->format('l, F j, Y') }}</span>
+        @endif
+        
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+        
+        @if(isset($order))
+            <h1 class="order-title">
+                @if($order->status === 'pending' || $order->status === 'payment_pending')
+                    Payment Pending
+                @elseif($order->status === 'success' || $order->status === 'completed')
+                    Thank You for Your Order!
+                @else
+                    Order Status: {{ ucfirst($order->status) }}
+                @endif
+            </h1>
+            <p class="order-number">Order #{{ $order->order_number }}</p>
+            
+            @if($order->status === 'pending' || $order->status === 'payment_pending')
+                <div class="pending-instructions">
+                    <h4><i class="fas fa-info-circle me-2"></i> Payment Instructions</h4>
+                    <p>Your payment is being processed. If you've completed the payment but still see this status, please wait a moment for our system to update.</p>
+                    <p>If you're using a payment simulator in sandbox mode, you may need to manually update the status.</p>
+                    
+                    <a href="{{ route('manual.update.status', $order->id) }}" class="refresh-status">
+                        <i class="fas fa-sync-alt me-2"></i> Update Status to Success
+                    </a>
+                </div>
+            @endif
+            
+            <div class="order-info">
+                <h3 class="section-title">Order Information</h3>
+                
+                <div class="info-item">
+                    <div class="info-label">Order Date:</div>
+                    <div class="info-value">{{ $order->created_at->format('F d, Y, h:i A') }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Payment Method:</div>
+                    <div class="info-value">
+                        @if(isset($order->payment_info['payment_type']))
+                            {{ ucfirst($order->payment_info['payment_type']) }}
+                        @else
+                            Midtrans
+                        @endif
             </div>
         </div>
-        <div class="mt-4">
-            <a href="/catalog" class="btn-continue">Continue Shopping</a>
+                
+                <div class="info-item">
+                    <div class="info-label">Shipping Address:</div>
+                    <div class="info-value">
+                        {{ $order->shipping_info['firstName'] }} {{ $order->shipping_info['lastName'] }}<br>
+                        {{ $order->shipping_info['address'] }}<br>
+                        {{ $order->shipping_info['city'] }}, {{ $order->shipping_info['postalCode'] }}<br>
+                        Phone: {{ $order->shipping_info['phoneNumber'] }}
         </div>
+    </div>
+
+                <div class="info-item">
+                    <div class="info-label">Shipping Method:</div>
+                    <div class="info-value">
+                        @if(isset($order->shipping_info['expedition']))
+                            {{ strtoupper($order->shipping_info['expedition']) }} - Regular
+                        @else
+                            Standard Shipping
+                        @endif
+                    </div>
+                </div>
+            </div>
+            
+            <div class="order-items">
+                <h3 class="section-title">Order Items</h3>
+                
+                @foreach($order->cart_items as $item)
+                    <div class="cart-item">
+                        <img src="{{ $item['image'] ?? asset('images/products/product1.jpg') }}" alt="{{ $item['name'] }}" class="cart-item-image">
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">{{ $item['name'] }}</div>
+                            <div class="cart-item-meta">
+                                Size: {{ $item['size'] }}
+                            </div>
+                            <div class="cart-item-meta">
+                                Quantity: {{ $item['quantity'] }}
+                            </div>
+                        </div>
+                        <div class="cart-item-price">
+                            IDR {{ number_format($item['price'], 0, ',', '.') }}
+                        </div>
+                    </div>
+                @endforeach
+                
+                <div class="order-summary">
+                    <div class="summary-item">
+                        <span>Subtotal</span>
+                        <span>IDR {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Shipping</span>
+                        <span>IDR {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="summary-item summary-total">
+                        <span>Total</span>
+                        <span>IDR {{ number_format($order->total, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <a href="/catalog" class="btn-back btn-outline">
+                    <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                </a>
+                
+                <a href="/account/orders" class="btn-back btn-primary">
+                    View My Orders <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        @else
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> No order information found. Please check your order history in your account.
+            </div>
+            
+            <div class="actions">
+                <a href="/catalog" class="btn-back btn-outline">
+                    <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                </a>
+                
+                <a href="/account/orders" class="btn-back btn-primary">
+                    View My Orders <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        @endif
     </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/landingpage.js') }}"></script>
-    <script>
-        // Clear cart data on successful order
-        document.addEventListener('DOMContentLoaded', function() {
-            // Clear cart in session storage
-            sessionStorage.removeItem('cart');
-            
-            // Get CSRF token
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            
-            // Clear cart on server via API
-            fetch('/api/clear-cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Server cart cleared:', data);
-                
-                // Broadcast cart update event to other controllers/pages
-                if (window.parent && window.parent.postMessage) {
-                    window.parent.postMessage({type: 'cartUpdated', cart: []}, '*');
-                }
-                
-                // If Angular is available, update the cart controller
-                if (window.angular) {
-                    var scope = angular.element(document.querySelector('[ng-controller="CartController"]')).scope();
-                    if (scope) {
-                        scope.$apply(function() {
-                            scope.cartItems = [];
-                        });
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error clearing cart on server:', error);
-            });
-        });
-    </script>
 </body>
 </html> 

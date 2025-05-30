@@ -19,6 +19,7 @@ class Order extends Model
         'shipping_cost',
         'total',
         'status',
+        'snap_token',
         'notes'
     ];
 

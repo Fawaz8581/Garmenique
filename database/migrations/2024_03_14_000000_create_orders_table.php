@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('shipping_cost', 12, 2);
             $table->decimal('total', 12, 2);
             $table->string('status');
-            $table->timestamps();
+            $table->string('snap_token')->nullable();
         });
     }
 

@@ -121,13 +121,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/admin', [\App\Http\Controllers\MessageController::class, 'getMessages'])->name('messages.data');
 
     // Checkout routes
-    Route::get('/checkout', function () {
-        return view('checkout');
-    })->name('checkout');
-    
-    Route::get('/order-success', function () {
-        return view('order-success');
-    })->name('order.success');
+    Route::get('/checkout/{id?}', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/order-success', [App\Http\Controllers\OrderController::class, 'success'])->name('order.success');
     
     Route::post('/api/orders', [\App\Http\Controllers\OrderController::class, 'store']);
 });
@@ -315,3 +311,8 @@ Route::post('/api/remove-from-cart', [\App\Http\Controllers\Api\CartController::
 // General API routes
 Route::post('/api/upload-image', [App\Http\Controllers\ImageController::class, 'storeImage'])->name('upload.image');
 Route::get('/api/images/{type}/{id}', [App\Http\Controllers\ImageController::class, 'getImage'])->name('get.image');
+
+// Midtrans Routes
+Route::post('/get-snap-token', [App\Http\Controllers\MidtransController::class, 'getSnapToken'])->name('get.snap.token');
+Route::post('/midtrans/notification', [App\Http\Controllers\MidtransController::class, 'notificationHandler'])->name('midtrans.notification');
+Route::get('/manual-update-status/{orderId}', [App\Http\Controllers\MidtransController::class, 'manualUpdateStatus'])->name('manual.update.status');
