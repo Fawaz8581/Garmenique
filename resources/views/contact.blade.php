@@ -453,10 +453,10 @@
         <section class="contact-section">
             <div class="container">
                 <div class="contact-us-header">
-                    <div class="contact-us-subtitle">CONTACT US</div>
-                    <h1 class="contact-us-title">Let's talk about your question</h1>
-                    <p class="contact-description">Drop us a line through the form below and we'll get back to you</p>
-                        </div>
+                    <div class="contact-us-subtitle">{{ $contactSettings['hero']['title'] }}</div>
+                    <h1 class="contact-us-title">{{ $contactSettings['hero']['subtitle'] }}</h1>
+                    <p class="contact-description">{{ $contactSettings['hero']['description'] }}</p>
+                </div>
                         
                 <div class="contact-form-wrapper">
                     @if (session('status'))
@@ -488,17 +488,17 @@
                             @enderror
                         </div>
                         <div class="form-group full-width">
-                            <textarea id="message" name="message" placeholder="Your message..." rows="5" required></textarea>
+                            <textarea id="message" name="message" placeholder="{{ $contactSettings['form']['messagePlaceholder'] }}" rows="5" required></textarea>
                             @error('message')
                                 <div class="error-message">{{ $message }}</div>
                             @enderror
-                                        </div>
+                        </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn-submit">SEND</button>
-                                    </div>
+                            <button type="submit" class="btn-submit">{{ $contactSettings['form']['buttonText'] }}</button>
+                        </div>
                     </form>
-                                        </div>
-                                        </div>
+                </div>
+            </div>
         </section>
 
         <!-- Contact Info Bar -->
@@ -509,19 +509,19 @@
                         <h3>VISIT US</h3>
                         <p>{{ $contactSettings['info']['address']['line1'] }}</p>
                         <p>{{ $contactSettings['info']['address']['line2'] }}</p>
-                            </div>
+                    </div>
                     
                     <div class="info-column">
                         <h3>CONTACT</h3>
                         <p>{{ $contactSettings['info']['email'] }}</p>
                         <p>{{ $contactSettings['info']['phone'] }}</p>
-                                </div>
-                                
+                    </div>
+                    
                     <div class="info-column">
                         <h3>OPENING HOURS</h3>
                         <p>{{ $contactSettings['info']['hours']['weekdays'] }}</p>
                         <p>{{ $contactSettings['info']['hours']['weekends'] }}</p>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
