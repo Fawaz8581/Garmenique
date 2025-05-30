@@ -180,64 +180,7 @@
         @include('partials.sliding-cart')
 
         <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="footer-grid">
-                    <div class="footer-col">
-                        <h4>Company</h4>
-                        <ul class="footer-links">
-                            <li><a href="/about">About Us</a></li>
-                            <li><a href="#">Our Story</a></li>
-                            <li><a href="#">Careers</a></li>
-                            <li><a href="#">Sustainability</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-col">
-                        <h4>Help</h4>
-                        <ul class="footer-links">
-                            <li><a href="#">Customer Service</a></li>
-                            <li><a href="#">Track Order</a></li>
-                            <li><a href="#">Returns & Exchanges</a></li>
-                            <li><a href="#">Shipping Info</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-col">
-                        <h4>Quick Links</h4>
-                        <ul class="footer-links">
-                            <li><a href="/men">Men's Collection</a></li>
-                            <li><a href="/women">Women's Collection</a></li>
-                            <li><a href="#">Gift Cards</a></li>
-                            <li><a href="/blog">Blog</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-col">
-                        <h4>Connect With Us</h4>
-                        <div class="social-email-section">
-                            <div class="social-icons">
-                                <a href="#" class="social-icon-circle"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-instagram"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="social-icon-circle"><i class="fab fa-pinterest"></i></a>
-                            </div>
-                            <p class="email-title">Sign Up for Updates</p>
-                            <form class="email-form">
-                                <input type="email" placeholder="Enter your email" class="email-input" required>
-                                <button type="submit" class="email-button">
-                                    <i class="fas fa-arrow-right"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="footer-bottom">
-                    <p>&copy; 2025 Garmenique. All Rights Reserved.</p>
-                </div>
-            </div>
-        </footer>
+        @include('partials.footer')
 
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

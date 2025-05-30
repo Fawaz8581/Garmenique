@@ -155,12 +155,6 @@
     <div class="footer-bottom">
         <div class="container">
             <p class="copyright">© {{ date('Y') }} Garmenique. All Rights Reserved.</p>
-            <div class="payment-methods">
-                <i class="fab fa-cc-visa"></i>
-                <i class="fab fa-cc-mastercard"></i>
-                <i class="fab fa-cc-amex"></i>
-                <i class="fab fa-cc-paypal"></i>
-            </div>
         </div>
     </div>
 </footer> 
