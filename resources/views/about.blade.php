@@ -316,7 +316,7 @@
                 <div class="nav-icons">
                     <a href="{{ route('user.messages') }}" class="nav-icon"><i class="fas fa-envelope"></i></a>
                     @include('partials.account-dropdown')
-                    <a href="javascript:void(0)" class="nav-icon cart-icon" ng-click="openCartPanel()">
+                    <a href="javascript:void(0)" class="nav-icon" ng-click="openCartPanel()">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
                 </div>
@@ -326,11 +326,11 @@
                         <span class="toggle-bar"></span>
                         <span class="toggle-bar"></span>
                         <span class="toggle-bar"></span>
-                    </button>
+                </button>
                 </div>
             </div>
         </header>
-
+        
         <!-- Search Overlay -->
         <div class="search-overlay" ng-class="{'active': isSearchActive}"></div>
 
