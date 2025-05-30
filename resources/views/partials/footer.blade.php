@@ -1,4 +1,108 @@
 <footer class="footer">
+    <style>
+        /* Footer styling */
+        .footer {
+            background-color: #f8f9fa;
+            padding: 60px 0 0;
+            margin-top: 60px;
+        }
+        
+        .footer-widget h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer-widget ul.footer-links {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 30px;
+        }
+        
+        .footer-widget ul.footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-widget ul.footer-links li a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-widget ul.footer-links li a:hover {
+            color: #333;
+        }
+        
+        .contact-info p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .contact-info i {
+            width: 20px;
+            margin-right: 8px;
+            color: #666;
+        }
+        
+        .social-icons {
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            background-color: #eee;
+            color: #555;
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        
+        .footer-bottom {
+            background-color: #f1f1f1;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .footer-bottom .copyright {
+            text-align: center;
+            color: #666;
+            margin: 0;
+        }
+        
+        .payment-methods {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .payment-methods i {
+            font-size: 24px;
+            color: #666;
+            margin: 0 5px;
+        }
+        
+        @media (max-width: 767px) {
+            .footer-widget {
+                margin-bottom: 30px;
+            }
+            
+            .footer-bottom .row {
+                flex-direction: column;
+            }
+            
+            .payment-methods {
+                margin-top: 15px;
+            }
+        }
+    </style>
     <div class="container">
         <div class="row">
             <div class="col-md-3 col-sm-6">
@@ -59,10 +163,10 @@
     <div class="footer-bottom">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-12">
                     <p class="copyright">© {{ date('Y') }} Garmenique. All Rights Reserved.</p>
                 </div>
-                <div class="col-md-6">
+                <div class="col-12">
                     <div class="payment-methods">
                         <i class="fab fa-cc-visa"></i>
                         <i class="fab fa-cc-mastercard"></i>
