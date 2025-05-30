@@ -68,23 +68,23 @@
         
         .footer-bottom {
             background-color: #f1f1f1;
-            padding: 20px 0;
+            padding: 15px 0;
             margin-top: 40px;
+            text-align: center;
         }
         
         .footer-bottom .copyright {
-            text-align: center;
             color: #666;
-            margin: 0;
+            margin: 0 0 10px 0;
+            font-size: 14px;
         }
         
         .payment-methods {
-            text-align: center;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         .payment-methods i {
-            font-size: 24px;
+            font-size: 20px;
             color: #666;
             margin: 0 5px;
         }
@@ -92,14 +92,6 @@
         @media (max-width: 767px) {
             .footer-widget {
                 margin-bottom: 30px;
-            }
-            
-            .footer-bottom .row {
-                flex-direction: column;
-            }
-            
-            .payment-methods {
-                margin-top: 15px;
             }
         }
     </style>
@@ -162,18 +154,12 @@
     </div>
     <div class="footer-bottom">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <p class="copyright">© {{ date('Y') }} Garmenique. All Rights Reserved.</p>
-                </div>
-                <div class="col-12">
-                    <div class="payment-methods">
-                        <i class="fab fa-cc-visa"></i>
-                        <i class="fab fa-cc-mastercard"></i>
-                        <i class="fab fa-cc-amex"></i>
-                        <i class="fab fa-cc-paypal"></i>
-                    </div>
-                </div>
+            <p class="copyright">© {{ date('Y') }} Garmenique. All Rights Reserved.</p>
+            <div class="payment-methods">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-amex"></i>
+                <i class="fab fa-cc-paypal"></i>
             </div>
         </div>
     </div>

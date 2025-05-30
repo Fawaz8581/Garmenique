@@ -754,7 +754,7 @@
                                                 <div class="cart-item">
                                                     <div class="cart-item-image">
                                                         <img src="${item.image}" alt="${item.name}">
-                                                    </div>
+                            </div>
                                                     <div class="cart-item-details">
                                                         <h4 class="cart-item-title">${item.name}</h4>
                                                         <p class="cart-item-variants">${item.size} · ${item.color}</p>
@@ -773,13 +773,13 @@
                                             }
                                             
                                             itemHtml += `
-                                                        </div>
-                                                    </div>
+                        </div>
+                    </div>
                                                     <div class="cart-item-quantity">
                                                         <button class="quantity-btn minus" onclick="handleQuantityAction('decrease', this)">−</button>
                                                         <input type="text" value="${item.quantity}" readonly>
                                                         <button class="quantity-btn plus" onclick="handleQuantityAction('increase', this)">+</button>
-                                                    </div>
+                </div>
                                                 </div>`;
                                             
                                             cartItemsContainer.innerHTML += itemHtml;
