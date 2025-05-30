@@ -19,7 +19,6 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/landing.page.search.css') }}">
         <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
         <link rel="stylesheet" href="{{ asset('css/sliding-cart.css') }}">
         
@@ -330,73 +329,6 @@
             </div>
         </header>
 
-        <!-- Search Overlay -->
-        <div class="search-overlay" ng-class="{'active': isSearchActive}"></div>
-
-        <!-- Search Panel (Hidden by default) -->
-        <div class="search-panel" ng-controller="SearchController" ng-class="{'active': isSearchActive}">
-            <div class="container">
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <div class="d-flex align-items-center">
-                        <input type="text" class="search-input" placeholder="Search" ng-model="searchQuery" autofocus>
-                        <a href="javascript:void(0)" class="cancel-btn" ng-click="closeSearch()">Cancel</a>
-                    </div>
-                </div>
-
-                <div class="search-content">
-                    <!-- Categories Navigation as Bullets -->
-                    <div class="categories-list">
-                        <ul>
-                            <li><a href="/catalog">BEST SELLERS</a></li>
-                            <li><a href="/catalog?category=t-shirt">T-SHIRT</a></li>
-                            <li><a href="/catalog?category=shirt">SHIRT</a></li>
-                            <li><a href="/catalog?category=jackets">JACKETS</a></li>
-                            <li><a href="/catalog?category=pants">PANTS</a></li>
-                            <li><a href="/catalog?category=hoodie">HOODIE</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Popular Categories -->
-                    <section class="popular-categories">
-                        <h2>Popular Categories</h2>
-                        <div class="row">
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="T-shirts" class="card-img-top">
-                                    <h5 class="category-card-title">T-shirts</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Shirts" class="card-img-top">
-                                    <h5 class="category-card-title">Shirts</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-outerwear.jpg') }}" alt="Jackets" class="card-img-top">
-                                    <h5 class="category-card-title">Jackets</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-bottoms.jpg') }}" alt="Pants" class="card-img-top">
-                                    <h5 class="category-card-title">Pants</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Hoodie" class="card-img-top">
-                                    <h5 class="category-card-title">Hoodie</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-        
         <!-- Blog Header Section -->
         <section class="blog-hero ng-cloak" ng-if="pageSettings.blog.hero.enabled" ng-style="{'background-image': 'url(' + pageSettings.blog.hero.backgroundImage + ')', 'background-size': 'cover', 'background-position': 'center', 'position': 'relative', 'padding': '80px 0', 'color': '#fff'}">
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);"></div>
@@ -406,8 +338,8 @@
                         <h1 style="font-size: 2.8rem; font-weight: 700; margin-bottom: 1.5rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">@{{ pageSettings.blog.hero.title }}</h1>
                         <p class="mission-statement" style="font-size: 1.2rem; line-height: 1.8; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">@{{ pageSettings.blog.hero.subtitle }}</p>
                     </div>
-                                </div>
-                            </div>
+                </div>
+            </div>
         </section>
 
         <!-- Latest Articles Section -->
@@ -416,22 +348,22 @@
                 <div class="text-center mb-4">
                     <h2 class="section-title">@{{ pageSettings.blog.latestArticles.title }}</h2>
                     <div class="section-title-underline"></div>
-                        </div>
-                        
+                </div>
+                
                 <!-- Featured Articles Grid (First Row) -->
                 <div class="blog-grid">
                     <div class="blog-card" ng-repeat="article in pageSettings.blog.latestArticles.articles | limitTo:3">
                         <a href="@{{ article.link }}" class="blog-card-link">
                             <div class="blog-img-container">
                                 <img ng-src="@{{ article.image }}" alt="@{{ article.title }}" class="blog-card-img">
-                        </div>
+                            </div>
                             <div class="blog-card-content">
                                 <span class="blog-category">@{{ article.category }}</span>
                                 <h3 class="blog-title">@{{ article.title }}</h3>
-                    </div>
-                        </a>
                             </div>
-                        </div>
+                        </a>
+                    </div>
+                </div>
 
                 <!-- Regular Articles Grid (Second Row) -->
                 <div class="blog-grid" ng-if="pageSettings.blog.latestArticles.articles.length > 3">
@@ -439,15 +371,15 @@
                         <a href="@{{ article.link }}" class="blog-card-link">
                             <div class="blog-img-container">
                                 <img ng-src="@{{ article.image }}" alt="@{{ article.title }}" class="blog-card-img">
-                        </div>
+                            </div>
                             <div class="blog-card-content">
                                 <span class="blog-category">@{{ article.category }}</span>
                                 <h3 class="blog-title">@{{ article.title }}</h3>
-                                        </div>
-                                        </a>
-                                    </div>
-                                        </div>
-                                        </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Values Section -->
@@ -457,11 +389,11 @@
                     <div class="value-item" ng-repeat="value in pageSettings.blog.values.items">
                         <div class="value-icon">
                             <img ng-src="@{{ value.iconUrl || getDefaultIconUrl(value.title) }}" alt="@{{ value.title }}" style="width: 40px; height: 40px;">
-                                    </div>
+                        </div>
                         <h3>@{{ value.title }}</h3>
-                                </div>
-                            </div>
-                            </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Progress Section -->
@@ -470,17 +402,17 @@
                 <div class="text-center mb-4">
                     <h2 class="section-title">@{{ pageSettings.blog.progress.title }}</h2>
                     <div class="section-title-underline"></div>
-                                </div>
-                                
+                </div>
+                
                 <div class="progress-grid">
                     <div class="progress-card" ng-repeat="item in pageSettings.blog.progress.items">
                         <div class="progress-img-container">
                             <img ng-src="@{{ item.image }}" alt="@{{ item.title }}" class="progress-img">
-                                </div>
-                        <h3 class="progress-title">@{{ item.title }}</h3>
-                            </div>
                         </div>
+                        <h3 class="progress-title">@{{ item.title }}</h3>
+                    </div>
                 </div>
+            </div>
         </section>
 
         <!-- Social Media Section -->
@@ -492,8 +424,8 @@
                     <a ng-repeat="link in pageSettings.blog.social.links" ng-href="@{{ link.url.startsWith('http') ? link.url : 'https://' + link.url }}" class="social-link" target="_blank">
                         <i class="fab" ng-class="'fa-' + link.platform"></i>
                     </a>
+                </div>
             </div>
-        </div>
         </section>
 
         <!-- Include Sliding Cart Partial -->

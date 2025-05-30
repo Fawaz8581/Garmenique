@@ -19,7 +19,6 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/catalog.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/landing.page.search.css') }}">
         <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
         <link rel="stylesheet" href="{{ asset('css/sliding-cart.css') }}">
         
@@ -538,73 +537,6 @@
             </div>
         </header>
 
-        <!-- Search Overlay -->
-        <div class="search-overlay" ng-class="{'active': isSearchActive}"></div>
-
-        <!-- Search Panel (Hidden by default) -->
-        <div class="search-panel" ng-controller="SearchController" ng-class="{'active': isSearchActive}">
-            <div class="container">
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <div class="d-flex align-items-center">
-                        <input type="text" class="search-input" placeholder="Search" ng-model="searchQuery" autofocus>
-                        <a href="javascript:void(0)" class="cancel-btn" ng-click="closeSearch()">Cancel</a>
-                    </div>
-                </div>
-
-                <div class="search-content">
-                    <!-- Categories Navigation as Bullets -->
-                    <div class="categories-list">
-                        <ul>
-                            <li><a href="/catalog">BEST SELLERS</a></li>
-                            <li><a href="/catalog?category=t-shirt">T-SHIRT</a></li>
-                            <li><a href="/catalog?category=shirt">SHIRT</a></li>
-                            <li><a href="/catalog?category=jackets">JACKETS</a></li>
-                            <li><a href="/catalog?category=pants">PANTS</a></li>
-                            <li><a href="/catalog?category=hoodie">HOODIE</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Popular Categories -->
-                    <section class="popular-categories">
-                        <h2>Popular Categories</h2>
-                        <div class="row">
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="T-shirts" class="card-img-top">
-                                    <h5 class="category-card-title">T-shirts</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Shirts" class="card-img-top">
-                                    <h5 class="category-card-title">Shirts</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-outerwear.jpg') }}" alt="Jackets" class="card-img-top">
-                                    <h5 class="category-card-title">Jackets</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-bottoms.jpg') }}" alt="Pants" class="card-img-top">
-                                    <h5 class="category-card-title">Pants</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-20p col-6">
-                                <div class="category-card">
-                                    <img src="{{ asset('images/catalog/category-tops.jpg') }}" alt="Hoodie" class="card-img-top">
-                                    <h5 class="category-card-title">Hoodie</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-        
         <!-- Main Content -->
             <div class="container mt-5 pt-5">
                 <!-- Spacer -->

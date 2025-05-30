@@ -19,7 +19,6 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/landingpage.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/about.search.css') }}">
         <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
         <link rel="stylesheet" href="{{ asset('css/email-subscription.css') }}">
         <link rel="stylesheet" href="{{ asset('css/sliding-cart.css') }}">
@@ -405,50 +404,6 @@
             </div>
         </header>
 
-        <!-- Search Overlay -->
-        <div class="search-overlay" ng-class="{'active': isSearchActive}"></div>
-
-        <!-- Search Panel (Hidden by default) -->
-        <div class="search-panel" ng-controller="SearchController" ng-class="{'active': isSearchActive}">
-            <div class="container">
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <div class="d-flex align-items-center">
-                        <input type="text" class="search-input" placeholder="Search" ng-model="searchQuery" autofocus>
-                        <a href="javascript:void(0)" class="cancel-btn" ng-click="closeSearch()">Cancel</a>
-                    </div>
-                </div>
-
-                <div class="search-content">
-                    <!-- Categories Navigation as Bullets -->
-                    <div class="categories-list">
-                        <ul>
-                            <li><a href="/catalog">BEST SELLERS</a></li>
-                            <li><a href="/catalog">CLOTHING</a></li>
-                            <li><a href="/catalog">TOPS & SWEATERS</a></li>
-                            <li><a href="/catalog">PANTS & JEANS</a></li>
-                            <li><a href="/catalog">OUTERWEAR</a></li>
-                            <li><a href="/catalog">SHOES & BAGS</a></li>
-                            <li><a href="/catalog">SALE</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Popular Categories -->
-                    <section class="popular-categories">
-                        <h2>Popular Categories</h2>
-                        <div class="row">
-                            <div class="col-6 col-md-3" ng-repeat="category in popularCategories">
-                                <div class="category-card" ng-mouseenter="hover(category)" ng-mouseleave="unhover(category)" ng-class="{'hovered': category.isHovered}">
-                                    <img ng-src="@{{ category.image }}" alt="@{{ category.name }}" class="card-img-top">
-                                    <h5 class="category-card-title">@{{ category.name }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-        
         <!-- Contact Section -->
         <section class="contact-section">
             <div class="container">
