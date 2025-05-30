@@ -518,6 +518,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ $page == 'products_detailed' ? 'active' : '' }}" href="{{ route('admin.customizes', 'products_detailed') }}">Products Detailed</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $page == 'footer' ? 'active' : '' }}" href="{{ route('admin.customizes', 'footer') }}">Footer</a>
+                </li>
             </ul>
         </div>
         
@@ -1313,6 +1316,224 @@
                     </div>
                 </div>
                 
+                <!-- Footer Controls -->
+                <div ng-if="currentPage === 'footer'">
+                    <!-- Footer Section Controls -->
+                    <div class="control-card">
+                        <h3>Footer Settings</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="footerToggle" ng-model="site.footer.enabled">
+                            <label class="form-check-label" for="footerToggle">Show Footer Section</label>
+                        </div>
+                        
+                        <!-- Shopping Column -->
+                        <div class="mb-4">
+                            <h4>Shopping Column</h4>
+                            <div class="mb-3">
+                                <label for="footerShoppingTitle" class="form-label">Column Title</label>
+                                <input type="text" class="form-control" id="footerShoppingTitle" ng-model="site.footer.columns.shopping.title">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Links</label>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Text</th>
+                                                <th>URL</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="link in site.footer.columns.shopping.links">
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" ng-model="link.text">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" ng-model="link.url">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-danger" ng-click="removeShoppingLink($index)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary" ng-click="addShoppingLink()">
+                                    <i class="fas fa-plus"></i> Add Link
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Information Column -->
+                        <div class="mb-4">
+                            <h4>Information Column</h4>
+                            <div class="mb-3">
+                                <label for="footerInfoTitle" class="form-label">Column Title</label>
+                                <input type="text" class="form-control" id="footerInfoTitle" ng-model="site.footer.columns.information.title">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Links</label>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Text</th>
+                                                <th>URL</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="link in site.footer.columns.information.links">
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" ng-model="link.text">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" ng-model="link.url">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-danger" ng-click="removeInfoLink($index)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary" ng-click="addInfoLink()">
+                                    <i class="fas fa-plus"></i> Add Link
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Account Column -->
+                        <div class="mb-4">
+                            <h4>Account Column</h4>
+                            <div class="mb-3">
+                                <label for="footerAccountTitle" class="form-label">Column Title</label>
+                                <input type="text" class="form-control" id="footerAccountTitle" ng-model="site.footer.columns.account.title">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Links</label>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Text</th>
+                                                <th>URL</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="link in site.footer.columns.account.links">
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" ng-model="link.text">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" ng-model="link.url">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-danger" ng-click="removeAccountLink($index)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary" ng-click="addAccountLink()">
+                                    <i class="fas fa-plus"></i> Add Link
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Column -->
+                        <div class="mb-4">
+                            <h4>Get In Touch Column</h4>
+                            <div class="mb-3">
+                                <label for="footerContactTitle" class="form-label">Column Title</label>
+                                <input type="text" class="form-control" id="footerContactTitle" ng-model="site.footer.columns.contact.title">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="footerContactAddress" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="footerContactAddress" ng-model="site.footer.columns.contact.address">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="footerContactPhone" class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="footerContactPhone" ng-model="site.footer.columns.contact.phone">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="footerContactEmail" class="form-label">Email</label>
+                                <input type="text" class="form-control" id="footerContactEmail" ng-model="site.footer.columns.contact.email">
+                            </div>
+                        </div>
+                        
+                        <!-- Social Media Links -->
+                        <div class="mb-4">
+                            <h4>Social Media Links</h4>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Social Media Accounts</label>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Platform</th>
+                                                <th>URL</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in socialMediaItems">
+                                                <td>
+                                                    <select class="form-select form-select-sm" ng-model="item.platform">
+                                                        <option value="facebook">Facebook</option>
+                                                        <option value="instagram">Instagram</option>
+                                                        <option value="twitter">Twitter</option>
+                                                        <option value="pinterest">Pinterest</option>
+                                                        <option value="youtube">YouTube</option>
+                                                        <option value="linkedin">LinkedIn</option>
+                                                        <option value="tiktok">TikTok</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="text" class="form-control form-control-sm" ng-model="item.url" placeholder="facebook.com/Garmenique">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-danger" ng-click="removeSocialMedia($index)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-sm btn-primary" ng-click="addSocialMedia()">
+                                    <i class="fas fa-plus"></i> Add Social Media
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Copyright Text -->
+                        <div class="mb-3">
+                            <label for="footerCopyright" class="form-label">Copyright Text</label>
+                            <input type="text" class="form-control" id="footerCopyright" ng-model="site.footer.copyright">
+                            <small class="text-muted">Year will be automatically added.</small>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Save Changes Button -->
                 <div class="text-end mb-4">
                     <button class="btn btn-danger me-2" ng-click="confirmReset()">
@@ -1335,7 +1556,7 @@
                                 <div class="hero-content">
                                     <h1 class="hero-title">{% site.hero.title %}</h1>
                                     <p class="hero-subtitle">{% site.hero.subtitle %}</p>
-                                    <a href="#" class="btn">{% site.hero.buttonText %}</a>
+                                    <a href="#" class="btn" style="background-color: #fff; color: #000; padding: 10px 25px; text-decoration: none; font-weight: 600; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">{% site.hero.buttonText %}</a>
                                 </div>
                             </div>
                         </div>
@@ -1366,7 +1587,7 @@
                         <div class="mission-section" ng-if="site.mission.enabled" ng-style="{'background-image': 'url(' + site.mission.backgroundImage + ')'}">
                             <div class="mission-content">
                                 <h2 class="mission-title">{% site.mission.title %}</h2>
-                                <button class="btn btn-light">{% site.mission.buttonText %}</button>
+                                <button class="btn btn-light" style="background-color: #fff; color: #000; padding: 10px 25px; text-decoration: none; font-weight: 600; display: inline-block; text-transform: uppercase; letter-spacing: 1px; border: none;">{% site.mission.buttonText %}</button>
                             </div>
                         </div>
                     </div>
@@ -1604,6 +1825,71 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Footer Preview -->
+                    <div ng-if="currentPage === 'footer'" class="footer-preview preview-container">
+                        <div style="background-color: #f8f9fa; padding: 40px 20px 0;">
+                            <div class="container">
+                                <div class="row">
+                                    <!-- Shopping Column -->
+                                    <div class="col-md-3 mb-4">
+                                        <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">{% site.footer.columns.shopping.title %}</h3>
+                                        <ul style="list-style: none; padding-left: 0; margin-bottom: 30px;">
+                                            <li ng-repeat="link in site.footer.columns.shopping.links" style="margin-bottom: 10px;">
+                                                <a href="javascript:void(0)" style="color: #555; text-decoration: none;">{% link.text %}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Information Column -->
+                                    <div class="col-md-3 mb-4">
+                                        <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">{% site.footer.columns.information.title %}</h3>
+                                        <ul style="list-style: none; padding-left: 0; margin-bottom: 30px;">
+                                            <li ng-repeat="link in site.footer.columns.information.links" style="margin-bottom: 10px;">
+                                                <a href="javascript:void(0)" style="color: #555; text-decoration: none;">{% link.text %}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Account Column -->
+                                    <div class="col-md-3 mb-4">
+                                        <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">{% site.footer.columns.account.title %}</h3>
+                                        <ul style="list-style: none; padding-left: 0; margin-bottom: 30px;">
+                                            <li ng-repeat="link in site.footer.columns.account.links" style="margin-bottom: 10px;">
+                                                <a href="javascript:void(0)" style="color: #555; text-decoration: none;">{% link.text %}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Contact Column -->
+                                    <div class="col-md-3 mb-4">
+                                        <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">{% site.footer.columns.contact.title %}</h3>
+                                        <div style="color: #555;">
+                                            <p style="margin-bottom: 10px;"><i class="fas fa-map-marker-alt" style="width: 20px; margin-right: 8px; color: #666;"></i> {% site.footer.columns.contact.address %}</p>
+                                            <p style="margin-bottom: 10px;"><i class="fas fa-phone" style="width: 20px; margin-right: 8px; color: #666;"></i> {% site.footer.columns.contact.phone %}</p>
+                                            <p style="margin-bottom: 10px;"><i class="fas fa-envelope" style="width: 20px; margin-right: 8px; color: #666;"></i> {% site.footer.columns.contact.email %}</p>
+                                        </div>
+                                        
+                                        <!-- Social Icons -->
+                                        <div style="margin-top: 20px;">
+                                            <a ng-repeat="item in socialMediaItems" ng-if="item.url" 
+                                               ng-href="https://{% item.url %}" 
+                                               target="_blank" 
+                                               style="display: inline-block; width: 36px; height: 36px; line-height: 36px; text-align: center; background-color: #eee; color: #555; border-radius: 50%; margin-right: 10px;" 
+                                               aria-label="{% item.platform | capitalize %}">
+                                                <i class="fab" ng-class="getSocialIcon(item.platform)"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer Bottom -->
+                            <div style="background-color: #f1f1f1; padding: 15px 0; margin-top: 40px; text-align: center;">
+                                <p style="color: #666; margin: 0; font-size: 14px;">{% site.footer.copyright %}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1620,6 +1906,14 @@
             // Change Angular's default brackets to avoid conflict with Laravel Blade
             $interpolateProvider.startSymbol('{%');
             $interpolateProvider.endSymbol('%}');
+        });
+        
+        // Add capitalize filter
+        app.filter('capitalize', function() {
+            return function(input) {
+                if (!input) return '';
+                return input.charAt(0).toUpperCase() + input.slice(1);
+            };
         });
         
         app.controller('CustomizeController', function($scope, $http) {
@@ -1891,12 +2185,126 @@
                             weekends: '10:00 AM - 3:00 PM'
                         }
                     }
+                },
+                footer: {
+                    enabled: true,
+                    columns: {
+                        shopping: {
+                            title: 'Shopping',
+                            links: [
+                                { text: 'Shop All', url: '/catalog' },
+                                { text: 'T-Shirts', url: '/catalog?category=t-shirts' },
+                                { text: 'Jeans', url: '/catalog?category=jeans' },
+                                { text: 'Dresses', url: '/catalog?category=dresses' },
+                                { text: 'Outerwear', url: '/catalog?category=outerwear' },
+                                { text: 'Accessories', url: '/catalog?category=accessories' }
+                            ]
+                        },
+                        information: {
+                            title: 'Information',
+                            links: [
+                                { text: 'About Us', url: '/about' },
+                                { text: 'Contact Us', url: '/contact' },
+                                { text: 'Blog', url: '/blog' },
+                                { text: 'Shipping & Returns', url: '/shipping' },
+                                { text: 'Privacy Policy', url: '/privacy-policy' },
+                                { text: 'Terms & Conditions', url: '/terms' }
+                            ]
+                        },
+                        account: {
+                            title: 'Account',
+                            links: [
+                                { text: 'Login / Register', url: '/login' },
+                                { text: 'My Account', url: '/account/settings' },
+                                { text: 'Order History', url: '/account/orders' },
+                                { text: 'Shopping Cart', url: '/cart' }
+                            ]
+                        },
+                        contact: {
+                            title: 'Get In Touch',
+                            address: '123 Fashion Street, New York, NY',
+                            phone: '+1 (555) 123-4567',
+                            email: 'contact@garmenique.com'
+                        }
+                    },
+                    social: {
+                        facebook: '#',
+                        instagram: '#',
+                        twitter: '#',
+                        pinterest: '#'
+                    },
+                    copyright: '© 2025 Garmenique. All Rights Reserved.'
                 }
             };
 
             // Store default settings for reset functionality
             $scope.defaultSettings = JSON.parse(JSON.stringify($scope.site));
-
+            
+            // Initialize social media items array
+            $scope.socialMediaItems = [];
+            
+            // Function to get social icon class based on platform
+            $scope.getSocialIcon = function(platform) {
+                switch(platform) {
+                    case 'facebook': return 'fa-facebook-f';
+                    case 'instagram': return 'fa-instagram';
+                    case 'twitter': return 'fa-twitter';
+                    case 'pinterest': return 'fa-pinterest-p';
+                    case 'youtube': return 'fa-youtube';
+                    case 'linkedin': return 'fa-linkedin-in';
+                    case 'tiktok': return 'fa-tiktok';
+                    default: return 'fa-' + platform;
+                }
+            };
+            
+            // Add social media item
+            $scope.addSocialMedia = function() {
+                $scope.socialMediaItems.push({
+                    platform: 'facebook',
+                    url: ''
+                });
+                $scope.syncSocialMediaToFooter();
+            };
+            
+            // Remove social media item
+            $scope.removeSocialMedia = function(index) {
+                $scope.socialMediaItems.splice(index, 1);
+                $scope.syncSocialMediaToFooter();
+            };
+            
+            // Sync social media items to footer.social object
+            $scope.syncSocialMediaToFooter = function() {
+                // Clear the current social object
+                $scope.site.footer.social = {};
+                
+                // Add each social media item to the social object
+                $scope.socialMediaItems.forEach(function(item) {
+                    if (item.platform && item.url) {
+                        $scope.site.footer.social[item.platform] = item.url;
+                    }
+                });
+            };
+            
+            // Sync footer.social object to social media items
+            $scope.syncFooterToSocialMedia = function() {
+                $scope.socialMediaItems = [];
+                
+                // Add each social platform from the social object to the items array
+                for (var platform in $scope.site.footer.social) {
+                    if (platform !== '$$hashKey' && $scope.site.footer.social[platform]) {
+                        $scope.socialMediaItems.push({
+                            platform: platform,
+                            url: $scope.site.footer.social[platform]
+                        });
+                    }
+                }
+            };
+            
+            // Watch for changes in socialMediaItems to sync back to footer.social
+            $scope.$watch('socialMediaItems', function() {
+                $scope.syncSocialMediaToFooter();
+            }, true);
+            
             // Load settings from database
             $scope.loadSettings = function() {
                 $http.get('/admin/api/page-settings?page=' + $scope.currentPage)
@@ -2200,6 +2608,49 @@
                                     }
                                 }
                             }
+                            else if ($scope.currentPage === 'footer') {
+                                console.log("Processing footer settings");
+                                if (savedSettings.footer) {
+                                    $scope.site.footer.enabled = savedSettings.footer.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.footer.settings) {
+                                        // Apply column settings
+                                        if (savedSettings.footer.settings.columns) {
+                                            if (savedSettings.footer.settings.columns.shopping) {
+                                                $scope.site.footer.columns.shopping = savedSettings.footer.settings.columns.shopping;
+                                            }
+                                            if (savedSettings.footer.settings.columns.information) {
+                                                $scope.site.footer.columns.information = savedSettings.footer.settings.columns.information;
+                                            }
+                                            if (savedSettings.footer.settings.columns.account) {
+                                                $scope.site.footer.columns.account = savedSettings.footer.settings.columns.account;
+                                            }
+                                            if (savedSettings.footer.settings.columns.contact) {
+                                                $scope.site.footer.columns.contact = savedSettings.footer.settings.columns.contact;
+                                            }
+                                        }
+                                        
+                                        // Social media settings
+                                        if (savedSettings.footer.settings.social) {
+                                            $scope.site.footer.social = savedSettings.footer.settings.social;
+                                        }
+                                        
+                                        // Copyright settings
+                                        if (savedSettings.footer.settings.copyright) {
+                                            $scope.site.footer.copyright = savedSettings.footer.settings.copyright;
+                                        }
+                                    }
+                                }
+                                
+                                // Initialize socialMediaItems array from footer.social
+                                $scope.syncFooterToSocialMedia();
+                            }
+                        }
+                        
+                        // Make sure socialMediaItems is initialized for footer page
+                        if ($scope.currentPage === 'footer' && !$scope.socialMediaItems.length) {
+                            $scope.syncFooterToSocialMedia();
                         }
                     })
                     .catch(function(error) {
@@ -2497,6 +2948,44 @@
                     
                     console.log("Settings to save:", settingsToSave);
                 }
+                else if ($scope.currentPage === 'footer') {
+                    console.log("Saving footer settings");
+                    
+                    // Make sure social media items are synced to footer.social
+                    $scope.syncSocialMediaToFooter();
+                    
+                    settingsToSave = {
+                        footer: {
+                            enabled: $scope.site.footer.enabled,
+                            settings: {
+                                columns: {
+                                    shopping: {
+                                        title: $scope.site.footer.columns.shopping.title,
+                                        links: $scope.site.footer.columns.shopping.links
+                                    },
+                                    information: {
+                                        title: $scope.site.footer.columns.information.title,
+                                        links: $scope.site.footer.columns.information.links
+                                    },
+                                    account: {
+                                        title: $scope.site.footer.columns.account.title,
+                                        links: $scope.site.footer.columns.account.links
+                                    },
+                                    contact: {
+                                        title: $scope.site.footer.columns.contact.title,
+                                        address: $scope.site.footer.columns.contact.address,
+                                        phone: $scope.site.footer.columns.contact.phone,
+                                        email: $scope.site.footer.columns.contact.email
+                                    }
+                                },
+                                social: $scope.site.footer.social,
+                                copyright: $scope.site.footer.copyright
+                            }
+                        }
+                    };
+                    
+                    console.log("Footer settings to save:", settingsToSave);
+                }
                 
                 // Send to server
                 $http.post('/admin/api/page-settings', {
@@ -2528,6 +3017,62 @@
             $scope.resetToDefault = function() {
                 // Reset all settings to default
                 $scope.site = JSON.parse(JSON.stringify($scope.defaultSettings));
+                
+                // For footer page, set specific default links
+                if ($scope.currentPage === 'footer') {
+                    $scope.site.footer = {
+                        enabled: true,
+                        columns: {
+                            shopping: {
+                                title: 'Shopping',
+                                links: [
+                                    { text: 'Shop All', url: '/catalog' },
+                                    { text: 'T-Shirts', url: '/catalog?category=t-shirts' },
+                                    { text: 'Jeans', url: '/catalog?category=jeans' },
+                                    { text: 'Dresses', url: '/catalog?category=dresses' },
+                                    { text: 'Outerwear', url: '/catalog?category=outerwear' },
+                                    { text: 'Accessories', url: '/catalog?category=accessories' }
+                                ]
+                            },
+                            information: {
+                                title: 'Information',
+                                links: [
+                                    { text: 'About Us', url: '/about' },
+                                    { text: 'Contact Us', url: '/contact' },
+                                    { text: 'Blog', url: '/blog' },
+                                    { text: 'Shipping & Returns', url: '/shipping' },
+                                    { text: 'Privacy Policy', url: '/privacy-policy' },
+                                    { text: 'Terms & Conditions', url: '/terms' }
+                                ]
+                            },
+                            account: {
+                                title: 'Account',
+                                links: [
+                                    { text: 'Login / Register', url: '/login' },
+                                    { text: 'My Account', url: '/account/settings' },
+                                    { text: 'Order History', url: '/account/orders' },
+                                    { text: 'Shopping Cart', url: '/cart' }
+                                ]
+                            },
+                            contact: {
+                                title: 'Get In Touch',
+                                address: '123 Fashion Street, New York, NY',
+                                phone: '+1 (555) 123-4567',
+                                email: 'contact@garmenique.com'
+                            }
+                        },
+                        social: {
+                            facebook: 'facebook.com/Garmenique',
+                            instagram: 'instagram.com/Garmenique',
+                            twitter: 'twitter.com/Garmenique',
+                            pinterest: 'pinterest.com/Garmenique'
+                        },
+                        copyright: '© 2025 Garmenique. All Rights Reserved.'
+                    };
+                    
+                    // Update the socialMediaItems array
+                    $scope.syncFooterToSocialMedia();
+                }
                 
                 // Delete settings from database
                 $http.post('/admin/api/page-settings', {
@@ -2710,6 +3255,39 @@
                                 }
                             }
                         }
+                    } : $scope.currentPage === 'footer' ? {
+                        footer: {
+                            enabled: $scope.site.footer.enabled,
+                            settings: {
+                                columns: {
+                                    shopping: {
+                                        title: $scope.site.footer.columns.shopping.title,
+                                        links: $scope.site.footer.columns.shopping.links
+                                    },
+                                    information: {
+                                        title: $scope.site.footer.columns.information.title,
+                                        links: $scope.site.footer.columns.information.links
+                                    },
+                                    account: {
+                                        title: $scope.site.footer.columns.account.title,
+                                        links: $scope.site.footer.columns.account.links
+                                    },
+                                    contact: {
+                                        title: $scope.site.footer.columns.contact.title,
+                                        address: $scope.site.footer.columns.contact.address,
+                                        phone: $scope.site.footer.columns.contact.phone,
+                                        email: $scope.site.footer.columns.contact.email
+                                    }
+                                },
+                                social: {
+                                    facebook: $scope.site.footer.social.facebook,
+                                    instagram: $scope.site.footer.social.instagram,
+                                    twitter: $scope.site.footer.social.twitter,
+                                    pinterest: $scope.site.footer.social.pinterest
+                                },
+                                copyright: $scope.site.footer.copyright
+                            }
+                        }
                     } : {}
                 })
                 .then(function(response) {
@@ -2859,6 +3437,40 @@
                 } else {
                     alert("Products Detailed section not properly initialized!");
                 }
+            };
+
+            // Footer Controls
+            $scope.addShoppingLink = function() {
+                $scope.site.footer.columns.shopping.links.push({
+                    text: 'New Link',
+                    url: '#'
+                });
+            };
+
+            $scope.removeShoppingLink = function(index) {
+                $scope.site.footer.columns.shopping.links.splice(index, 1);
+            };
+
+            $scope.addInfoLink = function() {
+                $scope.site.footer.columns.information.links.push({
+                    text: 'New Link',
+                    url: '#'
+                });
+            };
+
+            $scope.removeInfoLink = function(index) {
+                $scope.site.footer.columns.information.links.splice(index, 1);
+            };
+
+            $scope.addAccountLink = function() {
+                $scope.site.footer.columns.account.links.push({
+                    text: 'New Link',
+                    url: '#'
+                });
+            };
+
+            $scope.removeAccountLink = function(index) {
+                $scope.site.footer.columns.account.links.splice(index, 1);
             };
         });
     </script>

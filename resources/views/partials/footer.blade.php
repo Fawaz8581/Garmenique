@@ -1,3 +1,8 @@
+@php
+$footerSettings = \App\Models\PageSetting::getSectionSettings('footer', 'footer');
+$settings = $footerSettings ? $footerSettings->settings : null;
+@endphp
+
 <footer class="footer">
     <style>
         /* Footer styling */
@@ -99,54 +104,95 @@
         <div class="row">
             <div class="col-md-3 col-sm-6">
                 <div class="footer-widget">
-                    <h3>Shopping</h3>
+                    <h3>{{ $settings['columns']['shopping']['title'] ?? 'Shopping' }}</h3>
                     <ul class="footer-links">
-                        <li><a href="/catalog">Shop All</a></li>
-                        <li><a href="/catalog?category=t-shirts">T-Shirts</a></li>
-                        <li><a href="/catalog?category=jeans">Jeans</a></li>
-                        <li><a href="/catalog?category=dresses">Dresses</a></li>
-                        <li><a href="/catalog?category=outerwear">Outerwear</a></li>
-                        <li><a href="/catalog?category=accessories">Accessories</a></li>
+                        @if(isset($settings['columns']['shopping']['links']))
+                            @foreach($settings['columns']['shopping']['links'] as $link)
+                                <li><a href="{{ $link['url'] }}">{{ $link['text'] }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="/catalog">Shop All</a></li>
+                            <li><a href="/catalog?category=t-shirts">T-Shirts</a></li>
+                            <li><a href="/catalog?category=jeans">Jeans</a></li>
+                            <li><a href="/catalog?category=dresses">Dresses</a></li>
+                            <li><a href="/catalog?category=outerwear">Outerwear</a></li>
+                            <li><a href="/catalog?category=accessories">Accessories</a></li>
+                        @endif
                     </ul>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6">
                 <div class="footer-widget">
-                    <h3>Information</h3>
+                    <h3>{{ $settings['columns']['information']['title'] ?? 'Information' }}</h3>
                     <ul class="footer-links">
-                        <li><a href="/about">About Us</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
-                        <li><a href="/blog">Blog</a></li>
-                        <li><a href="/shipping">Shipping & Returns</a></li>
-                        <li><a href="/privacy-policy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms & Conditions</a></li>
+                        @if(isset($settings['columns']['information']['links']))
+                            @foreach($settings['columns']['information']['links'] as $link)
+                                <li><a href="{{ $link['url'] }}">{{ $link['text'] }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/blog">Blog</a></li>
+                            <li><a href="/shipping">Shipping & Returns</a></li>
+                            <li><a href="/privacy-policy">Privacy Policy</a></li>
+                            <li><a href="/terms">Terms & Conditions</a></li>
+                        @endif
                     </ul>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6">
                 <div class="footer-widget">
-                    <h3>Account</h3>
+                    <h3>{{ $settings['columns']['account']['title'] ?? 'Account' }}</h3>
                     <ul class="footer-links">
-                        <li><a href="/login">Login / Register</a></li>
-                        <li><a href="/account/settings">My Account</a></li>
-                        <li><a href="/account/orders">Order History</a></li>
-                        <li><a href="/cart">Shopping Cart</a></li>
+                        @if(isset($settings['columns']['account']['links']))
+                            @foreach($settings['columns']['account']['links'] as $link)
+                                <li><a href="{{ $link['url'] }}">{{ $link['text'] }}</a></li>
+                            @endforeach
+                        @else
+                            <li><a href="/login">Login / Register</a></li>
+                            <li><a href="/account/settings">My Account</a></li>
+                            <li><a href="/account/orders">Order History</a></li>
+                            <li><a href="/cart">Shopping Cart</a></li>
+                        @endif
                     </ul>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6">
                 <div class="footer-widget">
-                    <h3>Get In Touch</h3>
+                    <h3>{{ $settings['columns']['contact']['title'] ?? 'Get In Touch' }}</h3>
                     <div class="contact-info">
-                        <p><i class="fas fa-map-marker-alt"></i> 123 Fashion Street, New York, NY</p>
-                        <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
-                        <p><i class="fas fa-envelope"></i> contact@garmenique.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i> {{ $settings['columns']['contact']['address'] ?? '123 Fashion Street, New York, NY' }}</p>
+                        <p><i class="fas fa-phone"></i> {{ $settings['columns']['contact']['phone'] ?? '+1 (555) 123-4567' }}</p>
+                        <p><i class="fas fa-envelope"></i> {{ $settings['columns']['contact']['email'] ?? 'contact@garmenique.com' }}</p>
                     </div>
                     <div class="social-icons">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                        @if(isset($settings['social']) && is_array($settings['social']))
+                            @foreach($settings['social'] as $platform => $url)
+                                @if(!empty($url) && $url !== '#')
+                                    @php
+                                        $icon = '';
+                                        switch($platform) {
+                                            case 'facebook': $icon = 'fa-facebook-f'; break;
+                                            case 'instagram': $icon = 'fa-instagram'; break;
+                                            case 'twitter': $icon = 'fa-twitter'; break;
+                                            case 'pinterest': $icon = 'fa-pinterest-p'; break;
+                                            case 'youtube': $icon = 'fa-youtube'; break;
+                                            case 'linkedin': $icon = 'fa-linkedin-in'; break;
+                                            case 'tiktok': $icon = 'fa-tiktok'; break;
+                                            default: $icon = 'fa-' . $platform; break;
+                                        }
+                                        // Ensure URL has https:// prefix
+                                        $fullUrl = strpos($url, 'http') === 0 ? $url : 'https://' . ltrim($url, '/');
+                                    @endphp
+                                    <a href="{{ $fullUrl }}" target="_blank" aria-label="{{ ucfirst($platform) }}"><i class="fab {{ $icon }}"></i></a>
+                                @endif
+                            @endforeach
+                        @else
+                            <a href="https://facebook.com/Garmenique" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://instagram.com/Garmenique" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="https://twitter.com/Garmenique" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="https://pinterest.com/Garmenique" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -154,7 +200,7 @@
     </div>
     <div class="footer-bottom">
         <div class="container">
-            <p class="copyright">© {{ date('Y') }} Garmenique. All Rights Reserved.</p>
+            <p class="copyright">{{ $settings['copyright'] ?? '© 2025 Garmenique. All Rights Reserved.' }}</p>
         </div>
     </div>
 </footer> 

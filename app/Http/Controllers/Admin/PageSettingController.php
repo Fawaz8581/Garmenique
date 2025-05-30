@@ -375,6 +375,56 @@ class PageSettingController extends Controller
                     
                     // Skip the main foreach loop's PageSetting::updateOrCreate for 'products_detailed'
                     continue;
+                } elseif ($sectionName === 'footer' && isset($sectionData)) {
+                    // Handle footer settings
+                    $processedSettings = [
+                        'columns' => [
+                            'shopping' => [
+                                'title' => $sectionData['settings']['columns']['shopping']['title'] ?? 'Shopping',
+                                'links' => $sectionData['settings']['columns']['shopping']['links'] ?? [
+                                    ['text' => 'Shop All', 'url' => '/catalog'],
+                                    ['text' => 'T-Shirts', 'url' => '/catalog?category=t-shirts'],
+                                    ['text' => 'Jeans', 'url' => '/catalog?category=jeans'],
+                                    ['text' => 'Dresses', 'url' => '/catalog?category=dresses'],
+                                    ['text' => 'Outerwear', 'url' => '/catalog?category=outerwear'],
+                                    ['text' => 'Accessories', 'url' => '/catalog?category=accessories']
+                                ]
+                            ],
+                            'information' => [
+                                'title' => $sectionData['settings']['columns']['information']['title'] ?? 'Information',
+                                'links' => $sectionData['settings']['columns']['information']['links'] ?? [
+                                    ['text' => 'About Us', 'url' => '/about'],
+                                    ['text' => 'Contact Us', 'url' => '/contact'],
+                                    ['text' => 'Blog', 'url' => '/blog'],
+                                    ['text' => 'Shipping & Returns', 'url' => '/shipping'],
+                                    ['text' => 'Privacy Policy', 'url' => '/privacy-policy'],
+                                    ['text' => 'Terms & Conditions', 'url' => '/terms']
+                                ]
+                            ],
+                            'account' => [
+                                'title' => $sectionData['settings']['columns']['account']['title'] ?? 'Account',
+                                'links' => $sectionData['settings']['columns']['account']['links'] ?? [
+                                    ['text' => 'Login / Register', 'url' => '/login'],
+                                    ['text' => 'My Account', 'url' => '/account/settings'],
+                                    ['text' => 'Order History', 'url' => '/account/orders'],
+                                    ['text' => 'Shopping Cart', 'url' => '/cart']
+                                ]
+                            ],
+                            'contact' => [
+                                'title' => $sectionData['settings']['columns']['contact']['title'] ?? 'Get In Touch',
+                                'address' => $sectionData['settings']['columns']['contact']['address'] ?? '123 Fashion Street, New York, NY',
+                                'phone' => $sectionData['settings']['columns']['contact']['phone'] ?? '+1 (555) 123-4567',
+                                'email' => $sectionData['settings']['columns']['contact']['email'] ?? 'contact@garmenique.com'
+                            ]
+                        ],
+                        'social' => [
+                            'facebook' => $sectionData['settings']['social']['facebook'] ?? '#',
+                            'instagram' => $sectionData['settings']['social']['instagram'] ?? '#',
+                            'twitter' => $sectionData['settings']['social']['twitter'] ?? '#',
+                            'pinterest' => $sectionData['settings']['social']['pinterest'] ?? '#'
+                        ],
+                        'copyright' => $sectionData['settings']['copyright'] ?? '© 2025 Garmenique. All Rights Reserved.'
+                    ];
                 } else {
                     $processedSettings = $sectionData['settings'] ?? null;
                 }
