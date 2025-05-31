@@ -91,6 +91,21 @@ class DashboardController extends Controller
             $recentOrdersQuery->whereBetween('created_at', [$startDate, $endDate]);
         }
         
+        // Apply search filter if provided
+        $search = $request->input('search');
+        if ($search) {
+            $recentOrdersQuery->where(function($query) use ($search) {
+                $query->where('order_number', 'like', "%{$search}%")
+                      ->orWhere('cart_items', 'like', "%{$search}%"); // This is a rough approximation since cart_items is JSON
+            });
+        }
+        
+        // Apply status filter if provided
+        $status = $request->input('status');
+        if ($status) {
+            $recentOrdersQuery->where('status', $status);
+        }
+        
         // Preserve the all_dates parameter when paginating
         $recentOrdersPaginated = $recentOrdersQuery->paginate(5)->appends($request->except('page'));
         
@@ -144,6 +159,11 @@ class DashboardController extends Controller
         try {
             // Get date filter
             $showAllDates = $request->has('all_dates');
+            
+            // Get status filter
+            $statusFilter = $request->input('status');
+            
+            // Get selected date
             $selectedDate = $request->has('date') 
                 ? Carbon::parse($request->date)
                 : Carbon::today();
@@ -154,21 +174,27 @@ class DashboardController extends Controller
             // Apply date filter to orders query
             $ordersQuery = Order::where('status', '!=', 'rejected');
             
+            // Apply status filter if provided
+            if ($statusFilter) {
+                $ordersQuery->where('status', $statusFilter);
+            }
+            
             if (!$showAllDates) {
                 $startDate = $selectedDate->copy()->startOfDay();
                 $endDate = $selectedDate->copy()->endOfDay();
                 $ordersQuery->whereBetween('created_at', [$startDate, $endDate]);
             }
             
-            // Get total sales and orders for the selected date or all time
+            // Get total sales and orders
             $totalSales = $ordersQuery->sum('total');
             $totalOrders = $ordersQuery->count();
             
-            // Clone the query for pagination to ensure we're using the same filter conditions
+            // Clone the query for pagination
             $paginationQuery = clone $ordersQuery;
             
             // Get recent orders with pagination
-            $recentOrdersPaginated = $paginationQuery->orderBy('created_at', 'desc')
+            $recentOrdersPaginated = $paginationQuery
+                ->orderBy('created_at', 'desc')
                 ->paginate(10, ['*'], 'page', $page);
             
             $recentOrders = $recentOrdersPaginated->map(function ($order) {
@@ -191,37 +217,6 @@ class DashboardController extends Controller
                 ];
             });
             
-            // Calculate sales percentage (compared to previous period)
-            if (!$showAllDates) {
-                // If filtering by date, compare to previous day
-                $previousPeriod = [
-                    $selectedDate->copy()->subDay()->startOfDay(),
-                    $selectedDate->copy()->subDay()->endOfDay()
-                ];
-            } else {
-                // If showing all dates, compare to previous month
-                $previousPeriod = [
-                    Carbon::now()->subMonth()->startOfMonth(),
-                    Carbon::now()->subMonth()->endOfMonth()
-                ];
-            }
-            
-            // Base query for previous period
-            $previousOrdersQuery = Order::whereBetween('created_at', $previousPeriod)
-                                    ->where('status', '!=', 'rejected');
-            
-            $previousSales = $previousOrdersQuery->sum('total');
-            $previousOrders = $previousOrdersQuery->count();
-            
-            // Calculate percentages (avoid division by zero)
-            $salesPercentage = $previousSales > 0 
-                ? min(100, round(($totalSales / $previousSales) * 100)) 
-                : ($totalSales > 0 ? 100 : 0);
-            
-            $ordersPercentage = $previousOrders > 0 
-                ? min(100, round(($totalOrders / $previousOrders) * 100)) 
-                : ($totalOrders > 0 ? 100 : 0);
-            
             // Format pagination data for frontend
             $pagination = [
                 'current_page' => $recentOrdersPaginated->currentPage(),
@@ -234,18 +229,17 @@ class DashboardController extends Controller
                 'total_sales' => $totalSales,
                 'total_orders' => $totalOrders,
                 'recent_orders' => $recentOrders,
-                'sales_percentage' => $salesPercentage,
-                'orders_percentage' => $ordersPercentage,
+                'pagination' => $pagination,
                 'show_all_dates' => $showAllDates,
                 'date' => $selectedDate->format('Y-m-d'),
-                'pagination' => $pagination,
+                'selected_status' => $statusFilter, // Add this line
             ]);
+            
         } catch (\Exception $e) {
-            \Log::error('Error in getDashboardDataJson: ' . $e->getMessage());
             return response()->json([
-                'error' => 'An error occurred while loading dashboard data',
-                'message' => $e->getMessage(),
+                'error' => true,
+                'message' => 'Error fetching dashboard data: ' . $e->getMessage()
             ], 500);
         }
     }
-} 
+}

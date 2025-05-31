@@ -387,6 +387,12 @@
                 document.getElementById('selectedDate').valueAsDate = new Date();
             }
             
+            // Make sure pagination listeners are properly attached on page load
+            attachPaginationListeners();
+            
+            // Fix URL parameters to ensure consistency
+            fixUrlParameters();
+            
             // Date selector change event
             document.getElementById('selectedDate').addEventListener('change', function() {
                 // Only trigger navigation if not in all dates mode or if the input is not disabled
@@ -394,28 +400,63 @@
                     // Reload the page with the new date parameter
                     const url = new URL(window.location.href);
                     url.searchParams.delete('all_dates'); // Remove all_dates parameter if exists
+                    url.searchParams.delete('page'); // Reset to page 1
                     url.searchParams.set('date', this.value);
                     window.location.href = url.toString();
                 }
             });
             
+            // Function to fix URL parameters to ensure consistency
+            function fixUrlParameters() {
+                const currentUrl = new URL(window.location.href);
+                let needsUpdate = false;
+                
+                // Check if all_dates and date parameters are both present (they should be mutually exclusive)
+                if (currentUrl.searchParams.has('all_dates') && currentUrl.searchParams.has('date')) {
+                    // If both exist, prioritize all_dates
+                    currentUrl.searchParams.delete('date');
+                    needsUpdate = true;
+                }
+                
+                // Ensure page parameter is a valid number
+                if (currentUrl.searchParams.has('page')) {
+                    const page = parseInt(currentUrl.searchParams.get('page'));
+                    if (isNaN(page) || page < 1) {
+                        currentUrl.searchParams.set('page', '1');
+                        needsUpdate = true;
+                    }
+                }
+                
+                // Update URL if needed without causing a page reload
+                if (needsUpdate) {
+                    window.history.replaceState({}, '', currentUrl.toString());
+                }
+            }
+            
             // All dates button click event
             if (document.getElementById('allDatesBtn')) {
                 document.getElementById('allDatesBtn').addEventListener('click', function() {
+                    // Show loading state
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+                    
                     // Reload the page with all_dates parameter
                     const url = new URL(window.location.href);
                     url.searchParams.delete('date'); // Remove date parameter if exists
+                    url.searchParams.delete('page'); // Remove page parameter to start at page 1
                     url.searchParams.set('all_dates', '1');
                     
-                    // Prevent automatic refresh by storing the URL and navigating directly
-                    const targetUrl = url.toString();
-                    window.location.href = targetUrl;
+                    window.location.href = url.toString();
                 });
             }
             
             // Filter by date button click event
             if (document.getElementById('filterByDateBtn')) {
                 document.getElementById('filterByDateBtn').addEventListener('click', function() {
+                    // Show loading state
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+                    
                     // Enable the date input
                     const dateInput = document.getElementById('selectedDate');
                     dateInput.disabled = false;
@@ -423,6 +464,7 @@
                     // Reload the page with the selected date parameter
                     const url = new URL(window.location.href);
                     url.searchParams.delete('all_dates'); // Remove all_dates parameter
+                    url.searchParams.delete('page'); // Remove page parameter to start at page 1
                     url.searchParams.set('date', dateInput.value);
                     window.location.href = url.toString();
                 });
@@ -443,9 +485,9 @@
             
             // Search input input event with debounce
             if (searchInput) {
-                searchInput.addEventListener('input', debounce(function() {
+                searchInput.addEventListener('input', debounce(function(e) {
                     applySearchAndFilter();
-                }, 300)); // 300ms debounce
+                }, 500)); // 500ms delay
             }
             
             // Status filter change event
@@ -460,6 +502,7 @@
                 // Get the current data and re-filter it
                 const date = document.getElementById('selectedDate').value;
                 const isAllDates = new URLSearchParams(window.location.search).has('all_dates');
+                const statusFilter = document.getElementById('orderStatusFilter');
                 
                 // Show loading indicator
                 const tableBody = document.querySelector('.orders-table tbody');
@@ -475,7 +518,18 @@
                     params.append('date', date);
                 }
                 
-                // Fetch data with filters
+                // Add search term if exists
+                const searchTerm = document.getElementById('orderSearchInput').value.trim();
+                if (searchTerm) {
+                    params.append('search', searchTerm);
+                }
+                
+                // Add status filter if selected
+                if (statusFilter && statusFilter.value) {
+                    params.append('status', statusFilter.value);
+                }
+
+                // Fetch updated data
                 fetch(`/admin/api/dashboard-data?${params.toString()}`)
                     .then(response => {
                         if (!response.ok) {
@@ -495,6 +549,11 @@
                         if (data.pagination) {
                             updatePaginationUI(data.pagination);
                             attachPaginationListeners();
+                        }
+                        
+                        // Set the status filter to match current selection
+                        if (statusFilter && data.selected_status) {
+                            statusFilter.value = data.selected_status;
                         }
                     })
                     .catch(error => {
@@ -518,142 +577,102 @@
                 }
             }
             
-            // Handle pagination clicks
-            document.querySelectorAll('.custom-pagination .page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Skip if this is a disabled link
-                    if (this.parentElement.classList.contains('disabled') || 
-                        this.parentElement.classList.contains('active')) {
-                        return;
-                    }
-                    
-                    const url = new URL(this.href);
-                    const page = url.searchParams.get('page');
-                    
-                    if (page) {
-                        // Update current URL with the new page number without refreshing
-                        const currentUrl = new URL(window.location.href);
-                        currentUrl.searchParams.set('page', page);
-                        window.history.pushState({}, '', currentUrl);
-                        
-                        // Fetch data for the new page
-                        const isAllDates = currentUrl.searchParams.has('all_dates');
-                        const date = currentUrl.searchParams.get('date');
-                        
-                        // Build query parameters for API call
-                        let params = new URLSearchParams();
-                        params.set('page', page);
-                        
-                        if (isAllDates) {
-                            params.set('all_dates', '1');
-                        } else if (date) {
-                            params.set('date', date);
-                        }
-                        
-                        // Show loading indicator
-                        const tableBody = document.querySelector('.orders-table tbody');
-                        if (tableBody) {
-                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
-                        }
-                        
-                        // Fetch updated data
-                        fetch(`/admin/api/dashboard-data?${params.toString()}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok: ' + response.status);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                // Update table with new data
-                                updateRecentOrdersTable(data.recent_orders);
-                                
-                                // Update pagination UI
-                                updatePaginationUI(data.pagination);
-                                
-                                // Re-attach event listeners to the new pagination links
-                                attachPaginationListeners();
-                            })
-                            .catch(error => {
-                                console.error('Error fetching paginated data:', error);
-                                if (tableBody) {
-                                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data: ${error.message || 'Unknown error'}. Please try again.</td></tr>`;
-                                }
-                            });
-                    }
+            // Function to attach event listeners to pagination links
+            function attachPaginationListeners() {
+                document.querySelectorAll('.custom-pagination .page-link').forEach(link => {
+                    // Remove any existing click listeners to prevent duplicates
+                    link.removeEventListener('click', handlePaginationClick);
+                    link.addEventListener('click', handlePaginationClick);
                 });
-            });
+            }
+
+            // Handler function for pagination clicks
+            function handlePaginationClick(e) {
+                e.preventDefault();
+                
+                // Skip if this is a disabled link or we're already on this page
+                if (this.parentElement.classList.contains('disabled') || 
+                    this.parentElement.classList.contains('active')) {
+                    return;
+                }
+                
+                // Instead of AJAX, just navigate directly to the page
+                window.location.href = this.href;
+            }
         });
         
-        // Function to attach event listeners to pagination links
-        function attachPaginationListeners() {
-            document.querySelectorAll('.custom-pagination .page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Skip if this is a disabled link
-                    if (this.parentElement.classList.contains('disabled') || 
-                        this.parentElement.classList.contains('active')) {
-                        return;
-                    }
-                    
-                    const url = new URL(this.href);
-                    const page = url.searchParams.get('page');
-                    
-                    if (page) {
-                        // Update current URL with the new page number without refreshing
-                        const currentUrl = new URL(window.location.href);
-                        currentUrl.searchParams.set('page', page);
-                        window.history.pushState({}, '', currentUrl);
-                        
-                        // Fetch data for the new page
-                        const isAllDates = currentUrl.searchParams.has('all_dates');
-                        const date = currentUrl.searchParams.get('date');
-                        
-                        // Build query parameters for API call
-                        let params = new URLSearchParams();
-                        params.set('page', page);
-                        
-                        if (isAllDates) {
-                            params.set('all_dates', '1');
-                        } else if (date) {
-                            params.set('date', date);
-                        }
-                        
-                        // Show loading indicator
-                        const tableBody = document.querySelector('.orders-table tbody');
-                        if (tableBody) {
-                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
-                        }
-                        
-                        // Fetch updated data
-                        fetch(`/admin/api/dashboard-data?${params.toString()}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Network response was not ok: ' + response.status);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                // Update table with new data
-                                updateRecentOrdersTable(data.recent_orders);
-                                
-                                // Update pagination UI
-                                updatePaginationUI(data.pagination);
-                                
-                                // Re-attach event listeners to pagination links
-                                attachPaginationListeners();
-                            })
-                            .catch(error => {
-                                console.error('Error fetching paginated data:', error);
-                                if (tableBody) {
-                                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data: ${error.message || 'Unknown error'}. Please try again.</td></tr>`;
-                                }
+        // Helper function to fetch with retry logic
+        function fetchWithRetry(url, maxRetries) {
+            return new Promise((resolve, reject) => {
+                let retries = 0;
+                
+                function attempt() {
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.error) {
+                                throw new Error(data.message || 'Server returned an error');
+                            }
+                            
+                            // Validate data structure to ensure it has the expected format
+                            if (!data || !data.recent_orders) {
+                                throw new Error('Invalid data format received from server');
+                            }
+                            
+                            // Make sure pagination data is properly structured
+                            if (!data.pagination) {
+                                console.warn('Server response missing pagination data, creating default pagination');
+                                data.pagination = {
+                                    current_page: 1,
+                                    last_page: 1,
+                                    per_page: data.recent_orders.length,
+                                    total: data.recent_orders.length
+                                };
+                            }
+                            
+                            // Log for debugging
+                            console.log('Received data:', {
+                                total_orders: data.recent_orders.length,
+                                current_page: data.pagination.current_page,
+                                total_pages: data.pagination.last_page
                             });
-                    }
-                });
+                            
+                            resolve(data);
+                        })
+                        .catch(error => {
+                            retries++;
+                            console.warn(`Fetch attempt ${retries} failed:`, error);
+                            
+                            if (retries < maxRetries) {
+                                // Exponential backoff: wait longer between each retry
+                                setTimeout(attempt, Math.min(1000 * Math.pow(2, retries - 1), 5000));
+                            } else {
+                                // After max retries, show "No orders found" instead of error
+                                const tableBody = document.querySelector('.orders-table tbody');
+                                if (tableBody) {
+                                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No orders found. Please try refreshing the page.</td></tr>';
+                                }
+                                
+                                // Provide a partial resolution with empty data rather than rejecting
+                                resolve({
+                                    recent_orders: [],
+                                    pagination: {
+                                        current_page: parseInt(new URLSearchParams(window.location.search).get('page') || '1'),
+                                        last_page: 1,
+                                        per_page: 10,
+                                        total: 0
+                                    }
+                                });
+                            }
+                        });
+                }
+                
+                attempt();
             });
         }
         
@@ -662,7 +681,7 @@
             const paginationContainer = document.querySelector('.custom-pagination');
             if (!paginationContainer) return;
             
-            // Get current URL and parameters
+            // Preserve existing parameters
             const currentUrl = new URL(window.location.href);
             const urlParams = {};
             
@@ -673,7 +692,7 @@
                 }
             }
             
-            // Create new pagination HTML
+            // Create new pagination HTML with simple links for direct page refreshes
             let paginationHtml = '<ul class="pagination">';
             
             // Previous page link
@@ -695,21 +714,17 @@
                 </li>`;
             }
             
-            // Page links
+            // Simple page numbers - show up to 5 pages around current page
             const totalPages = pagination.last_page;
             const currentPage = pagination.current_page;
             
-            // Determine range of pages to show
+            // Always show at least 5 pages if available
             let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, currentPage + 2);
+            let endPage = Math.min(totalPages, startPage + 4);
             
-            // Adjust if we're near the beginning or end
+            // Adjust start page if we're near the end
             if (endPage - startPage < 4 && totalPages > 5) {
-                if (currentPage < 3) {
-                    endPage = Math.min(5, totalPages);
-                } else if (currentPage > totalPages - 2) {
-                    startPage = Math.max(1, totalPages - 4);
-                }
+                startPage = Math.max(1, endPage - 4);
             }
             
             // Page numbers
@@ -732,9 +747,9 @@
             }
             
             // Next page link
-            if (pagination.current_page < pagination.last_page) {
+            if (currentPage < totalPages) {
                 const nextPageUrl = new URL(window.location.href);
-                nextPageUrl.searchParams.set('page', pagination.current_page + 1);
+                nextPageUrl.searchParams.set('page', currentPage + 1);
                 for (const [key, value] of Object.entries(urlParams)) {
                     nextPageUrl.searchParams.set(key, value);
                 }
@@ -752,8 +767,12 @@
             
             paginationHtml += '</ul>';
             
-            // Replace pagination HTML
-            paginationContainer.innerHTML = paginationHtml;
+            // Replace pagination HTML - use a try-catch to handle any potential errors
+            try {
+                paginationContainer.innerHTML = paginationHtml;
+            } catch (error) {
+                console.error('Error updating pagination UI:', error);
+            }
         }
 
         // Apply filters and reload dashboard data
@@ -872,14 +891,25 @@
             // Clear existing rows
             tableBody.innerHTML = '';
             
+            // Check if orders is undefined or not an array
+            if (!orders || !Array.isArray(orders) || orders.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.innerHTML = '<td colspan="6" class="text-center">No orders found</td>';
+                tableBody.appendChild(emptyRow);
+                return;
+            }
+            
             // Apply search and filter if they exist
             const searchTerm = document.getElementById('orderSearchInput').value.toLowerCase();
             const statusFilter = document.getElementById('orderStatusFilter').value.toLowerCase();
             
             // Filter orders based on search term and status filter
             const filteredOrders = orders.filter(order => {
+                // Skip null or undefined orders
+                if (!order) return false;
+                
                 // Check if order matches the status filter
-                if (statusFilter && order.status.toLowerCase() !== statusFilter) {
+                if (statusFilter && order.status && order.status.toLowerCase() !== statusFilter) {
                     return false;
                 }
                 
@@ -893,7 +923,8 @@
                 // Get expedition name
                 let expeditionName = 'N/A';
                 if (order.shipping_info && order.shipping_info.expedition) {
-                    switch(order.shipping_info.expedition) {
+                    const expedition = order.shipping_info.expedition.toLowerCase();
+                    switch(expedition) {
                         case 'jne':
                             expeditionName = 'JNE';
                             break;
@@ -918,6 +949,8 @@
                         expeditionName += ` - ${order.shipping_info.service}`;
                     }
                 }
+                
+                expeditionName = expeditionName.toLowerCase();
                 
                 // Check if any field matches the search term
                 return productName.includes(searchTerm) || 
@@ -934,66 +967,105 @@
             
             // Add new rows
             filteredOrders.forEach(order => {
-                const row = document.createElement('tr');
-                
-                // Format the status badge
-                const statusClass = `status-badge status-${order.status.toLowerCase()}`;
-                const statusText = order.status.charAt(0).toUpperCase() + order.status.slice(1);
-                
-                // Determine expedition name
-                let expeditionName = 'N/A';
-                if (order.shipping_info && order.shipping_info.expedition) {
-                    switch(order.shipping_info.expedition) {
-                        case 'jne':
-                            expeditionName = 'JNE';
-                            break;
-                        case 'jnt':
-                            expeditionName = 'J&T Express';
-                            break;
-                        case 'sicepat':
-                            expeditionName = 'SiCepat';
-                            break;
-                        case 'pos':
-                            expeditionName = 'POS Indonesia';
-                            break;
-                        case 'tiki':
-                            expeditionName = 'TIKI';
-                            break;
-                        default:
-                            expeditionName = order.shipping_info.expedition.toUpperCase();
+                try {
+                    const row = document.createElement('tr');
+                    
+                    // Safety checks for required properties
+                    const productName = order.product_name || 'N/A';
+                    const productNumber = order.product_number || 'N/A';
+                    const status = order.status || 'pending';
+                    const total = order.total || 0;
+                    const orderId = order.id || '';
+                    const orderNumber = order.order_number || '';
+                    
+                    // Format the status badge
+                    const statusClass = `status-badge status-${status.toLowerCase()}`;
+                    const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+                    
+                    // Determine expedition name with error handling
+                    let expeditionName = 'N/A';
+                    if (order.shipping_info && order.shipping_info.expedition) {
+                        const expedition = order.shipping_info.expedition.toLowerCase();
+                        switch(expedition) {
+                            case 'jne':
+                                expeditionName = 'JNE';
+                                break;
+                            case 'jnt':
+                                expeditionName = 'J&T Express';
+                                break;
+                            case 'sicepat':
+                                expeditionName = 'SiCepat';
+                                break;
+                            case 'pos':
+                                expeditionName = 'POS Indonesia';
+                                break;
+                            case 'tiki':
+                                expeditionName = 'TIKI';
+                                break;
+                            default:
+                                expeditionName = order.shipping_info.expedition.toUpperCase();
+                        }
+                        
+                        // Add service name if available
+                        if (order.shipping_info.service) {
+                            expeditionName += ` - ${order.shipping_info.service}`;
+                        }
                     }
                     
-                    // Add service name if available
-                    if (order.shipping_info.service) {
-                        expeditionName += ` - ${order.shipping_info.service}`;
-                    }
+                    row.innerHTML = `
+                        <td>${productName}</td>
+                        <td>${productNumber}</td>
+                        <td>${expeditionName}</td>
+                        <td>IDR ${formatNumber(total)}</td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
+                        <td class="action-buttons">
+                            <button class="action-btn details-btn" data-order-id="${orderId}">Details</button>
+                            <button class="action-btn edit-btn" data-order-id="${orderId}" 
+                                    data-bs-toggle="modal" data-bs-target="#editOrderModal" 
+                                    data-order-number="${orderNumber}"
+                                    data-order-status="${status}">Edit</button>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                } catch (error) {
+                    console.error('Error processing order:', error, order);
                 }
-                
-                row.innerHTML = `
-                    <td>${order.product_name}</td>
-                    <td>${order.product_number}</td>
-                    <td>${expeditionName}</td>
-                    <td>IDR ${formatNumber(order.total)}</td>
-                    <td><span class="${statusClass}">${statusText}</span></td>
-                    <td class="action-buttons">
-                        <button class="action-btn details-btn" data-order-id="${order.id}">Details</button>
-                        <button class="action-btn edit-btn" data-order-id="${order.id}" 
-                                data-bs-toggle="modal" data-bs-target="#editOrderModal" 
-                                data-order-number="${order.order_number}"
-                                data-order-status="${order.status}">Edit</button>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
             });
             
             // Re-attach event listeners for the new buttons
-            document.querySelectorAll('.details-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const orderId = this.getAttribute('data-order-id');
-                    fetchOrderDetails(orderId);
+            try {
+                document.querySelectorAll('.details-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-order-id');
+                        if (orderId) {
+                            fetchOrderDetails(orderId);
+                        }
+                    });
                 });
-            });
+                
+                // Attach event listeners to edit buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const orderId = this.getAttribute('data-order-id');
+                        const orderNumber = this.getAttribute('data-order-number');
+                        const orderStatus = this.getAttribute('data-order-status');
+                        
+                        // Populate the edit modal
+                        if (document.getElementById('editOrderId')) {
+                            document.getElementById('editOrderId').value = orderId;
+                        }
+                        if (document.getElementById('orderNumber')) {
+                            document.getElementById('orderNumber').value = orderNumber;
+                        }
+                        if (document.getElementById('orderStatus')) {
+                            document.getElementById('orderStatus').value = orderStatus;
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Error attaching event listeners to buttons:', error);
+            }
         }
 
         // Sidebar toggle for mobile
