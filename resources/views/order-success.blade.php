@@ -203,14 +203,15 @@
         
         .pending-instructions {
             margin-top: 30px;
+            margin-bottom: 30px;
             padding: 20px;
             border-radius: 8px;
-            background-color: #E8F5E9;
-            border-left: 5px solid #4CAF50;
+            background-color: #e3f2fd;
+            border-left: 5px solid #007bff;
         }
         
         .pending-instructions h4 {
-            color: #2E7D32;
+            color: #0056b3;
             font-size: 18px;
             margin-bottom: 15px;
         }
@@ -235,6 +236,25 @@
         .refresh-status:hover {
             background-color: #4CAF50;
             color: #fff;
+        }
+        
+        .btn-pay-now {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-pay-now:hover {
+            background-color: #0069d9;
+            color: #fff;
+            text-decoration: none;
         }
         
         .alert {
@@ -308,12 +328,11 @@
             
             @if($order->status === 'pending' || $order->status === 'payment_pending')
                 <div class="pending-instructions">
-                    <h4><i class="fas fa-info-circle me-2"></i> Payment Instructions</h4>
-                    <p>Your payment is being processed. If you've completed the payment but still see this status, please wait a moment for our system to update.</p>
-                    <p>If you're using a payment simulator in sandbox mode, you may need to manually update the status.</p>
+                    <h4><i class="fas fa-credit-card me-2"></i> Payment Required</h4>
+                    <p>Your payment is still pending. Please complete your payment to process your order.</p>
                     
-                    <a href="{{ route('manual.update.status', $order->id) }}" class="refresh-status">
-                        <i class="fas fa-sync-alt me-2"></i> Update Status to Success
+                    <a href="{{ route('payment.retry', $order->id) }}" class="btn-pay-now">
+                        <i class="fas fa-money-bill-wave me-2"></i> Pay Now
                     </a>
                 </div>
             @endif
@@ -429,5 +448,71 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @if(isset($order) && ($order->status === 'pending' || $order->status === 'payment_pending') && !empty($order->snap_token))
+    <!-- Midtrans JS -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-61XuGAwQ8Bj8LxSS"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only set up the button click handler, don't automatically open payment popup
+            const payNowBtn = document.querySelector('.btn-pay-now');
+            if (payNowBtn) {
+                payNowBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Open Midtrans payment popup only when button is clicked
+                    window.snap.pay('{{ $order->snap_token }}', {
+                        onSuccess: function(result) {
+                            // Update the order status directly without page refresh
+                            updateOrderStatus('success', result);
+                        },
+                        onPending: function(result) {
+                            console.log('Payment is still pending');
+                        },
+                        onError: function(result) {
+                            alert('Payment failed. Please try again.');
+                        },
+                        onClose: function() {
+                            console.log('Payment popup closed without completing payment');
+                        }
+                    });
+                });
+            }
+            
+            // Function to update order status via AJAX
+            function updateOrderStatus(status, result) {
+                // Create a form and submit it to avoid CSRF issues
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("manual.update.status", $order->id) }}';
+                
+                // Add CSRF token
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                form.appendChild(csrfToken);
+                
+                // Add method field to handle PUT request
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'PUT';
+                form.appendChild(methodField);
+                
+                // Add status field
+                const statusField = document.createElement('input');
+                statusField.type = 'hidden';
+                statusField.name = 'status';
+                statusField.value = status;
+                form.appendChild(statusField);
+                
+                // Append form to body and submit
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    </script>
+    @endif
 </body>
 </html> 

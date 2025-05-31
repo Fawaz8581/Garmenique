@@ -484,25 +484,49 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Generate region-based pricing for demo
         function getLocationBasedPrice(province, city) {
-            // Base rates
-            const baseRate = 18000;
-            
-            // Province multipliers based on distance from Bogor, Jawa Barat
-            const provinceMultipliers = {
-                '1': 1.4,  // Bali - further from Bogor
-                '6': 0.9,  // Jakarta - close to Bogor
-                '9': 0.8,  // Jawa Barat - same province as Bogor
-                '10': 1.0, // Jawa Tengah - moderately close to Bogor
-                '11': 1.2, // Jawa Timur - further from Bogor in Java
-                '24': 3.0, // Papua - very far from Bogor
-                '25': 2.8, // Papua Barat - very far from Bogor
+            // Base pricing structure based on regions (with more reasonable values)
+            const regionalPricing = {
+                // Java pricing (lower)
+                java: {
+                    min: 15000,  // Minimum 15k IDR
+                    max: 25000   // Maximum 25k IDR
+                },
+                // Outside Java pricing (medium)
+                outsideJava: {
+                    min: 25000,  // Minimum 25k IDR
+                    max: 40000   // Maximum 40k IDR
+                },
+                // Remote area pricing (higher)
+                remote: {
+                    min: 35000,  // Minimum 35k IDR
+                    max: 60000   // Maximum 60k IDR
+                }
             };
             
-            // Get multiplier for the province, default to 1.5 if not found
-            const multiplier = provinceMultipliers[province] || 1.5;
+            // Java provinces (based on our province IDs)
+            const javaProvinces = [3, 5, 6, 9, 10, 11];
             
-            // Calculate price with multiplier
-            return Math.round(baseRate * multiplier);
+            // Remote provinces (based on our province IDs)
+            const remoteProvinces = [7, 16, 19, 20, 23, 24, 25, 27, 29, 30, 31];
+            
+            let pricing;
+            
+            if (javaProvinces.includes(parseInt(province))) {
+                pricing = regionalPricing.java;
+            } else if (remoteProvinces.includes(parseInt(province))) {
+                pricing = regionalPricing.remote;
+            } else {
+                pricing = regionalPricing.outsideJava;
+            }
+            
+            // Calculate price within range
+            // Using a more predictable formula based on city ID
+            const cityNum = parseInt(city) || 1;
+            const range = pricing.max - pricing.min;
+            const offset = (cityNum % 10) / 10; // Value between 0 and 0.9
+            
+            // Return a value between min and max
+            return Math.round(pricing.min + (range * offset));
         }
         
         // Custom region-based pricing
@@ -518,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     service: "YES",
                     cost: [{ 
-                        value: getLocationBasedPrice(province, destinationCity) * 2, 
+                        value: getLocationBasedPrice(province, destinationCity) * 1.5, 
                         etd: province < 12 ? "1" : "1-2" 
                     }]
                 }
@@ -536,14 +560,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 {
                     service: "ECO",
                     cost: [{ 
-                        value: getLocationBasedPrice(province, destinationCity) * 1.1, 
+                        value: getLocationBasedPrice(province, destinationCity) * 0.8, 
                         etd: province < 12 ? "2" : "3-6" 
                     }]
                 },
                 {
                     service: "REG",
                     cost: [{ 
-                        value: getLocationBasedPrice(province, destinationCity) * 1.5, 
+                        value: getLocationBasedPrice(province, destinationCity) * 1.2, 
                         etd: province < 12 ? "1" : "2-3" 
                     }]
                 }
@@ -652,7 +676,34 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.costs && result.costs.length > 0) {
                 result.costs.forEach(cost => {
                     const service = cost.service;
-                    const price = cost.cost[0].value;
+                    
+                    // Get the original price
+                    let originalPrice = cost.cost[0].value;
+                    
+                    // Cap the price at a reasonable level (max 100,000 IDR)
+                    if (originalPrice > 100000) {
+                        originalPrice = originalPrice % 100000;
+                        if (originalPrice < 15000) originalPrice += 15000;
+                    }
+                    
+                    // Apply additional price limits based on service type
+                    let price = originalPrice;
+                    
+                    // Make sure prices are reasonable for each service type
+                    if (service === 'REG' || service === 'Standard') {
+                        // Regular service: 15,000 - 35,000 IDR
+                        price = Math.min(Math.max(price, 15000), 35000);
+                    } else if (service === 'YES' || service === 'BEST') {
+                        // Express service: 35,000 - 60,000 IDR
+                        price = Math.min(Math.max(price, 35000), 60000);
+                    } else if (service === 'ECO') {
+                        // Economy service: 15,000 - 25,000 IDR
+                        price = Math.min(Math.max(price, 15000), 25000);
+                    } else {
+                        // Other services: 20,000 - 45,000 IDR
+                        price = Math.min(Math.max(price, 20000), 45000);
+                    }
+                    
                     const etd = cost.cost[0].etd;
                     
                     const optionDiv = document.createElement('div');
@@ -702,9 +753,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         continueBtn.title = '';
                     }
                     
-                    // Update shipping cost
-                    selectedShippingCost = parseInt(this.value);
-                    updateTotal();
+                    // Update shipping cost (with price capping)
+                    let cost = parseInt(this.value);
+                    if (cost > 100000) {
+                        cost = cost % 100000;
+                        if (cost < 15000) cost += 15000;
+                    }
+                    selectedShippingCost = cost;
+                    
+                    // Update shipping amount display with the capped price
+                    const shippingAmount = document.getElementById('shipping-amount');
+                    if (shippingAmount) {
+                        shippingAmount.textContent = `IDR ${formatNumber(selectedShippingCost)}`;
+                    }
                     
                     // Update expedition value
                     const expeditionInput = document.querySelector('input[name="expedition"]');
@@ -725,10 +786,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.getElementById('checkoutForm').appendChild(serviceInput);
                     }
                     
-                    // Update shipping cost input
+                    // Update shipping cost input with the capped price
                     if (shippingCostInput) {
                         shippingCostInput.value = selectedShippingCost;
                     }
+                    
+                    // Update total with new shipping cost
+                    updateTotal();
                 }
             });
         });
@@ -740,13 +804,26 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateTotal() {
         if (!totalElement) return;
         
-        const total = subtotal + selectedShippingCost;
+        // Make sure subtotal and shipping cost are valid numbers
+        const validSubtotal = isNaN(subtotal) || subtotal <= 0 ? 0 : subtotal;
+        let validShippingCost = isNaN(selectedShippingCost) ? 0 : selectedShippingCost;
+        
+        // Apply shipping cost capping
+        if (validShippingCost > 100000) {
+            validShippingCost = validShippingCost % 100000;
+            if (validShippingCost < 15000) validShippingCost += 15000;
+        }
+        
+        // Calculate total (cap at a billion to prevent overflow)
+        const total = Math.min(validSubtotal + validShippingCost, 1000000000);
+        
+        // Update total display
         totalElement.textContent = `IDR ${formatNumber(total)}`;
         
         // Update shipping amount in summary
         const shippingAmount = document.getElementById('shipping-amount');
         if (shippingAmount) {
-            shippingAmount.textContent = `IDR ${formatNumber(selectedShippingCost)}`;
+            shippingAmount.textContent = `IDR ${formatNumber(validShippingCost)}`;
         }
         
         // Update hidden total input for form submission
@@ -760,6 +837,14 @@ document.addEventListener('DOMContentLoaded', function() {
      * Format number with commas
      */
     function formatNumber(number) {
+        // Ensure the number is reasonable (cap at 100,000 IDR)
+        if (number > 100000) {
+            number = number % 100000;
+            if (number < 15000) number += 15000; // Ensure minimum reasonable price
+        }
+        
+        // Ensure number is an integer
+        number = Math.round(Number(number));
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 }); 

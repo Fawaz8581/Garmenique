@@ -250,7 +250,11 @@
                                                 <div class="d-flex align-items-center justify-content-between">
                                                     <span class="status-badge status-{{ strtolower($order->status) }}">{{ ucfirst($order->status) }}</span>
                                                     
-                                                    @if($order->status == 'shipped' || $order->status == 'delivered')
+                                                    @if($order->status == 'pending' || $order->status == 'payment_pending')
+                                                        <a href="{{ route('payment.retry', $order->id) }}" class="btn-pay-now" data-order-id="{{ $order->id }}">
+                                                            <i class="fas fa-money-bill-wave me-2"></i> Pay Now
+                                                        </a>
+                                                    @elseif($order->status == 'shipped' || $order->status == 'delivered')
                                                         @php
                                                             $trackingUrl = '#';
                                                             $waybill = $order->shipping_info['waybill'] ?? '';
@@ -976,6 +980,27 @@
             font-weight: 500;
         }
         
+        /* Pay Now Button */
+        .btn-pay-now {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-pay-now:hover {
+            background-color: #0069d9;
+            color: white;
+            text-decoration: none;
+        }
+        
         /* Status Badge Colors */
         .status-badge.status-pending {
             background-color: #ffc107;
@@ -1018,6 +1043,70 @@
             padding: 3px 8px !important;
         }
     </style>
+
+    <!-- Midtrans JS for Payment Retry -->
+    @foreach($orders as $order)
+        @if($order->status === 'pending' || $order->status === 'payment_pending')
+            @if(!empty($order->snap_token))
+                <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-61XuGAwQ8Bj8LxSS"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Set up click handlers for all Pay Now buttons
+                        const payNowBtn{{ $order->id }} = document.querySelector('[data-order-id="{{ $order->id }}"]');
+                        
+                        if (payNowBtn{{ $order->id }}) {
+                            payNowBtn{{ $order->id }}.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                
+                                // Open Midtrans payment popup when button is clicked
+                                window.snap.pay('{{ $order->snap_token }}', {
+                                    onSuccess: function(result) {
+                                        // Update the order status directly without page refresh
+                                        updateOrderStatus{{ $order->id }}('success', result);
+                                    },
+                                    onPending: function(result) {
+                                        console.log('Payment is still pending');
+                                    },
+                                    onError: function(result) {
+                                        alert('Payment failed. Please try again.');
+                                    },
+                                    onClose: function() {
+                                        console.log('Payment popup closed without completing payment');
+                                    }
+                                });
+                            });
+                        }
+                        
+                        // Function to update order status via AJAX
+                        function updateOrderStatus{{ $order->id }}(status, result) {
+                            // Create a form and submit it to avoid CSRF issues
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '{{ route("manual.update.status", $order->id) }}';
+                            
+                            // Add CSRF token
+                            const csrfToken = document.createElement('input');
+                            csrfToken.type = 'hidden';
+                            csrfToken.name = '_token';
+                            csrfToken.value = '{{ csrf_token() }}';
+                            form.appendChild(csrfToken);
+                            
+                            // Add method field to handle PUT request
+                            const methodField = document.createElement('input');
+                            methodField.type = 'hidden';
+                            methodField.name = '_method';
+                            methodField.value = 'PUT';
+                            form.appendChild(methodField);
+                            
+                            // Add the form to the document and submit
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                </script>
+            @endif
+        @endif
+    @endforeach
 </body>
 </html>
 

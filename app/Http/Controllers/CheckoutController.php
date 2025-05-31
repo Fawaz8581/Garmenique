@@ -31,8 +31,9 @@ class CheckoutController extends Controller
         $userId = Auth::id();
         $cartItems = session("user_cart_{$userId}", []);
         
-        if (empty($cartItems)) {
-            return redirect('/catalog')->with('error', 'Your cart is empty');
+        // Check if cart is empty
+        if (empty($cartItems) || count($cartItems) === 0) {
+            return redirect('/catalog')->with('error', 'Your cart is empty. Please add items before checkout.');
         }
         
         return view('checkout', ['cartItems' => $cartItems]);

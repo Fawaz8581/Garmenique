@@ -191,6 +191,10 @@
                                                 $expeditionName = 'J&T Express';
                                             } elseif ($expedition === 'sicepat') {
                                                 $expeditionName = 'SiCepat';
+                                            } elseif ($expedition === 'pos') {
+                                                $expeditionName = 'POS Indonesia';
+                                            } elseif ($expedition === 'tiki') {
+                                                $expeditionName = 'TIKI';
                                             }
                                         @endphp
                                         {{ $expeditionName }}
@@ -891,14 +895,27 @@
                 if (order.shipping_info && order.shipping_info.expedition) {
                     switch(order.shipping_info.expedition) {
                         case 'jne':
-                            expeditionName = 'jne';
+                            expeditionName = 'JNE';
                             break;
                         case 'jnt':
-                            expeditionName = 'j&t express';
+                            expeditionName = 'J&T Express';
                             break;
                         case 'sicepat':
-                            expeditionName = 'sicepat';
+                            expeditionName = 'SiCepat';
                             break;
+                        case 'pos':
+                            expeditionName = 'POS Indonesia';
+                            break;
+                        case 'tiki':
+                            expeditionName = 'TIKI';
+                            break;
+                        default:
+                            expeditionName = order.shipping_info.expedition.toUpperCase();
+                    }
+                    
+                    // Add service name if available
+                    if (order.shipping_info.service) {
+                        expeditionName += ` - ${order.shipping_info.service}`;
                     }
                 }
                 
@@ -936,6 +953,19 @@
                         case 'sicepat':
                             expeditionName = 'SiCepat';
                             break;
+                        case 'pos':
+                            expeditionName = 'POS Indonesia';
+                            break;
+                        case 'tiki':
+                            expeditionName = 'TIKI';
+                            break;
+                        default:
+                            expeditionName = order.shipping_info.expedition.toUpperCase();
+                    }
+                    
+                    // Add service name if available
+                    if (order.shipping_info.service) {
+                        expeditionName += ` - ${order.shipping_info.service}`;
                     }
                 }
                 
@@ -1098,17 +1128,29 @@
                 let expeditionName = '';
                 switch(order.shipping_info.expedition) {
                     case 'jne':
-                        expeditionName = 'JNE - Regular delivery';
+                        expeditionName = 'JNE';
                         break;
                     case 'jnt':
-                        expeditionName = 'J&T Express - Regular delivery';
+                        expeditionName = 'J&T Express';
                         break;
                     case 'sicepat':
-                        expeditionName = 'SiCepat - Regular delivery';
+                        expeditionName = 'SiCepat';
+                        break;
+                    case 'pos':
+                        expeditionName = 'POS Indonesia';
+                        break;
+                    case 'tiki':
+                        expeditionName = 'TIKI';
                         break;
                     default:
-                        expeditionName = order.shipping_info.expedition;
+                        expeditionName = order.shipping_info.expedition.toUpperCase();
                 }
+                
+                // Add service if available
+                if (order.shipping_info.service) {
+                    expeditionName += ` - ${order.shipping_info.service}`;
+                }
+                
                 expeditionInfo = `<br><strong>Shipping Method:</strong> ${expeditionName}`;
             }
             

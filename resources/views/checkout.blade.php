@@ -547,7 +547,7 @@
                             </div>
                         </div>
                         @endforeach
-                    @elseif(isset($cartItems))
+                    @elseif(isset($cartItems) && count($cartItems) > 0)
                         @foreach($cartItems as $item)
                         <div class="cart-item">
                             <img src="{{ $item['image'] ?? asset('images/products/product1.jpg') }}" alt="{{ $item['name'] }}" class="cart-item-image">
@@ -564,18 +564,8 @@
                         </div>
                         @endforeach
                     @else
-                        <div class="cart-item">
-                            <img src="{{ asset('images/products/product1.jpg') }}" alt="Product" class="cart-item-image">
-                            <div class="cart-item-details">
-                                <div class="cart-item-title">Kaos Hitam</div>
-                                <div class="cart-item-meta text-muted small mb-1">
-                                    Size: XL
-                                </div>
-                                <div class="cart-item-price">
-                                    <span class="quantity">2x</span>
-                                    <span class="price">IDR 200.000</span>
-                                </div>
-                            </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-shopping-cart me-2"></i> Your cart is empty
                         </div>
                     @endif
                 </div>
@@ -584,7 +574,17 @@
                 <div class="summary-calculations mt-4">
                     <div class="summary-item">
                         <span>Subtotal</span>
-                        <span id="subtotal-amount">IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : number_format(400000, 0, ',', '.') }}</span>
+                        <span id="subtotal-amount">
+                            @if(isset($order))
+                                IDR {{ number_format($order->subtotal, 0, ',', '.') }}
+                            @elseif(isset($cartItems) && count($cartItems) > 0)
+                                IDR {{ number_format(array_reduce($cartItems, function($carry, $item) {
+                                    return $carry + ($item['price'] * $item['quantity']);
+                                }, 0), 0, ',', '.') }}
+                            @else
+                                IDR 0
+                            @endif
+                        </span>
                     </div>
                     <div class="summary-item">
                         <span>Shipping</span>
@@ -592,7 +592,17 @@
                     </div>
                     <div class="summary-item summary-total">
                         <span>Total</span>
-                        <span id="total-amount">IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : number_format(400000, 0, ',', '.') }}</span>
+                        <span id="total-amount">
+                            @if(isset($order))
+                                IDR {{ number_format($order->total, 0, ',', '.') }}
+                            @elseif(isset($cartItems) && count($cartItems) > 0)
+                                IDR {{ number_format(array_reduce($cartItems, function($carry, $item) {
+                                    return $carry + ($item['price'] * $item['quantity']);
+                                }, 0), 0, ',', '.') }}
+                            @else
+                                IDR 0
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
@@ -632,13 +642,30 @@
             return total;
         }
         
+        // Check if cart is empty
+        const isCartEmpty = document.querySelector('.alert.alert-info') !== null && 
+                           document.querySelector('.alert.alert-info').textContent.includes('Your cart is empty');
+        
         // Calculate and update subtotal/total on page load
         const subtotal = calculateSubtotal();
         const subtotalElement = document.getElementById('subtotal-amount');
         const totalElement = document.getElementById('total-amount');
         const totalInput = document.getElementById('total-input');
         
-        if (subtotalElement && subtotal > 0) {
+        if (isCartEmpty) {
+            // Set values to zero if cart is empty
+            if (subtotalElement) subtotalElement.textContent = 'IDR 0';
+            if (totalElement) totalElement.textContent = 'IDR 0';
+            if (totalInput) totalInput.value = 0;
+            
+            // Disable the continue button
+            const continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.disabled = true;
+                continueBtn.classList.add('disabled');
+                continueBtn.title = 'Your cart is empty';
+            }
+        } else if (subtotalElement && subtotal > 0) {
             // Format the number with thousands separator
             subtotalElement.textContent = 'IDR ' + new Intl.NumberFormat('id-ID').format(subtotal);
             

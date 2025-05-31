@@ -315,7 +315,8 @@ Route::get('/api/images/{type}/{id}', [App\Http\Controllers\ImageController::cla
 // Midtrans Routes
 Route::post('/get-snap-token', [App\Http\Controllers\MidtransController::class, 'getSnapToken'])->name('get.snap.token');
 Route::post('/midtrans/notification', [App\Http\Controllers\MidtransController::class, 'notificationHandler'])->name('midtrans.notification');
-Route::get('/manual-update-status/{orderId}', [App\Http\Controllers\MidtransController::class, 'manualUpdateStatus'])->name('manual.update.status');
+Route::match(['get', 'post', 'put'], '/manual-update-status/{orderId}', [App\Http\Controllers\MidtransController::class, 'manualUpdateStatus'])->name('manual.update.status');
+Route::get('/payment/retry/{orderId}', [App\Http\Controllers\MidtransController::class, 'retryPayment'])->name('payment.retry');
 
 // Test route to verify stock reduction (for testing purposes only)
 Route::get('/test-stock-reduction/{orderId}', function($orderId) {

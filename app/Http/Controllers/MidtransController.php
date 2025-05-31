@@ -365,34 +365,204 @@ class MidtransController extends Controller
         }
     }
     
-    // Menambahkan endpoint untuk mengupdate status pesanan secara manual
+    /**
+     * Update order status manually - supports both GET and POST requests
+     * 
+     * @param Request $request
+     * @param int $orderId
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function manualUpdateStatus(Request $request, $orderId)
     {
         try {
             $order = Order::findOrFail($orderId);
             
-            // Update status pesanan ke success
-            $order->status = 'success';
+            // Verify that the order belongs to the authenticated user
+            if (Auth::id() !== $order->user_id && !Auth::user()->is_admin) {
+                return redirect()->back()
+                    ->with('error', 'You are not authorized to update this order');
+            }
+            
+            // Get status from request or default to success
+            $status = $request->input('status', 'success');
+            
+            // Only allow valid statuses
+            $validStatuses = ['success', 'completed', 'confirmed'];
+            if (!in_array($status, $validStatuses)) {
+                $status = 'success';
+            }
+            
+            // Only update stock if changing to success/completed status
+            $previousStatus = $order->status;
+            $order->status = $status;
             $order->save();
             
-            // Update product stock on manual status update
-            $this->updateProductStock($order);
+            if (($status === 'success' || $status === 'completed') && 
+                ($previousStatus === 'pending' || $previousStatus === 'payment_pending')) {
+                // Update product stock on successful payment
+                $this->updateProductStock($order);
+                
+                Log::info('Order status manually updated and stock reduced', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'previous_status' => $previousStatus,
+                    'new_status' => $status
+                ]);
+            } else {
+                Log::info('Order status manually updated without stock change', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'previous_status' => $previousStatus,
+                    'new_status' => $status
+                ]);
+            }
             
-            Log::info('Order status manually updated to success', [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number
-            ]);
+            // If this was an AJAX request, return JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order status has been updated to ' . $status,
+                    'order_id' => $order->id,
+                    'status' => $status
+                ]);
+            }
             
+            // Otherwise redirect to order success page
             return redirect()->route('order.success', ['order_id' => $order->id])
-                ->with('success', 'Order status has been updated to success');
+                ->with('success', 'Order status has been updated to ' . $status);
                 
         } catch (\Exception $e) {
             Log::error('Manual status update error', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'order_id' => $orderId
             ]);
             
+            // If this was an AJAX request, return JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update order status: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return redirect()->back()->with('error', 'Failed to update order status: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Retry payment for an order with pending status
+     * 
+     * @param Request $request
+     * @param int $orderId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function retryPayment(Request $request, $orderId)
+    {
+        try {
+            $order = Order::findOrFail($orderId);
+            
+            // Verify that the order belongs to the authenticated user
+            if (Auth::id() !== $order->user_id) {
+                return redirect()->route('account.orders')
+                    ->with('error', 'You are not authorized to access this order');
+            }
+            
+            // Verify that the order is in pending status
+            if ($order->status !== 'pending' && $order->status !== 'payment_pending') {
+                return redirect()->route('account.orders')
+                    ->with('error', 'This order is not in a pending payment status');
+            }
+            
+            // Set Midtrans configuration
+            \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
+            \Midtrans\Config::$clientKey = 'SB-Mid-client-61XuGAwQ8Bj8LxSS'; 
+            \Midtrans\Config::$isProduction = false;
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+            
+            // Set up transaction parameters
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->order_number,
+                    'gross_amount' => (int)$order->total,
+                ],
+                'customer_details' => [
+                    'first_name' => $order->shipping_info['firstName'] ?? '',
+                    'last_name' => $order->shipping_info['lastName'] ?? '',
+                    'email' => $order->shipping_info['email'] ?? '',
+                    'phone' => $order->shipping_info['phoneNumber'] ?? '',
+                    'billing_address' => [
+                        'first_name' => $order->shipping_info['firstName'] ?? '',
+                        'last_name' => $order->shipping_info['lastName'] ?? '',
+                        'email' => $order->shipping_info['email'] ?? '',
+                        'phone' => $order->shipping_info['phoneNumber'] ?? '',
+                        'address' => $order->shipping_info['address'] ?? '',
+                        'country_code' => 'IDN'
+                    ],
+                ],
+                'item_details' => [],
+                'callbacks' => [
+                    'finish' => route('order.success', ['order_id' => $order->id]),
+                    'error' => route('order.success', ['order_id' => $order->id, 'status' => 'failed']),
+                    'pending' => route('order.success', ['order_id' => $order->id, 'status' => 'pending'])
+                ]
+            ];
+            
+            // Add cart items to transaction params
+            foreach ($order->cart_items as $item) {
+                $params['item_details'][] = [
+                    'id' => $item['id'] ?? 'UNKNOWN',
+                    'name' => $item['name'] ?? 'Unknown Product',
+                    'price' => (int)($item['price'] ?? 0),
+                    'quantity' => (int)($item['quantity'] ?? 1)
+                ];
+            }
+            
+            // Add shipping cost to item details
+            $params['item_details'][] = [
+                'id' => 'SHIPPING',
+                'name' => 'Shipping Cost',
+                'price' => (int)$order->shipping_cost,
+                'quantity' => 1
+            ];
+            
+            Log::info('Retrying payment with params', ['params' => $params]);
+            
+            try {
+                // Generate new snap token
+                $snapToken = \Midtrans\Snap::getSnapToken($params);
+                
+                Log::info('Successfully generated new snap token for retry payment', ['token' => $snapToken]);
+                
+                // Update order with new snap token
+                $order->snap_token = $snapToken;
+                $order->save();
+                
+                // Redirect to order success page with the new token
+                return redirect()->route('order.success', ['order_id' => $order->id])
+                    ->with('success', 'Payment retry initiated. Please complete your payment.');
+                    
+            } catch (\Exception $snapError) {
+                Log::error('Midtrans retry payment token generation error', [
+                    'error' => $snapError->getMessage(),
+                    'trace' => $snapError->getTraceAsString(),
+                    'params' => $params
+                ]);
+                
+                return redirect()->route('account.orders')
+                    ->with('error', 'Error generating payment token: ' . $snapError->getMessage());
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Error in retryPayment', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'order_id' => $orderId
+            ]);
+            
+            return redirect()->route('account.orders')
+                ->with('error', 'Error processing payment retry: ' . $e->getMessage());
         }
     }
     
