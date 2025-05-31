@@ -519,7 +519,7 @@
                     </div>
                     
                     <!-- Hidden fields for Midtrans -->
-                    <input type="hidden" name="total" id="total-input" value="{{ isset($order) ? $order->total : '618000' }}">
+                    <input type="hidden" name="total" id="total-input" value="{{ isset($order) ? $order->total : '400000' }}">
                     <input type="hidden" name="snap_token" id="snap-token" value="{{ isset($order) ? $order->snap_token : '' }}">
                     <input type="hidden" name="order_id" id="order-id" value="{{ isset($order) ? $order->id : '' }}">
                 </form>
@@ -572,7 +572,7 @@
                                     Size: XL
                                 </div>
                                 <div class="cart-item-price">
-                                    <span class="quantity">3x</span>
+                                    <span class="quantity">2x</span>
                                     <span class="price">IDR 200.000</span>
                                 </div>
                             </div>
@@ -584,7 +584,7 @@
                 <div class="summary-calculations mt-4">
                     <div class="summary-item">
                         <span>Subtotal</span>
-                        <span id="subtotal-amount">IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : number_format(600000, 0, ',', '.') }}</span>
+                        <span id="subtotal-amount">IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : number_format(400000, 0, ',', '.') }}</span>
                     </div>
                     <div class="summary-item">
                         <span>Shipping</span>
@@ -592,7 +592,7 @@
                     </div>
                     <div class="summary-item summary-total">
                         <span>Total</span>
-                        <span id="total-amount">IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : number_format(600000, 0, ',', '.') }}</span>
+                        <span id="total-amount">IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : number_format(400000, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
@@ -603,5 +603,56 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/checkout.js') }}"></script>
     <script src="{{ asset('js/shipping.js') }}"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the subtotal from cart items
+        function calculateSubtotal() {
+            let total = 0;
+            
+            // Look for cart items in the page
+            const cartItems = document.querySelectorAll('.cart-item');
+            if (cartItems.length > 0) {
+                cartItems.forEach(item => {
+                    const quantityText = item.querySelector('.quantity')?.textContent;
+                    const priceText = item.querySelector('.price')?.textContent;
+                    
+                    if (quantityText && priceText) {
+                        const quantity = parseInt(quantityText.replace('x', '').trim());
+                        // Extract price value from "IDR 200.000" format
+                        const price = parseInt(priceText.replace(/[^\d]/g, ''));
+                        
+                        if (!isNaN(quantity) && !isNaN(price)) {
+                            total += quantity * price;
+                        }
+                    }
+                });
+            }
+            
+            return total;
+        }
+        
+        // Calculate and update subtotal/total on page load
+        const subtotal = calculateSubtotal();
+        const subtotalElement = document.getElementById('subtotal-amount');
+        const totalElement = document.getElementById('total-amount');
+        const totalInput = document.getElementById('total-input');
+        
+        if (subtotalElement && subtotal > 0) {
+            // Format the number with thousands separator
+            subtotalElement.textContent = 'IDR ' + new Intl.NumberFormat('id-ID').format(subtotal);
+            
+            // Update total as well (initially equals subtotal before shipping is added)
+            if (totalElement) {
+                totalElement.textContent = 'IDR ' + new Intl.NumberFormat('id-ID').format(subtotal);
+            }
+            
+            // Update hidden input
+            if (totalInput) {
+                totalInput.value = subtotal;
+            }
+        }
+    });
+    </script>
 </body>
 </html>

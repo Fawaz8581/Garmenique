@@ -12,7 +12,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const continueBtn = document.getElementById('continue-btn');
     
     let selectedShippingCost = 0;
-    const subtotal = parseFloat(subtotalElement?.textContent?.replace(/[^0-9]/g, '') || 0);
+    let subtotal = 0;
+    
+    // Calculate subtotal from cart items
+    function calculateSubtotal() {
+        let total = 0;
+        
+        // Look for cart items in the page
+        const cartItems = document.querySelectorAll('.cart-item');
+        if (cartItems.length > 0) {
+            cartItems.forEach(item => {
+                const quantityText = item.querySelector('.quantity')?.textContent;
+                const priceText = item.querySelector('.price')?.textContent;
+                
+                if (quantityText && priceText) {
+                    const quantity = parseInt(quantityText.replace('x', '').trim());
+                    // Extract price value from "IDR 200.000" format
+                    const price = parseInt(priceText.replace(/[^\d]/g, ''));
+                    
+                    if (!isNaN(quantity) && !isNaN(price)) {
+                        total += quantity * price;
+                    }
+                }
+            });
+        }
+        
+        return total;
+    }
+    
+    // Calculate subtotal on page load and update display
+    subtotal = calculateSubtotal();
+    if (subtotalElement && subtotal > 0) {
+        subtotalElement.textContent = `IDR ${formatNumber(subtotal)}`;
+    } else {
+        // Fallback to existing subtotal from the page if calculation fails
+        subtotal = parseFloat(subtotalElement?.textContent?.replace(/[^0-9]/g, '') || 0);
+    }
     
     // Disable continue button until shipping option is selected
     if (continueBtn) {
