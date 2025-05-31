@@ -17,11 +17,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = document.getElementById('email').value;
         const phoneNumber = document.getElementById('phoneNumber').value;
         const address = document.getElementById('address').value;
-        const city = document.getElementById('city').value;
-        const postalCode = document.getElementById('postalCode').value;
+        const province = document.getElementById('province').value;
+        const shippingCost = document.getElementById('shipping-cost').value;
         
-        if (!firstName || !lastName || !email || !phoneNumber || !address || !city || !postalCode) {
+        if (!firstName || !lastName || !email || !phoneNumber || !address || !province) {
             alert('Please fill in all required fields.');
+            return false;
+        }
+        
+        // Check if a shipping option is selected
+        if (!shippingCost || parseInt(shippingCost) === 0) {
+            alert('Please select a shipping option before proceeding to payment.');
             return false;
         }
         

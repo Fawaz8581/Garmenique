@@ -334,24 +334,29 @@
                         @else
                             Midtrans
                         @endif
-            </div>
-        </div>
+                    </div>
+                </div>
                 
                 <div class="info-item">
                     <div class="info-label">Shipping Address:</div>
                     <div class="info-value">
                         {{ $order->shipping_info['firstName'] }} {{ $order->shipping_info['lastName'] }}<br>
                         {{ $order->shipping_info['address'] }}<br>
-                        {{ $order->shipping_info['city'] }}, {{ $order->shipping_info['postalCode'] }}<br>
+                        {{ $order->shipping_info['province'] ?? 'Unknown Province' }}<br>
                         Phone: {{ $order->shipping_info['phoneNumber'] }}
-        </div>
-    </div>
+                    </div>
+                </div>
 
                 <div class="info-item">
                     <div class="info-label">Shipping Method:</div>
                     <div class="info-value">
                         @if(isset($order->shipping_info['expedition']))
-                            {{ strtoupper($order->shipping_info['expedition']) }} - Regular
+                            {{ strtoupper($order->shipping_info['expedition']) }}
+                            @if(isset($order->shipping_info['service']))
+                                - {{ $order->shipping_info['service'] }}
+                            @else
+                                - Regular
+                            @endif
                         @else
                             Standard Shipping
                         @endif

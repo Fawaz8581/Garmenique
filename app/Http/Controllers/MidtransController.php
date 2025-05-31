@@ -20,9 +20,10 @@ class MidtransController extends Controller
                 'lastName' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'address' => 'required|string|max:255',
-                'city' => 'nullable|string|max:255',
-                'postalCode' => 'nullable|string|max:20',
                 'phoneNumber' => 'nullable|string|max:20',
+                'province_id' => 'required|string',
+                'expedition' => 'required|string',
+                'shipping_cost' => 'required|numeric',
                 'total' => 'required|numeric',
             ]);
 
@@ -33,17 +34,6 @@ class MidtransController extends Controller
                     'message' => 'You must be logged in to process payment'
                 ], 401);
             }
-
-            // Create shipping info array
-            $shippingInfo = [
-                'firstName' => $request->firstName,
-                'lastName' => $request->lastName,
-                'email' => $request->email,
-                'address' => $request->address,
-                'city' => $request->city,
-                'postalCode' => $request->postalCode,
-                'phoneNumber' => $request->phoneNumber,
-            ];
 
             // Get cart items from session
             $userId = Auth::id();
@@ -59,16 +49,77 @@ class MidtransController extends Controller
             
             // Calculate totals
             $subtotal = 0;
+            $totalQuantity = 0;
             foreach ($cartItems as $item) {
                 $subtotal += $item['price'] * $item['quantity'];
+                $totalQuantity += $item['quantity'];
             }
             
-            $shippingCost = 18000; // Default shipping cost from the form
+            // Calculate weight - 250g per item
+            $weight = $totalQuantity * 250;
+            
+            // Get shipping cost from the form
+            $shippingCost = (int)$request->shipping_cost;
             $total = $subtotal + $shippingCost;
+            
+            // Get province name based on ID
+            $provinces = [
+                '1' => 'Bali',
+                '2' => 'Bangka Belitung',
+                '3' => 'Banten',
+                '4' => 'Bengkulu',
+                '5' => 'DI Yogyakarta',
+                '6' => 'DKI Jakarta',
+                '7' => 'Gorontalo',
+                '8' => 'Jambi',
+                '9' => 'Jawa Barat',
+                '10' => 'Jawa Tengah',
+                '11' => 'Jawa Timur',
+                '12' => 'Kalimantan Barat',
+                '13' => 'Kalimantan Selatan',
+                '14' => 'Kalimantan Tengah',
+                '15' => 'Kalimantan Timur',
+                '16' => 'Kalimantan Utara',
+                '17' => 'Kepulauan Riau',
+                '18' => 'Lampung',
+                '19' => 'Maluku',
+                '20' => 'Maluku Utara',
+                '21' => 'Nanggroe Aceh Darussalam',
+                '22' => 'Nusa Tenggara Barat',
+                '23' => 'Nusa Tenggara Timur',
+                '24' => 'Papua',
+                '25' => 'Papua Barat',
+                '26' => 'Riau',
+                '27' => 'Sulawesi Barat',
+                '28' => 'Sulawesi Selatan',
+                '29' => 'Sulawesi Tengah',
+                '30' => 'Sulawesi Tenggara',
+                '31' => 'Sulawesi Utara',
+                '32' => 'Sumatera Barat',
+                '33' => 'Sumatera Selatan',
+                '34' => 'Sumatera Utara',
+            ];
+            
+            $provinceName = $provinces[$request->province_id] ?? 'Unknown Province';
             
             // Generate unique order number
             $orderNumber = 'ORD-' . strtoupper(uniqid());
             
+            // Create shipping info array
+            $shippingInfo = [
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'email' => $request->email,
+                'address' => $request->address,
+                'phoneNumber' => $request->phoneNumber,
+                'province' => $provinceName,
+                'province_id' => $request->province_id,
+                'city_id' => $request->city_id ?? '',
+                'expedition' => $request->expedition,
+                'service' => $request->service ?? '',
+                'weight' => $weight // Add weight to shipping info
+            ];
+
             // Create order
             $order = Order::create([
                 'user_id' => Auth::id(),
@@ -108,9 +159,6 @@ class MidtransController extends Controller
             \Midtrans\Config::$isProduction = false;
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
-            \Midtrans\Config::$appendNotifUrl = "https://webhook.site/c7e81171-dbde-43aa-bd9a-c7e6e6f3d506"; // Tambahkan URL webhook untuk testing
-            \Midtrans\Config::$overrideNotifUrl = "https://webhook.site/c7e81171-dbde-43aa-bd9a-c7e6e6f3d506"; // Override notifikasi URL
-
             // Set up transaction parameters
             $params = [
                 'transaction_details' => [
@@ -128,8 +176,6 @@ class MidtransController extends Controller
                         'email' => $request->email,
                         'phone' => $request->phoneNumber,
                         'address' => $request->address,
-                        'city' => $request->city,
-                        'postal_code' => $request->postalCode,
                         'country_code' => 'IDN'
                     ],
                 ],

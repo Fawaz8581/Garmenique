@@ -47,9 +47,29 @@
         .admin-icon-link:hover {
             transform: scale(1.1);
         }
+
+        /* Track Your Order button style */
+        .btn-track-order {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #f8f9fa;
+            color: #212529;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-track-order:hover {
+            background-color: #e9ecef;
+            color: #000;
+            text-decoration: none;
+        }
     </style>
 </head>
-
 <body ng-app="garmeniqueApp">
     <!-- Header Section -->
     <header class="header" ng-controller="HeaderController">
@@ -157,7 +177,7 @@
                                                 <div class="address">
                                                     {{ $order->shipping_info['firstName'] }} {{ $order->shipping_info['lastName'] }}<br>
                                                     {{ $order->shipping_info['address'] }}<br>
-                                                    {{ $order->shipping_info['city'] }}, {{ $order->shipping_info['postalCode'] }}
+                                                    {{ $order->shipping_info['province'] ?? 'Unknown Province' }}
                                                 </div>
                                             </div>
                                             
@@ -172,25 +192,41 @@
                                                         if(isset($order->shipping_info['expedition'])) {
                                                             switch($order->shipping_info['expedition']) {
                                                                 case 'jne':
-                                                                    $expeditionName = 'JNE - Regular delivery';
+                                                                    $expeditionName = 'JNE';
                                                                     $expeditionIcon = 'fa-truck';
                                                                     $expeditionColor = 'text-primary';
                                                                     break;
+                                                                case 'pos':
+                                                                    $expeditionName = 'POS Indonesia';
+                                                                    $expeditionIcon = 'fa-envelope';
+                                                                    $expeditionColor = 'text-danger';
+                                                                    break;
+                                                                case 'tiki':
+                                                                    $expeditionName = 'TIKI';
+                                                                    $expeditionIcon = 'fa-truck-fast';
+                                                                    $expeditionColor = 'text-warning';
+                                                                    break;
                                                                 case 'jnt':
-                                                                    $expeditionName = 'J&T Express - Regular delivery';
-                                                                    $expeditionIcon = 'fa-shipping-fast';
+                                                                    $expeditionName = 'J&T Express';
+                                                                    $expeditionIcon = 'fa-truck-moving';
                                                                     $expeditionColor = 'text-danger';
                                                                     break;
                                                                 case 'sicepat':
-                                                                    $expeditionName = 'SiCepat - Regular delivery';
-                                                                    $expeditionIcon = 'fa-bolt';
+                                                                    $expeditionName = 'SiCepat';
+                                                                    $expeditionIcon = 'fa-truck-arrow-right';
                                                                     $expeditionColor = 'text-success';
                                                                     break;
                                                             }
                                                         }
+                                                        
+                                                        // Get service if available
+                                                        $service = isset($order->shipping_info['service']) ? $order->shipping_info['service'] : '';
                                                     @endphp
-                                                    <i class="fas {{ $expeditionIcon }} {{ $expeditionColor }}"></i>
-                                                    {{ $expeditionName }}
+                                                    
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas {{ $expeditionIcon }} {{ $expeditionColor }} me-2"></i>
+                                                        <span>{{ $expeditionName }} {{ $service ? "- {$service}" : '' }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -214,24 +250,33 @@
                                                 <div class="d-flex align-items-center justify-content-between">
                                                     <span class="status-badge status-{{ strtolower($order->status) }}">{{ ucfirst($order->status) }}</span>
                                                     
-                                                    @if(strtolower($order->status) === 'shipped')
+                                                    @if($order->status == 'shipped' || $order->status == 'delivered')
                                                         @php
                                                             $trackingUrl = '#';
+                                                            $waybill = $order->shipping_info['waybill'] ?? '';
+                                                            
                                                             if(isset($order->shipping_info['expedition'])) {
                                                                 switch($order->shipping_info['expedition']) {
                                                                     case 'jne':
                                                                         $trackingUrl = 'https://jne.co.id/tracking-package';
                                                                         break;
-                                                                    case 'jnt':
-                                                                        $trackingUrl = 'https://jet.co.id/track';
+                                                                    case 'pos':
+                                                                        $trackingUrl = 'https://www.posindonesia.co.id/id/tracking';
+                                                                        break;
+                                                                    case 'tiki':
+                                                                        $trackingUrl = 'https://www.tiki.id/id/track';
                                                                         break;
                                                                     case 'sicepat':
                                                                         $trackingUrl = 'https://www.sicepat.com/';
                                                                         break;
+                                                                    case 'jnt':
+                                                                        $trackingUrl = 'https://jet.co.id/track';
+                                                                        break;
                                                                 }
                                                             }
                                                         @endphp
-                                                        <a href="{{ $trackingUrl }}" class="btn-track-order" target="_blank">
+                                                        
+                                                        <a href="{{ $trackingUrl }}" target="_blank" class="btn-track-order">
                                                             <i class="fas fa-map-marker-alt me-2"></i> Track Your Order
                                                         </a>
                                                     @endif

@@ -22,16 +22,17 @@ class OrderController extends Controller
                 'lastName' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'address' => 'required|string|max:255',
-                'city' => 'nullable|string|max:255',
-                'postalCode' => 'nullable|string|max:20',
                 'phoneNumber' => 'nullable|string|max:20',
+                'province_id' => 'required|string',
                 'expedition' => 'required|string',
+                'shipping_cost' => 'required|numeric',
                 'total' => 'required|numeric'
             ]);
             
             Log::info('Order validation passed', [
-                'shipping' => $request->only('firstName', 'lastName', 'email', 'address', 'city', 'postalCode', 'phoneNumber'),
+                'shipping' => $request->only('firstName', 'lastName', 'email', 'address', 'phoneNumber', 'province_id'),
                 'expedition' => $request->expedition,
+                'shipping_cost' => $request->shipping_cost,
                 'total' => $request->total
             ]);
 
@@ -57,12 +58,58 @@ class OrderController extends Controller
             
             // Calculate totals
             $subtotal = 0;
+            $totalQuantity = 0;
             foreach ($cartItems as $item) {
                 $subtotal += $item['price'] * $item['quantity'];
+                $totalQuantity += $item['quantity'];
             }
             
-            $shippingCost = 18000; // Default shipping cost
+            // Calculate weight - 250g per item
+            $weight = $totalQuantity * 250;
+            
+            // Get shipping cost from the form
+            $shippingCost = (int)$request->shipping_cost;
             $total = $subtotal + $shippingCost;
+
+            // Get province name based on ID
+            $provinces = [
+                '1' => 'Bali',
+                '2' => 'Bangka Belitung',
+                '3' => 'Banten',
+                '4' => 'Bengkulu',
+                '5' => 'DI Yogyakarta',
+                '6' => 'DKI Jakarta',
+                '7' => 'Gorontalo',
+                '8' => 'Jambi',
+                '9' => 'Jawa Barat',
+                '10' => 'Jawa Tengah',
+                '11' => 'Jawa Timur',
+                '12' => 'Kalimantan Barat',
+                '13' => 'Kalimantan Selatan',
+                '14' => 'Kalimantan Tengah',
+                '15' => 'Kalimantan Timur',
+                '16' => 'Kalimantan Utara',
+                '17' => 'Kepulauan Riau',
+                '18' => 'Lampung',
+                '19' => 'Maluku',
+                '20' => 'Maluku Utara',
+                '21' => 'Nanggroe Aceh Darussalam',
+                '22' => 'Nusa Tenggara Barat',
+                '23' => 'Nusa Tenggara Timur',
+                '24' => 'Papua',
+                '25' => 'Papua Barat',
+                '26' => 'Riau',
+                '27' => 'Sulawesi Barat',
+                '28' => 'Sulawesi Selatan',
+                '29' => 'Sulawesi Tengah',
+                '30' => 'Sulawesi Tenggara',
+                '31' => 'Sulawesi Utara',
+                '32' => 'Sumatera Barat',
+                '33' => 'Sumatera Selatan',
+                '34' => 'Sumatera Utara',
+            ];
+            
+            $provinceName = $provinces[$request->province_id] ?? 'Unknown Province';
 
             // Create shipping info array
             $shippingInfo = [
@@ -70,10 +117,13 @@ class OrderController extends Controller
                 'lastName' => $request->lastName,
                 'email' => $request->email,
                 'address' => $request->address,
-                'city' => $request->city,
-                'postalCode' => $request->postalCode,
                 'phoneNumber' => $request->phoneNumber,
-                'expedition' => $request->expedition
+                'province' => $provinceName,
+                'province_id' => $request->province_id,
+                'city_id' => $request->city_id ?? '',
+                'expedition' => $request->expedition,
+                'service' => $request->service ?? '',
+                'weight' => $weight // Add weight to shipping info
             ];
             
             // Create the order
@@ -115,8 +165,6 @@ class OrderController extends Controller
                         'email' => $request->email,
                         'phone' => $request->phoneNumber,
                         'address' => $request->address,
-                        'city' => $request->city,
-                        'postal_code' => $request->postalCode,
                         'country_code' => 'IDN'
                     ],
                 ],

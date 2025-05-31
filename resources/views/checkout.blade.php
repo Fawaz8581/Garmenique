@@ -400,42 +400,95 @@
                             <label for="address">Address</label>
                         </div>
                         
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="city" name="city" required>
-                                    <label for="city">City</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="postalCode" name="postalCode" required>
-                                    <label for="postalCode">Postal Code</label>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Shipping Expedition Selection -->
                         <div class="shipping-options mt-4">
-                            <h5 class="mb-3">Select Shipping Expedition</h5>
+                            <h5 class="mb-3">Shipping Options</h5>
                             
-                            <div class="form-group">
-                                <div class="shipping-method selected">
-                                    <div class="d-flex align-items-center">
-                                        <div class="shipping-logo me-3">
-                                            <i class="fas fa-truck text-primary" style="font-size: 1.5rem;"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">JNE</h6>
-                                            <small class="text-muted">Regular delivery</small>
-                                        </div>
-                                        <div class="ms-auto">
-                                            <span class="shipping-price">IDR 18.000</span>
-                                        </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="province" name="province_id">
+                                            <option value="">Select Province</option>
+                                            <option value="1">Bali</option>
+                                            <option value="2">Bangka Belitung</option>
+                                            <option value="3">Banten</option>
+                                            <option value="4">Bengkulu</option>
+                                            <option value="5">DI Yogyakarta</option>
+                                            <option value="6">DKI Jakarta</option>
+                                            <option value="7">Gorontalo</option>
+                                            <option value="8">Jambi</option>
+                                            <option value="9">Jawa Barat</option>
+                                            <option value="10">Jawa Tengah</option>
+                                            <option value="11">Jawa Timur</option>
+                                            <option value="12">Kalimantan Barat</option>
+                                            <option value="13">Kalimantan Selatan</option>
+                                            <option value="14">Kalimantan Tengah</option>
+                                            <option value="15">Kalimantan Timur</option>
+                                            <option value="16">Kalimantan Utara</option>
+                                            <option value="17">Kepulauan Riau</option>
+                                            <option value="18">Lampung</option>
+                                            <option value="19">Maluku</option>
+                                            <option value="20">Maluku Utara</option>
+                                            <option value="21">Nanggroe Aceh Darussalam</option>
+                                            <option value="22">Nusa Tenggara Barat</option>
+                                            <option value="23">Nusa Tenggara Timur</option>
+                                            <option value="24">Papua</option>
+                                            <option value="25">Papua Barat</option>
+                                            <option value="26">Riau</option>
+                                            <option value="27">Sulawesi Barat</option>
+                                            <option value="28">Sulawesi Selatan</option>
+                                            <option value="29">Sulawesi Tengah</option>
+                                            <option value="30">Sulawesi Tenggara</option>
+                                            <option value="31">Sulawesi Utara</option>
+                                            <option value="32">Sumatera Barat</option>
+                                            <option value="33">Sumatera Selatan</option>
+                                            <option value="34">Sumatera Utara</option>
+                                        </select>
+                                        <label for="province">Province</label>
                                     </div>
-                                    <input type="hidden" name="expedition" value="jne">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="city" name="city_id">
+                                            <option value="">Select City</option>
+                                        </select>
+                                        <label for="city">City/District</label>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="courier" name="courier">
+                                            <option value="">Select Courier</option>
+                                            <option value="jne">JNE</option>
+                                            <option value="pos">POS Indonesia</option>
+                                            <option value="tiki">TIKI</option>
+                                            <option value="sicepat">SiCepat</option>
+                                            <option value="jnt">J&T Express</option>
+                                        </select>
+                                        <label for="courier">Courier</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="weight" name="weight" value="250" min="1" readonly style="background-color: #f8f9fa;">
+                                        <label for="weight">Weight (grams)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="hidden" id="origin-city" value="78"> <!-- Bogor, Jawa Barat as origin city -->
+                                    <button type="button" class="btn btn-primary w-100 h-100" id="calculate-shipping">Calculate Shipping</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Shipping Results will be displayed here -->
+                            <div id="shipping-results" class="mt-3"></div>
+                            
+                            <!-- Hidden input for shipping cost - will be updated by JS -->
+                            <input type="hidden" name="expedition" value="jne">
+                            <input type="hidden" name="shipping_cost" id="shipping-cost" value="0">
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">
@@ -531,15 +584,15 @@
                 <div class="summary-calculations mt-4">
                     <div class="summary-item">
                         <span>Subtotal</span>
-                        <span>IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : number_format(600000, 0, ',', '.') }}</span>
+                        <span id="subtotal-amount">IDR {{ isset($order) ? number_format($order->subtotal, 0, ',', '.') : number_format(600000, 0, ',', '.') }}</span>
                     </div>
                     <div class="summary-item">
                         <span>Shipping</span>
-                        <span>IDR {{ isset($order) ? number_format($order->shipping_cost, 0, ',', '.') : number_format(18000, 0, ',', '.') }}</span>
+                        <span id="shipping-amount">IDR 0</span>
                     </div>
                     <div class="summary-item summary-total">
                         <span>Total</span>
-                        <span>IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : number_format(618000, 0, ',', '.') }}</span>
+                        <span id="total-amount">IDR {{ isset($order) ? number_format($order->total, 0, ',', '.') : number_format(600000, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
@@ -549,5 +602,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/checkout.js') }}"></script>
+    <script src="{{ asset('js/shipping.js') }}"></script>
 </body>
 </html>
