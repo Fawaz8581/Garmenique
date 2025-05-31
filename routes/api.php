@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\MidtransController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +27,9 @@ Route::prefix('shipping')->group(function () {
     Route::post('/calculate', [ShipmentController::class, 'calculateShipping']);
     Route::post('/track', [ShipmentController::class, 'trackShipment']);
 }); 
+
+// Midtrans payment gateway routes
+Route::post('/midtrans/notification', [MidtransController::class, 'notificationHandler']);
+Route::get('/midtrans/finish', [MidtransController::class, 'finishRedirect']);
+Route::get('/midtrans/unfinish', [MidtransController::class, 'unfinishRedirect']);
+Route::get('/midtrans/error', [MidtransController::class, 'errorRedirect']);

@@ -145,8 +145,9 @@ class OrderController extends Controller
             \Midtrans\Config::$isProduction = false;
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
-            \Midtrans\Config::$appendNotifUrl = "https://webhook.site/c7e81171-dbde-43aa-bd9a-c7e6e6f3d506";
-            \Midtrans\Config::$overrideNotifUrl = "https://webhook.site/c7e81171-dbde-43aa-bd9a-c7e6e6f3d506";
+            // Gunakan URL aplikasi Anda sendiri untuk callback
+            \Midtrans\Config::$appendNotifUrl = url('/api/midtrans/notification');
+            \Midtrans\Config::$overrideNotifUrl = url('/api/midtrans/notification');
 
             // Set up transaction parameters
             $params = [

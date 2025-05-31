@@ -293,27 +293,36 @@ class MidtransController extends Controller
             $previousStatus = $order->status;
             $stockUpdated = false;
             
+            // Cek apakah stok sudah pernah dikurangi untuk order ini
+            $stockAlreadyUpdated = isset($order->payment_info['stock_updated']) && $order->payment_info['stock_updated'] === true;
+            
             if ($transaction == 'capture') {
                 if ($type == 'credit_card') {
                     if ($fraud == 'challenge') {
                         $order->status = 'challenge';
                     } else {
                         $order->status = 'success';
-                        // Update product stock on successful payment
-                        $this->updateProductStock($order);
-                        $stockUpdated = true;
+                        // Update product stock on successful payment hanya jika belum pernah diupdate
+                        if (!$stockAlreadyUpdated) {
+                            $this->updateProductStock($order);
+                            $stockUpdated = true;
+                        }
                     }
                 } else {
                     $order->status = 'success';
-                    // Update product stock on successful payment
-                    $this->updateProductStock($order);
-                    $stockUpdated = true;
+                    // Update product stock on successful payment hanya jika belum pernah diupdate
+                    if (!$stockAlreadyUpdated) {
+                        $this->updateProductStock($order);
+                        $stockUpdated = true;
+                    }
                 }
             } else if ($transaction == 'settlement') {
                 $order->status = 'success';
-                // Update product stock on successful payment
-                $this->updateProductStock($order);
-                $stockUpdated = true;
+                // Update product stock on successful payment hanya jika belum pernah diupdate
+                if (!$stockAlreadyUpdated) {
+                    $this->updateProductStock($order);
+                    $stockUpdated = true;
+                }
             } else if ($transaction == 'pending') {
                 $order->status = 'pending';
             } else if ($transaction == 'deny') {
@@ -339,6 +348,13 @@ class MidtransController extends Controller
                     'full_notification' => $paymentDetails
                 ]
             );
+            
+            // Jika stok berhasil diupdate, tandai di payment_info
+            if ($stockUpdated) {
+                $paymentInfo = $order->payment_info;
+                $paymentInfo['stock_updated'] = true;
+                $order->payment_info = $paymentInfo;
+            }
             
             $order->save();
             
@@ -400,8 +416,20 @@ class MidtransController extends Controller
             
             if (($status === 'success' || $status === 'completed') && 
                 ($previousStatus === 'pending' || $previousStatus === 'payment_pending')) {
-                // Update product stock on successful payment
-                $this->updateProductStock($order);
+                
+                // Cek apakah stok sudah pernah dikurangi untuk order ini
+                $stockAlreadyUpdated = isset($order->payment_info['stock_updated']) && $order->payment_info['stock_updated'] === true;
+                
+                // Update product stock on successful payment hanya jika belum pernah diupdate
+                if (!$stockAlreadyUpdated) {
+                    $this->updateProductStock($order);
+                    
+                    // Tandai bahwa stok sudah diupdate
+                    $paymentInfo = $order->payment_info;
+                    $paymentInfo['stock_updated'] = true;
+                    $order->payment_info = $paymentInfo;
+                    $order->save();
+                }
                 
                 Log::info('Order status manually updated and stock reduced', [
                     'order_id' => $order->id,
@@ -565,6 +593,98 @@ class MidtransController extends Controller
             return redirect()->route('account.orders')
                 ->with('error', 'Error processing payment retry: ' . $e->getMessage());
         }
+    }
+    
+    // Implementasi method updateProductStock ada di bawah
+    
+    /**
+     * Handle finish redirect from Midtrans
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function finishRedirect(Request $request)
+    {
+        Log::info('Midtrans finish redirect received', [
+            'payload' => $request->all()
+        ]);
+        
+        $orderId = $request->input('order_id');
+        
+        if (!$orderId) {
+            return redirect()->route('home')
+                ->with('error', 'Invalid order information');
+        }
+        
+        $order = Order::where('order_number', $orderId)->first();
+        
+        if (!$order) {
+            return redirect()->route('home')
+                ->with('error', 'Order not found');
+        }
+        
+        return redirect()->route('order.success', ['order_id' => $order->id])
+            ->with('success', 'Payment completed successfully');
+    }
+    
+    /**
+     * Handle unfinish redirect from Midtrans
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function unfinishRedirect(Request $request)
+    {
+        Log::info('Midtrans unfinish redirect received', [
+            'payload' => $request->all()
+        ]);
+        
+        $orderId = $request->input('order_id');
+        
+        if (!$orderId) {
+            return redirect()->route('home')
+                ->with('error', 'Invalid order information');
+        }
+        
+        $order = Order::where('order_number', $orderId)->first();
+        
+        if (!$order) {
+            return redirect()->route('home')
+                ->with('error', 'Order not found');
+        }
+        
+        return redirect()->route('order.success', ['order_id' => $order->id])
+            ->with('warning', 'Payment is not completed');
+    }
+    
+    /**
+     * Handle error redirect from Midtrans
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function errorRedirect(Request $request)
+    {
+        Log::info('Midtrans error redirect received', [
+            'payload' => $request->all()
+        ]);
+        
+        $orderId = $request->input('order_id');
+        
+        if (!$orderId) {
+            return redirect()->route('home')
+                ->with('error', 'Invalid order information');
+        }
+        
+        $order = Order::where('order_number', $orderId)->first();
+        
+        if (!$order) {
+            return redirect()->route('home')
+                ->with('error', 'Order not found');
+        }
+        
+        return redirect()->route('order.success', ['order_id' => $order->id])
+            ->with('error', 'Payment failed. Please try again.');
     }
     
     /**
