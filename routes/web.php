@@ -214,6 +214,9 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
             // Orders API
             Route::put('/orders/{id}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus']);
             Route::get('/orders/{id}', [App\Http\Controllers\Admin\OrderController::class, 'getOrderDetails']);
+            
+            // Invoice API
+            Route::get('/invoice/download/{order_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('admin.invoice.download');
         });
     });
 });

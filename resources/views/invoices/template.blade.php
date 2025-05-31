@@ -182,13 +182,12 @@
         <!-- Header Section -->
         <div class="header clearfix">
             @php
-                $invoiceSettings = \App\Models\PageSetting::where('page_name', 'invoice')->first();
-                $invoiceData = $invoiceSettings ? (is_array($invoiceSettings->settings) ? $invoiceSettings->settings : json_decode($invoiceSettings->settings, true)) : null;
-                $companyName = ($invoiceData && isset($invoiceData['companyName'])) ? $invoiceData['companyName'] : 'Garmenique Clothing Co.';
-                $companyAddress = ($invoiceData && isset($invoiceData['companyAddress'])) ? $invoiceData['companyAddress'] : 'Jl. Cihapit No. 12, Bandung';
-                $companyRegion = ($invoiceData && isset($invoiceData['companyRegion'])) ? $invoiceData['companyRegion'] : 'West Java, Indonesia';
-                $companyPhone = ($invoiceData && isset($invoiceData['companyPhone'])) ? $invoiceData['companyPhone'] : '+62 22 1234567';
-                $companyEmail = ($invoiceData && isset($invoiceData['companyEmail'])) ? $invoiceData['companyEmail'] : 'support@garmenique.com';
+                // Gunakan settings yang dikirim dari controller
+                $companyName = isset($settings['companyName']) ? $settings['companyName'] : 'Garmenique Clothing Co.';
+                $companyAddress = isset($settings['companyAddress']) ? $settings['companyAddress'] : 'Jl. Cihapit No. 12, Bandung';
+                $companyRegion = isset($settings['companyRegion']) ? $settings['companyRegion'] : 'West Java, Indonesia';
+                $companyPhone = isset($settings['companyPhone']) ? $settings['companyPhone'] : '+62 22 1234567';
+                $companyEmail = isset($settings['companyEmail']) ? $settings['companyEmail'] : 'support@garmenique.com';
             @endphp
             
             <div class="header-left">
@@ -217,27 +216,48 @@
             <div class="billing-left">
                 <div class="section-title">Billed To:</div>
                 <div>
-                    {{ $order->customer_name }}<br>
-                    {{ $order->address }}<br>
-                    {{ $order->city }}<br>
-                    {{ $order->country }}
+                    {{ $order->shipping_info['firstName'] ?? '' }} {{ $order->shipping_info['lastName'] ?? '' }}<br>
+                    {{ $order->shipping_info['address'] ?? '' }}<br>
+                    {{ $order->shipping_info['city'] ?? '' }}<br>
+                    {{ $order->shipping_info['country'] ?? '' }}
                 </div>
                 <div style="margin-top: 10px;">
-                    Phone: {{ $order->phone }}<br>
-                    Email: {{ $order->email }}
+                    Phone: {{ $order->shipping_info['phoneNumber'] ?? '' }}<br>
+                    Email: {{ $order->shipping_info['email'] ?? '' }}
                 </div>
             </div>
             
             <div class="billing-right">
                 <div class="section-title">Shipping Details:</div>
                 <div>
-                    {{ $order->shipping_name ?: $order->customer_name }}<br>
-                    {{ $order->shipping_address ?: $order->address }}<br>
-                    {{ $order->shipping_city ?: $order->city }}<br>
-                    {{ $order->shipping_country ?: $order->country }}
+                    {{ $order->shipping_info['firstName'] ?? '' }} {{ $order->shipping_info['lastName'] ?? '' }}<br>
+                    {{ $order->shipping_info['address'] ?? '' }}<br>
+                    {{ $order->shipping_info['city'] ?? '' }}<br>
+                    {{ $order->shipping_info['country'] ?? '' }}
                 </div>
                 <div style="margin-top: 10px;">
-                    Shipping Method: {{ $order->shipping_method }}
+                    @php
+                        $expedition = $order->shipping_info['expedition'] ?? '';
+                        $expeditionName = 'N/A';
+                        
+                        if ($expedition === 'jne') {
+                            $expeditionName = 'JNE';
+                        } elseif ($expedition === 'jnt') {
+                            $expeditionName = 'J&T Express';
+                        } elseif ($expedition === 'sicepat') {
+                            $expeditionName = 'SiCepat';
+                        } elseif ($expedition === 'pos') {
+                            $expeditionName = 'POS Indonesia';
+                        } elseif ($expedition === 'tiki') {
+                            $expeditionName = 'TIKI';
+                        }
+                        
+                        // Add service if available
+                        if (isset($order->shipping_info['service'])) {
+                            $expeditionName .= ' - ' . $order->shipping_info['service'];
+                        }
+                    @endphp
+                    Shipping Method: {{ $expeditionName }}
                 </div>
             </div>
         </div>
@@ -314,15 +334,10 @@
         
         <!-- Footer Notes -->
         @php
-            // Ensure we have the invoice data
-            if (!isset($invoiceData)) {
-                $invoiceSettings = \App\Models\PageSetting::where('page_name', 'invoice')->first();
-                $invoiceData = $invoiceSettings ? (is_array($invoiceSettings->settings) ? $invoiceSettings->settings : json_decode($invoiceSettings->settings, true)) : null;
-            }
-            
-            $footerNote = ($invoiceData && isset($invoiceData['footerNote'])) ? $invoiceData['footerNote'] : 'Thank you for your business! If you have any questions about this invoice, please contact our customer support.';
-            $footerDisclaimer = ($invoiceData && isset($invoiceData['footerDisclaimer'])) ? $invoiceData['footerDisclaimer'] : 'This is a computer-generated document and doesn\'t require a signature.';
-            $footerCopyright = ($invoiceData && isset($invoiceData['footerCopyright'])) ? $invoiceData['footerCopyright'] : '&copy; ' . date('Y') . ' Garmenique. All rights reserved.';
+            // Gunakan settings yang dikirim dari controller
+            $footerNote = isset($settings['footerNote']) ? $settings['footerNote'] : 'Thank you for your business! If you have any questions about this invoice, please contact our customer support.';
+            $footerDisclaimer = isset($settings['footerDisclaimer']) ? $settings['footerDisclaimer'] : 'This is a computer-generated document and doesn\'t require a signature.';
+            $footerCopyright = isset($settings['footerCopyright']) ? $settings['footerCopyright'] : '&copy; ' . date('Y') . ' Garmenique. All rights reserved.';
         @endphp
         
         <div class="footer-note">

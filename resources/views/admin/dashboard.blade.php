@@ -207,6 +207,9 @@
                                                 data-bs-toggle="modal" data-bs-target="#editOrderModal" 
                                                 data-order-number="{{ $order['order_number'] }}"
                                                 data-order-status="{{ $order['status'] }}">Edit</button>
+                                        @if(in_array(strtolower($order['status']), ['success', 'confirmed', 'packing', 'shipped', 'delivered', 'completed']))
+                                            <a href="{{ route('admin.invoice.download', ['order_id' => $order['id']]) }}" class="action-btn invoice-btn" target="_blank" style="text-decoration: none;">Invoice</a>
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty
@@ -370,6 +373,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <span id="invoiceButtonContainer">
+                        <!-- Tombol invoice akan ditampilkan disini melalui JavaScript -->
+                    </span>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -1242,6 +1248,23 @@
             document.getElementById('detailSubtotal').textContent = `IDR ${formatNumber(order.subtotal)}`;
             document.getElementById('detailShipping').textContent = `IDR ${formatNumber(order.shipping_cost)}`;
             document.getElementById('detailTotal').textContent = `IDR ${formatNumber(order.total)}`;
+            
+            // Set invoice download link - hanya tampilkan jika status pembayaran sudah berhasil
+            const invoiceButtonContainer = document.getElementById('invoiceButtonContainer');
+            invoiceButtonContainer.innerHTML = '';
+            
+            // Status yang dianggap sudah melakukan pembayaran
+            const paidStatuses = ['success', 'confirmed', 'packing', 'shipped', 'delivered', 'completed'];
+            
+            if (paidStatuses.includes(order.status.toLowerCase())) {
+                const invoiceButton = document.createElement('a');
+                invoiceButton.href = `/admin/invoice/download/${order.id}`;
+                invoiceButton.className = 'btn btn-primary';
+                invoiceButton.target = '_blank';
+                invoiceButton.style.textDecoration = 'none';
+                invoiceButton.textContent = 'Download Invoice';
+                invoiceButtonContainer.appendChild(invoiceButton);
+            }
             
             // Products list
             const productsList = document.getElementById('orderProductsList');
