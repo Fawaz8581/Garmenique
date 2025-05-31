@@ -80,7 +80,20 @@ class ProductController extends Controller
                     // Get image data and encode as base64 to avoid UTF-8 issues
                     $imageData = base64_encode(file_get_contents($request->file('image')->getRealPath()));
                     $mimeType = $request->file('image')->getMimeType();
+                    
+                    // Log successful image processing
+                    Log::info('Image processed successfully for new product', [
+                        'mime_type' => $mimeType,
+                        'size' => strlen($imageData),
+                        'path' => $path,
+                        'encoding' => 'base64'
+                    ]);
                 } catch (\Exception $e) {
+                    Log::error('Error processing image for new product: ' . $e->getMessage(), [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    
                     return response()->json([
                         'success' => false,
                         'message' => 'Error processing image: ' . $e->getMessage()
@@ -254,7 +267,20 @@ class ProductController extends Controller
                     // Get image data and encode as base64 to avoid UTF-8 issues
                     $imageData = base64_encode(file_get_contents($request->file('image')->getRealPath()));
                     $mimeType = $request->file('image')->getMimeType();
+                    
+                    // Log successful image processing
+                    Log::info('Image processed successfully', [
+                        'mime_type' => $mimeType,
+                        'size' => strlen($imageData),
+                        'path' => $path,
+                        'encoding' => 'base64'
+                    ]);
                 } catch (\Exception $e) {
+                    Log::error('Error processing image: ' . $e->getMessage(), [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    
                     return response()->json([
                         'success' => false,
                         'message' => 'Error processing image: ' . $e->getMessage()
@@ -285,13 +311,27 @@ class ProductController extends Controller
                         }
                     }
                     
+                    // First, clear existing image data to prevent data corruption
+                    DB::table('products')
+                        ->where('id', $product->id)
+                        ->update([
+                            'image_data' => null,
+                            'image_mime_type' => null
+                        ]);
+                    
                     // Update product with image path
                     $product->update([
                         'images' => ['storage/' . $path]
                     ]);
                     
-                    // Handle binary data separately
+                    // Then add new image data after a short delay to ensure DB transaction completes
                     if ($imageData && $mimeType) {
+                        Log::info('Updating product image data', [
+                            'product_id' => $product->id,
+                            'mime_type' => $mimeType,
+                            'data_size' => strlen($imageData)
+                        ]);
+                        
                         DB::table('products')
                             ->where('id', $product->id)
                             ->update([
@@ -407,25 +447,49 @@ class ProductController extends Controller
                 return $this->returnDefaultImage();
             }
             
+            // First priority: Use image_data if available (binary storage)
             if ($product->image_data && $product->image_mime_type) {
                 Log::info('Serving image from database', [
                     'product_id' => $id,
                     'mime_type' => $product->image_mime_type
                 ]);
                 
-                // Decode the base64 image data
-                $imageData = base64_decode($product->image_data);
+                // We're now consistently storing image data as base64, so decode it
+                try {
+                    $imageData = base64_decode($product->image_data);
+                    
+                    // Validate that decode was successful
+                    if ($imageData === false) {
+                        Log::warning('Failed to decode base64 image data', [
+                            'product_id' => $id,
+                            'data_length' => strlen($product->image_data)
+                        ]);
+                        return $this->returnDefaultImage();
+                    }
+                    
+                    Log::info('Successfully decoded base64 image data', [
+                        'product_id' => $id,
+                        'decoded_size' => strlen($imageData)
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error decoding image data: ' . $e->getMessage());
+                    return $this->returnDefaultImage();
+                }
+
+                // Generate a unique cache key with a random component to prevent browser caching
+                $timestamp = time();
+                $random = mt_rand(1000, 9999);
+                $cacheKey = 'product-img-' . $id . '-' . $timestamp . '-' . $random;
                 
                 return response($imageData)
                     ->header('Content-Type', $product->image_mime_type)
-                    ->header('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+                    ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                    ->header('Pragma', 'no-cache')
+                    ->header('Expires', '0')
+                    ->header('ETag', $cacheKey); // Add unique ETag to force refresh
             }
             
-            Log::warning('No image data found for product', [
-                'product_id' => $id
-            ]);
-            
-            // Check if there's a file-based image
+            // Second priority: Use file-based image if available
             $images = json_decode($product->images ?? '[]');
             if (!empty($images) && is_array($images)) {
                 $path = str_replace('storage/', '', $images[0]);
@@ -438,6 +502,7 @@ class ProductController extends Controller
                 }
             }
             
+            // No image found - return default
             return $this->returnDefaultImage();
         } catch (\Exception $e) {
             Log::error('Error retrieving product image: ' . $e->getMessage(), [

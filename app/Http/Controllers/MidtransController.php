@@ -181,9 +181,9 @@ class MidtransController extends Controller
                 ],
                 'item_details' => [],
                 'callbacks' => [
-                    'finish' => route('order.success', ['order_id' => $order->id]),
-                    'error' => route('order.success', ['order_id' => $order->id, 'status' => 'failed']),
-                    'pending' => route('order.success', ['order_id' => $order->id, 'status' => 'pending'])
+                    'finish' => route('order.success', ['order_id' => $order->order_number]),
+                    'error' => route('order.success', ['order_id' => $order->order_number, 'status' => 'failed']),
+                    'pending' => route('order.success', ['order_id' => $order->order_number, 'status' => 'pending'])
                 ]
             ];
 
@@ -220,7 +220,8 @@ class MidtransController extends Controller
                 return response()->json([
                     'success' => true,
                     'snap_token' => $snapToken,
-                    'order_id' => $order->id
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
                 ]);
             } catch (\Exception $snapError) {
                 Log::error('Midtrans snap token generation error', [
@@ -503,9 +504,9 @@ class MidtransController extends Controller
                 ],
                 'item_details' => [],
                 'callbacks' => [
-                    'finish' => route('order.success', ['order_id' => $order->id]),
-                    'error' => route('order.success', ['order_id' => $order->id, 'status' => 'failed']),
-                    'pending' => route('order.success', ['order_id' => $order->id, 'status' => 'pending'])
+                    'finish' => route('order.success', ['order_id' => $order->order_number]),
+                    'error' => route('order.success', ['order_id' => $order->order_number, 'status' => 'failed']),
+                    'pending' => route('order.success', ['order_id' => $order->order_number, 'status' => 'pending'])
                 ]
             ];
             

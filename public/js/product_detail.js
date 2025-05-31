@@ -186,15 +186,33 @@ app.controller('ProductDetailController', ['$scope', '$window', '$http', functio
     
     // Add to cart
     $scope.addToCart = function() {
-        if(!$scope.selectedSize || !$scope.selectedColor) {
-            alert('Please select a size and color');
+        if (!selectedSize) {
+            alert('Please select a size');
             return;
+        }
+        
+        // Find the product data
+        const productId = document.querySelector('[data-product-id]').dataset.productId;
+        const productName = document.querySelector('.product-title').textContent;
+        const productPrice = parseFloat(document.querySelector('.current-price').textContent.replace(/[^\d]/g, ''));
+        
+        // Get the product image URL and add cache-busting parameter
+        let productImage;
+        const imgElement = document.querySelector('.main-product-image img');
+        if (imgElement) {
+            // Get the original image URL without any existing query parameters
+            let baseImageUrl = imgElement.getAttribute('src').split('?')[0];
+            // Add a new cache-busting parameter
+            const cacheBuster = `v=${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            productImage = `${baseImageUrl}?${cacheBuster}`;
+        } else {
+            productImage = '/path/to/default/image.jpg';
         }
         
         var cartItem = {
             id: $scope.product.id,
             name: $scope.product.name,
-            image: $scope.product.primaryImage,
+            image: productImage,
             price: $scope.product.price,
             oldPrice: $scope.product.oldPrice,
             discount: $scope.product.discount,

@@ -42,11 +42,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Calculate subtotal on page load and update display
     subtotal = calculateSubtotal();
+    
+    // Set initial subtotal and total
     if (subtotalElement && subtotal > 0) {
         subtotalElement.textContent = `IDR ${formatNumber(subtotal)}`;
-    } else {
-        // Fallback to existing subtotal from the page if calculation fails
-        subtotal = parseFloat(subtotalElement?.textContent?.replace(/[^0-9]/g, '') || 0);
+        
+        // Set initial total to match subtotal since shipping is 0 initially
+        if (totalElement) {
+            totalElement.textContent = `IDR ${formatNumber(subtotal)}`;
+            
+            // Also update the hidden total input
+            const totalInput = document.getElementById('total-input');
+            if (totalInput) {
+                totalInput.value = subtotal;
+            }
+        }
     }
     
     // Disable continue button until shipping option is selected
@@ -816,6 +826,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Calculate total (cap at a billion to prevent overflow)
         const total = Math.min(validSubtotal + validShippingCost, 1000000000);
+        
+        console.log('Updating total: subtotal=' + validSubtotal + ', shipping=' + validShippingCost + ', total=' + total);
         
         // Update total display
         totalElement.textContent = `IDR ${formatNumber(total)}`;

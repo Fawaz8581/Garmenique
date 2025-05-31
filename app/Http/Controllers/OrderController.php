@@ -248,11 +248,43 @@ class OrderController extends Controller
             return redirect('/')->with('error', 'No order specified');
         }
         
-        $order = Order::find($orderId);
+        // First try to find the order by order_number (when it starts with "ORD-")
+        if (is_string($orderId) && strpos($orderId, 'ORD-') === 0) {
+            $order = Order::where('order_number', $orderId)->first();
+            
+            Log::info('Order looked up by order_number', [
+                'order_number' => $orderId,
+                'found' => $order ? 'yes' : 'no'
+            ]);
+        } 
+        // Otherwise try to find by ID if it's numeric
+        else if (is_numeric($orderId)) {
+            $order = Order::find($orderId);
+            
+            Log::info('Order looked up by ID', [
+                'id' => $orderId,
+                'found' => $order ? 'yes' : 'no'
+            ]);
+        } 
+        // If not a valid format, try both
+        else {
+            $order = Order::where('order_number', $orderId)->first();
+            if (!$order) {
+                try {
+                    $order = Order::find($orderId);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to find order', [
+                        'order_id' => $orderId,
+                        'error' => $e->getMessage()
+                    ]);
+                    // Continue with order as null
+                }
+            }
+        }
         
         // Check if order exists and belongs to current user
-        if (!$order || $order->user_id !== Auth::id()) {
-            return redirect('/')->with('error', 'Order not found');
+        if (!$order || (!Auth::check() || $order->user_id !== Auth::id())) {
+            return redirect('/')->with('error', 'Order not found or unauthorized');
         }
         
         // If status is pending, update order status

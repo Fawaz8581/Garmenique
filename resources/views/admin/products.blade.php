@@ -623,12 +623,17 @@
             // Get category name
             const categoryName = product.category_name || 'Uncategorized';
             
-            // Get product image
-            const imageUrl = product.db_image_url 
-                ? product.db_image_url 
-                : (product.image_url
-                    ? product.image_url
-                    : 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');
+            // Get product image with cache-busting parameter
+            const cacheBuster = '?v=' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000);
+            let imageUrl = '';
+            
+            if (product.db_image_url) {
+                imageUrl = product.db_image_url + cacheBuster;
+            } else if (product.image_url) {
+                imageUrl = product.image_url + cacheBuster;
+            } else {
+                imageUrl = 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
+            }
             
             // Format price with Indonesian number format
             const formattedPrice = new Intl.NumberFormat('id-ID').format(product.price);
@@ -966,6 +971,8 @@
                     return response.json();
                 })
                 .then(data => {
+                    console.log('Response:', data);
+                    
                     // Reset button state
                     saveEditBtn.disabled = false;
                     saveEditBtn.innerHTML = 'Save Changes';
@@ -973,28 +980,36 @@
                     // Re-enable close and cancel buttons
                     if (closeBtn) closeBtn.disabled = false;
                     if (cancelBtn) cancelBtn.disabled = false;
-                    
+
                     if (data.success) {
-                        console.log('Update successful, received data:', data);
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
+                        modal.hide();
                         
-                        // Update the product in the products array
-                        const index = products.findIndex(p => p.id == id);
+                        // If image was updated, force refresh the page to clear browser cache
+                        const imageFile = document.getElementById('editProductImage').files[0];
+                        if (imageFile) {
+                            showNotification('Success', 'Product updated successfully. Refreshing page...');
+                            setTimeout(() => {
+                                window.location.reload(true); // Force reload from server, not cache
+                            }, 1000);
+                            return;
+                        }
+                        
+                        // Update the products array
+                        const index = products.findIndex(p => p.id === data.product.id);
                         if (index !== -1) {
                             products[index] = data.product;
                         }
                         
-                        // Re-render the products
+                        // Re-render products
                         renderProducts(products);
                         
-                        // Close the modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProductModal'));
-                        modal.hide();
-                        
-                        // Show success notification
-                        showNotification('Success', 'Product updated successfully!', 'success');
+                        // Show success message
+                        showNotification('Success', 'Product updated successfully');
                     } else {
-                        console.error('Update failed:', data.message);
-                        showNotification('Error', data.message || 'Failed to update product', 'error');
+                        // Show error message
+                        showNotification('Error', data.message || 'An error occurred while updating the product', 'error');
                     }
                 })
                 .catch(error => {
@@ -1182,11 +1197,13 @@
             // Display current image if available
             const currentImagePreview = document.getElementById('currentImagePreview');
             const currentImage = document.getElementById('currentImage');
+            // Add a cache-busting parameter to force browser to fetch fresh image
+            const cacheBuster = '?v=' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000);
             if (product.db_image_url) {
-                currentImage.src = product.db_image_url;
+                currentImage.src = product.db_image_url + cacheBuster;
                 currentImagePreview.style.display = 'block';
             } else if (product.image_url) {
-                currentImage.src = product.image_url;
+                currentImage.src = product.image_url + cacheBuster;
                 currentImagePreview.style.display = 'block';
             } else {
                 currentImagePreview.style.display = 'none';
@@ -1261,11 +1278,13 @@
 
             // Set image
             const detailImage = document.getElementById('detailCurrentImage');
+            // Add a cache-busting parameter to force browser to fetch fresh image
+            const detailCacheBuster = '?v=' + new Date().getTime() + '-' + Math.floor(Math.random() * 1000);
             if (product.db_image_url) {
-                detailImage.src = product.db_image_url;
+                detailImage.src = product.db_image_url + detailCacheBuster;
                 document.getElementById('detailImagePreview').style.display = 'block';
             } else if (product.image_url) {
-                detailImage.src = product.image_url;
+                detailImage.src = product.image_url + detailCacheBuster;
                 document.getElementById('detailImagePreview').style.display = 'block';
             } else {
                 document.getElementById('detailImagePreview').style.display = 'none';

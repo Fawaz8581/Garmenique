@@ -365,7 +365,7 @@
                         <i class="fas fa-arrow-left me-2"></i> Back to Catalog
                     </a>
                 </div>
-                <form id="checkoutForm" method="POST" action="{{ route('checkout.process') }}">
+                <form id="checkoutForm" method="POST" action="{{ route('checkout.process') }}" autocomplete="off">
                     @csrf
                     <!-- Shipping Information -->
                     <div class="form-section" id="shipping-section">
@@ -373,31 +373,82 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="firstName" name="firstName" value="{{ Auth::user()->name ?? '' }}" required>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required autocomplete="new-name">
                                     <label for="firstName">First Name</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" required autocomplete="new-lastName">
                                     <label for="lastName">Last Name</label>
                                 </div>
                             </div>
                         </div>
                         <div class="form-floating">
-                            <input type="email" class="form-control" id="email" name="email" value="{{ Auth::user()->email ?? '' }}" required>
+                            <input type="email" class="form-control" id="email" name="email" required autocomplete="new-email">
                             <label for="email">Email Address</label>
                         </div>
 
                         <!-- Phone Number -->
-                        <div class="form-floating mt-3">
-                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required>
-                            <label for="phoneNumber">Phone Number</label>
+                        <div class="mt-3">
+                            <h5 class="mb-2">Phone Number</h5>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="phone_option" id="new_phone" value="new" checked>
+                                    <label class="form-check-label" for="new_phone">
+                                        Use a new phone number
+                                    </label>
+                                </div>
+                                @if(Auth::check() && Auth::user()->phone_number)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="phone_option" id="saved_phone" value="saved">
+                                    <label class="form-check-label" for="saved_phone">
+                                        Use saved phone number ({{ Auth::user()->country_code }} {{ Auth::user()->phone_number }})
+                                    </label>
+                                </div>
+                                @endif
+                            </div>
+                            <div class="form-floating" id="phone_input_container">
+                                <div class="row">
+                                    <div class="col-4 col-md-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="countryCode" name="countryCode" value="+62" autocomplete="new-country-code">
+                                            <label for="countryCode">Code</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-8 col-md-9">
+                                        <div class="form-floating">
+                                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" autocomplete="new-phone">
+                                            <label for="phoneNumber">Phone Number</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-floating mt-3">
-                            <input type="text" class="form-control" id="address" name="address" required>
-                            <label for="address">Address</label>
+                        <!-- Address -->
+                        <div class="mt-3">
+                            <h5 class="mb-2">Address</h5>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="address_option" id="new_address" value="new" checked>
+                                    <label class="form-check-label" for="new_address">
+                                        Use a new address
+                                    </label>
+                                </div>
+                                @if(Auth::check() && Auth::user()->address)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="address_option" id="saved_address" value="saved">
+                                    <label class="form-check-label" for="saved_address">
+                                        Use saved address
+                                    </label>
+                                </div>
+                                @endif
+                            </div>
+                            <div class="form-floating" id="address_input_container">
+                                <input type="text" class="form-control" id="address" name="address" autocomplete="new-address">
+                                <label for="address">Address</label>
+                            </div>
                         </div>
                         
                         <!-- Shipping Expedition Selection -->
@@ -616,6 +667,18 @@
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Disable autofill for the entire form
+        const form = document.getElementById('checkoutForm');
+        if (form) {
+            form.setAttribute('autocomplete', 'off');
+            
+            // Also add random attributes to important fields to further prevent autofill
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+            inputs.forEach(input => {
+                input.setAttribute('autocomplete', 'new-' + Math.random().toString(36).substring(2, 8));
+            });
+        }
+        
         // Get the subtotal from cart items
         function calculateSubtotal() {
             let total = 0;
@@ -640,6 +703,29 @@
             }
             
             return total;
+        }
+        
+        // Calculate and update total based on subtotal and shipping
+        function updateTotal() {
+            const subtotal = calculateSubtotal();
+            const shippingText = document.getElementById('shipping-amount')?.textContent || 'IDR 0';
+            const shipping = parseInt(shippingText.replace(/[^\d]/g, ''));
+            
+            const total = subtotal + shipping;
+            
+            console.log('Checkout total calculation: subtotal=' + subtotal + ', shipping=' + shipping + ', total=' + total);
+            
+            // Update total display
+            const totalElement = document.getElementById('total-amount');
+            if (totalElement) {
+                totalElement.textContent = 'IDR ' + new Intl.NumberFormat('id-ID').format(total);
+            }
+            
+            // Update hidden input
+            const totalInput = document.getElementById('total-input');
+            if (totalInput) {
+                totalInput.value = total;
+            }
         }
         
         // Check if cart is empty
@@ -678,6 +764,62 @@
             if (totalInput) {
                 totalInput.value = subtotal;
             }
+            
+            // Make sure the total is updated whenever shipping changes
+            const shippingAmount = document.getElementById('shipping-amount');
+            if (shippingAmount) {
+                // Create a mutation observer to watch for changes to the shipping amount
+                const observer = new MutationObserver(function(mutations) {
+                    updateTotal();
+                });
+                
+                observer.observe(shippingAmount, { childList: true, characterData: true, subtree: true });
+            }
+        }
+        
+        // Handle address and phone number options
+        // Phone number options
+        const newPhoneRadio = document.getElementById('new_phone');
+        const savedPhoneRadio = document.getElementById('saved_phone');
+        const phoneInput = document.getElementById('phone_input_container');
+        
+        if (newPhoneRadio && savedPhoneRadio) {
+            newPhoneRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('phoneNumber').value = '';
+                    document.getElementById('countryCode').value = '+62';
+                }
+            });
+            
+            savedPhoneRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    @if(Auth::check() && Auth::user()->phone_number)
+                    document.getElementById('phoneNumber').value = '{{ Auth::user()->phone_number }}';
+                    document.getElementById('countryCode').value = '{{ Auth::user()->country_code ?? "+62" }}';
+                    @endif
+                }
+            });
+        }
+        
+        // Address options
+        const newAddressRadio = document.getElementById('new_address');
+        const savedAddressRadio = document.getElementById('saved_address');
+        const addressInput = document.getElementById('address_input_container');
+        
+        if (newAddressRadio && savedAddressRadio) {
+            newAddressRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('address').value = '';
+                }
+            });
+            
+            savedAddressRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    @if(Auth::check() && Auth::user()->address)
+                    document.getElementById('address').value = '{{ Auth::user()->address }}';
+                    @endif
+                }
+            });
         }
     });
     </script>

@@ -152,12 +152,22 @@ document.addEventListener('DOMContentLoaded', function() {
                                 onSuccess: function(result) {
                                     console.log('Payment success:', result);
                                     alert('Payment successful! You will be redirected to the order success page.');
-                                    handleSuccessfulPayment(data.order_id);
+                                    // Try to get order_number from the result if available
+                                    let orderReference = data.order_number || data.order_id;
+                                    if (result && result.order_id) {
+                                        orderReference = result.order_id;
+                                    }
+                                    handleSuccessfulPayment(orderReference);
                                 },
                                 onPending: function(result) {
                                     console.log('Payment pending:', result);
                                     alert('Payment is pending. Please complete your payment according to the instructions.');
-                                    handlePendingPayment(data.order_id);
+                                    // Try to get order_number from the result if available
+                                    let orderReference = data.order_number || data.order_id;
+                                    if (result && result.order_id) {
+                                        orderReference = result.order_id;
+                                    }
+                                    handlePendingPayment(orderReference);
                                 },
                                 onError: function(result) {
                                     console.error('Payment error:', result);

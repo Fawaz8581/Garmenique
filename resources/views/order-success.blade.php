@@ -471,6 +471,28 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    @if(isset($order))
+    <script>
+        // Handle case where Midtrans might redirect with order_id parameter that's the order_number
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get URL params to check if we have the transaction_status
+            const urlParams = new URLSearchParams(window.location.search);
+            const transactionStatus = urlParams.get('transaction_status');
+            
+            // If this is a redirect from Midtrans, we need to update the page
+            if (transactionStatus) {
+                console.log('Detected return from Midtrans with status:', transactionStatus);
+                
+                // Refresh the page without the Midtrans query parameters to avoid issues on reload
+                if (window.history.replaceState) {
+                    const cleanUrl = window.location.href.split('?')[0] + '?order_id={{ $order->order_number }}';
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+            }
+        });
+    </script>
+    @endif
+    
     @if(isset($order) && ($order->status === 'pending' || $order->status === 'payment_pending') && !empty($order->snap_token))
     <!-- Midtrans JS -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-61XuGAwQ8Bj8LxSS"></script>

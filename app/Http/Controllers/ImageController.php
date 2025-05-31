@@ -31,9 +31,18 @@ class ImageController extends Controller
                 ], 400);
             }
 
-            // Get image data and mime type
-            $imageData = file_get_contents($request->file('image')->getRealPath());
+            // Get image data and encode as base64 to avoid UTF-8 issues
+            $imageData = base64_encode(file_get_contents($request->file('image')->getRealPath()));
             $mimeType = $request->file('image')->getMimeType();
+            
+            // Log image information
+            Log::info('Processing image upload via ImageController', [
+                'type' => $request->type,
+                'id' => $request->id,
+                'mime_type' => $mimeType,
+                'size' => strlen($imageData),
+                'encoding' => 'base64'
+            ]);
             
             // Store image data in the appropriate table based on type
             switch ($request->type) {
@@ -104,9 +113,42 @@ class ImageController extends Controller
                 // Return default image
                 return response()->file(public_path('images/no-image.jpg'));
             }
-
-            return response($item->image_data)
-                ->header('Content-Type', $item->image_mime_type);
+            
+            // We now consistently store images as base64, so decode it
+            try {
+                $imageData = base64_decode($item->image_data);
+                
+                // Validate that decode was successful
+                if ($imageData === false) {
+                    Log::warning('Failed to decode base64 image data', [
+                        'type' => $type,
+                        'id' => $id,
+                        'data_length' => strlen($item->image_data)
+                    ]);
+                    return response()->file(public_path('images/no-image.jpg'));
+                }
+                
+                Log::info('Successfully decoded base64 image data', [
+                    'type' => $type,
+                    'id' => $id,
+                    'decoded_size' => strlen($imageData)
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error decoding image data: ' . $e->getMessage());
+                return response()->file(public_path('images/no-image.jpg'));
+            }
+            
+            // Add anti-cache headers to ensure browsers always load the new image
+            $timestamp = time();
+            $random = mt_rand(1000, 9999);
+            $cacheKey = 'img-' . $type . '-' . $id . '-' . $timestamp . '-' . $random;
+            
+            return response($imageData)
+                ->header('Content-Type', $item->image_mime_type)
+                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0')
+                ->header('ETag', md5($cacheKey));
 
         } catch (\Exception $e) {
             Log::error('Error retrieving image: ' . $e->getMessage());
