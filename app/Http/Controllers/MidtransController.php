@@ -349,12 +349,7 @@ class MidtransController extends Controller
                 ]
             );
             
-            // Jika stok berhasil diupdate, tandai di payment_info
-            if ($stockUpdated) {
-                $paymentInfo = $order->payment_info;
-                $paymentInfo['stock_updated'] = true;
-                $order->payment_info = $paymentInfo;
-            }
+            // Stock_updated sudah ditandai di awal proses
             
             $order->save();
             
@@ -417,19 +412,8 @@ class MidtransController extends Controller
             if (($status === 'success' || $status === 'completed') && 
                 ($previousStatus === 'pending' || $previousStatus === 'payment_pending')) {
                 
-                // Cek apakah stok sudah pernah dikurangi untuk order ini
-                $stockAlreadyUpdated = isset($order->payment_info['stock_updated']) && $order->payment_info['stock_updated'] === true;
-                
-                // Update product stock on successful payment hanya jika belum pernah diupdate
-                if (!$stockAlreadyUpdated) {
-                    $this->updateProductStock($order);
-                    
-                    // Tandai bahwa stok sudah diupdate
-                    $paymentInfo = $order->payment_info;
-                    $paymentInfo['stock_updated'] = true;
-                    $order->payment_info = $paymentInfo;
-                    $order->save();
-                }
+                // Update product stock (fungsi updateProductStock sudah memiliki pengecekan internal)
+                $this->updateProductStock($order);
                 
                 Log::info('Order status manually updated and stock reduced', [
                     'order_id' => $order->id,
@@ -694,26 +678,48 @@ class MidtransController extends Controller
      */
     private function updateProductStock($order)
     {
-        if (!$order || empty($order->cart_items)) {
-            Log::warning('Cannot update stock: Order has no cart items', ['order_id' => $order->id ?? 'null']);
-            return;
-        }
-        
-        // Log cart items for debugging
-        Log::info('MidtransController: Processing cart items for stock update', [
-            'order_id' => $order->id,
-            'cart_items' => $order->cart_items
-        ]);
-        
-        $successCount = 0;
-        $failedCount = 0;
-        
-        foreach ($order->cart_items as $item) {
-            if (!isset($item['id']) || !isset($item['size']) || !isset($item['quantity'])) {
-                Log::warning('Skipping stock update for incomplete cart item', ['item' => $item]);
-                $failedCount++;
-                continue;
+        // Gunakan database transaction untuk memastikan operasi atomik
+        return \DB::transaction(function() use ($order) {
+            // Refresh order dari database untuk mendapatkan data terbaru
+            $order->refresh();
+            
+            // Cek apakah stok sudah pernah dikurangi untuk order ini
+            $stockAlreadyUpdated = isset($order->payment_info['stock_updated']) && $order->payment_info['stock_updated'] === true;
+            
+            if ($stockAlreadyUpdated) {
+                Log::info('Stock already updated for this order, skipping', ['order_id' => $order->id]);
+                return false; // Tidak ada update yang dilakukan
             }
+            
+            if (!$order || empty($order->cart_items)) {
+                Log::warning('Cannot update stock: Order has no cart items', ['order_id' => $order->id ?? 'null']);
+                return false;
+            }
+            
+            // Tandai bahwa stok sudah diupdate sebelum melakukan pengurangan stok
+            // Ini untuk mencegah pengurangan stok ganda jika ada race condition
+            $paymentInfo = $order->payment_info ?: [];
+            $paymentInfo['stock_updated'] = true;
+            $order->payment_info = $paymentInfo;
+            $order->save();
+            
+            Log::info('Order marked as stock_updated before processing', ['order_id' => $order->id]);
+        
+            // Log cart items for debugging
+            Log::info('MidtransController: Processing cart items for stock update', [
+                'order_id' => $order->id,
+                'cart_items' => $order->cart_items
+            ]);
+            
+            $successCount = 0;
+            $failedCount = 0;
+        
+            foreach ($order->cart_items as $item) {
+                if (!isset($item['id']) || !isset($item['size']) || !isset($item['quantity'])) {
+                    Log::warning('Skipping stock update for incomplete cart item', ['item' => $item]);
+                    $failedCount++;
+                    continue;
+                }
             
             $product = \App\Models\Product::find($item['id']);
             
@@ -809,11 +815,14 @@ class MidtransController extends Controller
             ]);
         }
         
-        Log::info('Stock update operation completed', [
-            'order_id' => $order->id,
-            'successful_updates' => $successCount,
-            'failed_updates' => $failedCount,
-            'total_items' => count($order->cart_items)
-        ]);
+            Log::info('Stock update operation completed', [
+                'order_id' => $order->id,
+                'successful_updates' => $successCount,
+                'failed_updates' => $failedCount,
+                'total_items' => count($order->cart_items)
+            ]);
+            
+            return true; // Berhasil update stok
+        });
     }
 } 

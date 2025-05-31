@@ -302,14 +302,28 @@ class OrderController extends Controller
             $order->status = 'completed';
             $order->save();
             
-            // Update product stock here - Make sure we're using the product stock update method correctly
+            // Update product stock here - hanya jika belum pernah diupdate
             if ($order->cart_items) {
-                $this->updateProductStock($order->cart_items);
+                // Cek apakah stok sudah pernah dikurangi untuk order ini
+                $stockAlreadyUpdated = isset($order->payment_info['stock_updated']) && $order->payment_info['stock_updated'] === true;
                 
-                Log::info('Stock updated for order items after successful payment', [
-                    'order_id' => $orderId,
-                    'cart_items_count' => count($order->cart_items)
-                ]);
+                if (!$stockAlreadyUpdated) {
+                    // Tandai bahwa stok sudah diupdate
+                    $paymentInfo = $order->payment_info ?: [];
+                    $paymentInfo['stock_updated'] = true;
+                    $order->payment_info = $paymentInfo;
+                    $order->save();
+                    
+                    // Update stok produk
+                    $this->updateProductStock($order->cart_items);
+                    
+                    Log::info('Stock updated for order items after successful payment', [
+                        'order_id' => $orderId,
+                        'cart_items_count' => count($order->cart_items)
+                    ]);
+                } else {
+                    Log::info('Stock already updated for this order, skipping', ['order_id' => $order->id]);
+                }
             } else {
                 Log::warning('No cart items found in order for stock update', [
                     'order_id' => $orderId
