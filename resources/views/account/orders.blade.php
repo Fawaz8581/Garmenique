@@ -964,6 +964,60 @@
             }
         });
     </script>
+
+    <!-- Status Badge Styles -->
+    <style>
+        /* Status Badge Base Style */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        /* Status Badge Colors */
+        .status-badge.status-pending {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .status-badge.status-confirmed {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .status-badge.status-packing {
+            background-color: #6610f2;
+            color: white;
+        }
+        
+        .status-badge.status-shipped {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .status-badge.status-delivered {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .status-badge.status-completed {
+            background-color: #20c997;
+            color: white;
+        }
+        
+        .status-badge.status-rejected {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        /* Note Status Badge - smaller version */
+        .note-status {
+            font-size: 11px !important;
+            padding: 3px 8px !important;
+        }
+    </style>
 </body>
 </html>
 

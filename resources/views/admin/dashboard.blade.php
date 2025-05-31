@@ -138,6 +138,31 @@
             <div class="col-lg-12 mb-4">
                 <div class="updates-section">
                     <h2 class="section-title">Recent Orders</h2>
+                    
+                    <!-- Search and Filter Bar -->
+                    <div class="search-filter-bar mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="orderSearchInput" placeholder="Search by Product Name, Product Number or Shipping Method...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="orderStatusFilter">
+                                    <option value="">All Statuses</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="packing">Packing</option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="orders-table table-responsive">
                         <table class="table">
                             <thead>
@@ -399,6 +424,83 @@
                 });
             }
             
+            // Setup search and filter functionality
+            const searchInput = document.getElementById('orderSearchInput');
+            const statusFilter = document.getElementById('orderStatusFilter');
+            
+            // Debounce function to prevent too many filters while typing
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+            
+            // Search input input event with debounce
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(function() {
+                    applySearchAndFilter();
+                }, 300)); // 300ms debounce
+            }
+            
+            // Status filter change event
+            if (statusFilter) {
+                statusFilter.addEventListener('change', function() {
+                    applySearchAndFilter();
+                });
+            }
+            
+            // Function to apply search and filter
+            function applySearchAndFilter() {
+                // Get the current data and re-filter it
+                const date = document.getElementById('selectedDate').value;
+                const isAllDates = new URLSearchParams(window.location.search).has('all_dates');
+                
+                // Show loading indicator
+                const tableBody = document.querySelector('.orders-table tbody');
+                if (tableBody) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
+                }
+                
+                // Build query parameters
+                let params = new URLSearchParams();
+                if (isAllDates) {
+                    params.append('all_dates', '1');
+                } else if (date) {
+                    params.append('date', date);
+                }
+                
+                // Fetch data with filters
+                fetch(`/admin/api/dashboard-data?${params.toString()}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.message || 'Server returned an error');
+                        }
+                        
+                        // Update the table with filtered data
+                        updateRecentOrdersTable(data.recent_orders);
+                        
+                        // Update pagination UI if pagination data is available
+                        if (data.pagination) {
+                            updatePaginationUI(data.pagination);
+                            attachPaginationListeners();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching dashboard data:', error);
+                        if (tableBody) {
+                            tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data: ${error.message || 'Unknown error'}. Please try again.</td></tr>`;
+                        }
+                    });
+            }
+            
             // Check if we're on the all_dates view and update UI accordingly
             if (new URLSearchParams(window.location.search).has('all_dates')) {
                 document.querySelectorAll('.card-period').forEach(el => {
@@ -454,7 +556,12 @@
                         
                         // Fetch updated data
                         fetch(`/admin/api/dashboard-data?${params.toString()}`)
-                            .then(response => response.json())
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok: ' + response.status);
+                                }
+                                return response.json();
+                            })
                             .then(data => {
                                 // Update table with new data
                                 updateRecentOrdersTable(data.recent_orders);
@@ -468,7 +575,7 @@
                             .catch(error => {
                                 console.error('Error fetching paginated data:', error);
                                 if (tableBody) {
-                                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
+                                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data: ${error.message || 'Unknown error'}. Please try again.</td></tr>`;
                                 }
                             });
                     }
@@ -519,7 +626,12 @@
                         
                         // Fetch updated data
                         fetch(`/admin/api/dashboard-data?${params.toString()}`)
-                            .then(response => response.json())
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok: ' + response.status);
+                                }
+                                return response.json();
+                            })
                             .then(data => {
                                 // Update table with new data
                                 updateRecentOrdersTable(data.recent_orders);
@@ -533,7 +645,7 @@
                             .catch(error => {
                                 console.error('Error fetching paginated data:', error);
                                 if (tableBody) {
-                                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading data. Please try again.</td></tr>';
+                                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data: ${error.message || 'Unknown error'}. Please try again.</td></tr>`;
                                 }
                             });
                     }
@@ -680,10 +792,25 @@
             
             const url = `/admin/api/dashboard-data?${params.toString()}`;
             
+            // Show loading indicator in the table
+            const tableBody = document.querySelector('.orders-table tbody');
+            if (tableBody) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading...</td></tr>';
+            }
+            
             // Fetch data with filters
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    if (data.error) {
+                        throw new Error(data.message || 'Server returned an error');
+                    }
+                    
                     // Update the dashboard cards
                     document.querySelector('.dashboard-card:nth-child(1) .card-value').textContent = 
                         'IDR ' + formatNumber(data.total_sales);
@@ -704,6 +831,13 @@
                     // Update recent orders table
                     updateRecentOrdersTable(data.recent_orders);
                     
+                    // Update pagination UI if pagination data is available
+                    if (data.pagination) {
+                        updatePaginationUI(data.pagination);
+                        // Re-attach event listeners to pagination links
+                        attachPaginationListeners();
+                    }
+                    
                     // Update card period text based on filter
                     document.querySelectorAll('.card-period').forEach(el => {
                         if (data.show_all_dates) {
@@ -720,6 +854,9 @@
                 })
                 .catch(error => {
                     console.error('Error fetching dashboard data:', error);
+                    if (tableBody) {
+                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading data: ${error.message || 'Unknown error'}. Please try again.</td></tr>`;
+                    }
                 });
         }
 
@@ -731,7 +868,47 @@
             // Clear existing rows
             tableBody.innerHTML = '';
             
-            if (orders.length === 0) {
+            // Apply search and filter if they exist
+            const searchTerm = document.getElementById('orderSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('orderStatusFilter').value.toLowerCase();
+            
+            // Filter orders based on search term and status filter
+            const filteredOrders = orders.filter(order => {
+                // Check if order matches the status filter
+                if (statusFilter && order.status.toLowerCase() !== statusFilter) {
+                    return false;
+                }
+                
+                // If no search term, return true
+                if (!searchTerm) return true;
+                
+                // Check if order matches the search term
+                const productName = (order.product_name || '').toLowerCase();
+                const productNumber = (order.product_number || '').toLowerCase();
+                
+                // Get expedition name
+                let expeditionName = 'N/A';
+                if (order.shipping_info && order.shipping_info.expedition) {
+                    switch(order.shipping_info.expedition) {
+                        case 'jne':
+                            expeditionName = 'jne';
+                            break;
+                        case 'jnt':
+                            expeditionName = 'j&t express';
+                            break;
+                        case 'sicepat':
+                            expeditionName = 'sicepat';
+                            break;
+                    }
+                }
+                
+                // Check if any field matches the search term
+                return productName.includes(searchTerm) || 
+                       productNumber.includes(searchTerm) || 
+                       expeditionName.includes(searchTerm);
+            });
+            
+            if (filteredOrders.length === 0) {
                 const emptyRow = document.createElement('tr');
                 emptyRow.innerHTML = '<td colspan="6" class="text-center">No orders found</td>';
                 tableBody.appendChild(emptyRow);
@@ -739,7 +916,7 @@
             }
             
             // Add new rows
-            orders.forEach(order => {
+            filteredOrders.forEach(order => {
                 const row = document.createElement('tr');
                 
                 // Format the status badge
@@ -1232,6 +1409,71 @@
     .pagination .page-item:last-child .page-link {
         font-size: 16px;
         font-weight: bold;
+    }
+    
+    /* Search and Filter Bar Styles */
+    .search-filter-bar {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .search-filter-bar .form-control,
+    .search-filter-bar .form-select {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+        height: 42px;
+    }
+    
+    .search-filter-bar .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        color: #6c757d;
+    }
+    
+    .search-filter-bar .input-group .form-control {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    
+    /* Status Badge Colors */
+    .status-badge.status-pending {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .status-badge.status-confirmed {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
+    .status-badge.status-packing {
+        background-color: #6610f2;
+        color: white;
+    }
+    
+    .status-badge.status-shipped {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .status-badge.status-delivered {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .status-badge.status-completed {
+        background-color: #20c997;
+        color: white;
+    }
+    
+    .status-badge.status-rejected {
+        background-color: #dc3545;
+        color: white;
     }
     </style>
 </body>
