@@ -4,112 +4,119 @@
     <meta charset="utf-8">
     <title>Invoice #{{ $order->order_number }}</title>
     <style>
+        @page {
+            margin: 1cm;
+        }
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             color: #333;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
+            background-color: white;
         }
         
         .invoice-container {
+            width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 30px;
-            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
         }
         
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
+        .header {
             margin-bottom: 30px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 20px;
         }
         
-        .invoice-logo {
-            max-width: 150px;
-            height: auto;
-            margin-bottom: 10px;
+        .header-left {
+            float: left;
+            width: 50%;
         }
         
-        .invoice-company {
-            font-size: 12px;
-            color: #666;
+        .header-right {
+            float: right;
+            width: 50%;
+            text-align: right;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .company-details {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
         }
         
         .invoice-title {
-            text-align: right;
             font-size: 28px;
             font-weight: bold;
-            color: #000;
             margin-bottom: 10px;
         }
         
         .invoice-details {
-            text-align: right;
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .invoice-id {
-            font-weight: bold;
-            color: #000;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        
-        .billing-details {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 1.4;
         }
         
         .billing-section {
-            width: 48%;
+            margin-bottom: 30px;
+            overflow: hidden;
         }
         
-        .billing-title {
+        .billing-left {
+            float: left;
+            width: 50%;
+        }
+        
+        .billing-right {
+            float: right;
+            width: 50%;
+        }
+        
+        .section-title {
             font-weight: bold;
             margin-bottom: 10px;
             font-size: 16px;
-            color: #000;
         }
         
-        .billing-address {
-            font-size: 14px;
-            line-height: 1.5;
+        .payment-status {
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 16px;
         }
         
-        .billing-info {
-            margin-top: 10px;
-            font-size: 14px;
+        .payment-status.pending {
+            background-color: #ffc107;
+            color: #333;
         }
         
-        .table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         
-        .table th {
-            background: #f8f8f8;
+        table th {
             text-align: left;
-            padding: 12px;
-            font-weight: 600;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
             color: #333;
-            border-bottom: 2px solid #e0e0e0;
         }
         
-        .table td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
-        }
-        
-        .table tr:last-child td {
-            border-bottom: none;
+        table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
         }
         
         .text-right {
@@ -117,140 +124,140 @@
         }
         
         .summary {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .summary-row {
+            overflow: hidden;
+            padding: 5px 0;
+        }
+        
+        .summary-label {
             float: right;
-            width: 300px;
+            width: 70%;
+            text-align: right;
+            padding-right: 10px;
         }
         
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e0e0e0;
+        .summary-value {
+            float: right;
+            width: 30%;
+            text-align: right;
         }
         
-        .summary-item:last-child {
-            border-bottom: 2px solid #000;
+        .total-row {
             font-weight: bold;
-            font-size: 16px;
-            padding: 12px 0;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            margin-top: 5px;
         }
         
-        .note {
+        .footer-note {
             margin-top: 40px;
+            text-align: center;
             font-size: 12px;
             color: #666;
-            text-align: center;
-            clear: both;
-            padding-top: 20px;
-        }
-        
-        .payment-status {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
-            color: #fff;
-            background-color: #28a745;
-        }
-        
-        .payment-status.pending {
-            background-color: #ffc107;
-            color: #212529;
+            line-height: 1.4;
         }
         
         .footer {
             margin-top: 50px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
             text-align: center;
-            color: #888;
             font-size: 12px;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 20px;
+            color: #666;
+        }
+        
+        .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
         }
     </style>
 </head>
 <body>
     <div class="invoice-container">
-        <!-- Invoice Header -->
-        <div class="invoice-header">
-            <div>
-                <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">GARMENIQUE</div>
-                <div class="invoice-company">
-                    Garmenique Clothing Co.<br>
-                    Jl. Cihapit No. 12, Bandung<br>
-                    West Java, Indonesia<br>
-                    Phone: +62 22 1234567<br>
-                    Email: support@garmenique.com
+        <!-- Header Section -->
+        <div class="header clearfix">
+            @php
+                $invoiceSettings = \App\Models\PageSetting::where('page_name', 'invoice')->first();
+                $invoiceData = $invoiceSettings ? (is_array($invoiceSettings->settings) ? $invoiceSettings->settings : json_decode($invoiceSettings->settings, true)) : null;
+                $companyName = ($invoiceData && isset($invoiceData['companyName'])) ? $invoiceData['companyName'] : 'Garmenique Clothing Co.';
+                $companyAddress = ($invoiceData && isset($invoiceData['companyAddress'])) ? $invoiceData['companyAddress'] : 'Jl. Cihapit No. 12, Bandung';
+                $companyRegion = ($invoiceData && isset($invoiceData['companyRegion'])) ? $invoiceData['companyRegion'] : 'West Java, Indonesia';
+                $companyPhone = ($invoiceData && isset($invoiceData['companyPhone'])) ? $invoiceData['companyPhone'] : '+62 22 1234567';
+                $companyEmail = ($invoiceData && isset($invoiceData['companyEmail'])) ? $invoiceData['companyEmail'] : 'support@garmenique.com';
+            @endphp
+            
+            <div class="header-left">
+                <div class="company-name">GARMENIQUE</div>
+                <div class="company-details">
+                    {{ $companyName }}<br>
+                    {{ $companyAddress }}<br>
+                    {{ $companyRegion }}<br>
+                    Phone: {{ $companyPhone }}<br>
+                    Email: {{ $companyEmail }}
                 </div>
             </div>
-            <div>
+            
+            <div class="header-right">
                 <div class="invoice-title">INVOICE</div>
                 <div class="invoice-details">
-                    <div class="invoice-id">Invoice #{{ $order->order_number }}</div>
+                    <div><strong>Invoice #{{ $order->order_number }}</strong></div>
                     <div>Date: {{ $order->created_at->format('F d, Y') }}</div>
                     <div>Status: {{ ucfirst($order->status) }}</div>
                 </div>
             </div>
         </div>
         
-        <!-- Billing Details -->
-        <div class="billing-details">
-            <div class="billing-section">
-                <div class="billing-title">Billed To:</div>
-                <div class="billing-address">
-                    {{ $order->shipping_info['firstName'] }} {{ $order->shipping_info['lastName'] }}<br>
-                    {{ $order->shipping_info['address'] }}<br>
-                    {{ $order->shipping_info['province'] ?? 'Unknown Province' }}<br>
-                    Indonesia
+        <!-- Billing Details Section -->
+        <div class="billing-section clearfix">
+            <div class="billing-left">
+                <div class="section-title">Billed To:</div>
+                <div>
+                    {{ $order->customer_name }}<br>
+                    {{ $order->address }}<br>
+                    {{ $order->city }}<br>
+                    {{ $order->country }}
                 </div>
-                <div class="billing-info">
-                    Phone: {{ $order->shipping_info['phoneNumber'] ?? 'N/A' }}<br>
-                    Email: {{ $order->shipping_info['email'] ?? 'N/A' }}
+                <div style="margin-top: 10px;">
+                    Phone: {{ $order->phone }}<br>
+                    Email: {{ $order->email }}
                 </div>
             </div>
-            <div class="billing-section">
-                <div class="billing-title">Shipping Details:</div>
-                <div class="billing-address">
-                    {{ $order->shipping_info['firstName'] }} {{ $order->shipping_info['lastName'] }}<br>
-                    {{ $order->shipping_info['address'] }}<br>
-                    {{ $order->shipping_info['province'] ?? 'Unknown Province' }}<br>
-                    Indonesia
+            
+            <div class="billing-right">
+                <div class="section-title">Shipping Details:</div>
+                <div>
+                    {{ $order->shipping_name ?: $order->customer_name }}<br>
+                    {{ $order->shipping_address ?: $order->address }}<br>
+                    {{ $order->shipping_city ?: $order->city }}<br>
+                    {{ $order->shipping_country ?: $order->country }}
                 </div>
-                <div class="billing-info">
-                    Shipping Method: 
-                    @if(isset($order->shipping_info['expedition']))
-                        {{ strtoupper($order->shipping_info['expedition']) }}
-                        @if(isset($order->shipping_info['service']))
-                            - {{ $order->shipping_info['service'] }}
-                        @endif
-                    @else
-                        Standard Shipping
-                    @endif
+                <div style="margin-top: 10px;">
+                    Shipping Method: {{ $order->shipping_method }}
                 </div>
             </div>
         </div>
         
         <!-- Payment Status -->
         @php
-            $statusClass = '';
+            $paymentStatusClass = '';
             if (in_array($order->status, ['success', 'confirmed', 'packing', 'shipped', 'delivered', 'completed'])) {
-                $statusClass = '';
+                $paymentStatus = 'PAYMENT COMPLETED';
             } else {
-                $statusClass = 'pending';
+                $paymentStatusClass = 'pending';
+                $paymentStatus = 'PAYMENT PENDING';
             }
         @endphp
-        
-        <div class="payment-status {{ $statusClass }}">
-            @if(in_array($order->status, ['success', 'confirmed', 'packing', 'shipped', 'delivered', 'completed']))
-                PAYMENT COMPLETED
-            @else
-                PAYMENT PENDING
-            @endif
+        <div class="payment-status {{ $paymentStatusClass }}">
+            {{ $paymentStatus }}
         </div>
         
         <!-- Order Items -->
-        <table class="table">
+        <table>
             <thead>
                 <tr>
                     <th>Product</th>
@@ -261,43 +268,70 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($order->cart_items as $item)
-                <tr>
-                    <td>{{ $item['name'] }}</td>
-                    <td>{{ $item['size'] }}</td>
-                    <td>IDR {{ number_format($item['price'], 0, ',', '.') }}</td>
-                    <td>{{ $item['quantity'] }}</td>
-                    <td class="text-right">IDR {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</td>
-                </tr>
-                @endforeach
+                @if(isset($order->items) && is_array($order->items))
+                    @foreach($order->items as $item)
+                    <tr>
+                        <td>{{ $item->product->name ?? $item['name'] ?? 'Product' }}</td>
+                        <td>{{ $item->size ?? $item['size'] ?? '-' }}</td>
+                        <td>IDR {{ number_format($item->price ?? $item['price'] ?? 0, 0, ',', '.') }}</td>
+                        <td>{{ $item->quantity ?? $item['quantity'] ?? 1 }}</td>
+                        <td class="text-right">IDR {{ number_format(($item->price ?? $item['price'] ?? 0) * ($item->quantity ?? $item['quantity'] ?? 1), 0, ',', '.') }}</td>
+                    </tr>
+                    @endforeach
+                @elseif(isset($order->cart_items) && is_array($order->cart_items))
+                    @foreach($order->cart_items as $item)
+                    <tr>
+                        <td>{{ $item['name'] ?? 'Product' }}</td>
+                        <td>{{ $item['size'] ?? '-' }}</td>
+                        <td>IDR {{ number_format($item['price'] ?? 0, 0, ',', '.') }}</td>
+                        <td>{{ $item['quantity'] ?? 1 }}</td>
+                        <td class="text-right">IDR {{ number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 1), 0, ',', '.') }}</td>
+                    </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="5" class="text-center">No items found</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
         
         <!-- Order Summary -->
         <div class="summary">
-            <div class="summary-item">
-                <div>Subtotal:</div>
-                <div>IDR {{ number_format($order->subtotal, 0, ',', '.') }}</div>
+            <div class="summary-row">
+                <div class="summary-label">Subtotal:</div>
+                <div class="summary-value">IDR {{ number_format($order->subtotal ?? ($order->cart_subtotal ?? 0), 0, ',', '.') }}</div>
             </div>
-            <div class="summary-item">
-                <div>Shipping:</div>
-                <div>IDR {{ number_format($order->shipping_cost, 0, ',', '.') }}</div>
+            <div class="summary-row">
+                <div class="summary-label">Shipping:</div>
+                <div class="summary-value">IDR {{ number_format($order->shipping_cost ?? (isset($order->shipping_info) && isset($order->shipping_info['cost']) ? $order->shipping_info['cost'] : 0), 0, ',', '.') }}</div>
             </div>
-            <div class="summary-item">
-                <div>Total:</div>
-                <div>IDR {{ number_format($order->total, 0, ',', '.') }}</div>
+            <div class="summary-row total-row">
+                <div class="summary-label">Total:</div>
+                <div class="summary-value">IDR {{ number_format($order->total ?? ($order->cart_total ?? 0), 0, ',', '.') }}</div>
             </div>
         </div>
         
-        <!-- Note -->
-        <div class="note">
-            <p>Thank you for your business! If you have any questions about this invoice, please contact our customer support.</p>
-            <p>This is a computer-generated document and doesn't require a signature.</p>
+        <!-- Footer Notes -->
+        @php
+            // Ensure we have the invoice data
+            if (!isset($invoiceData)) {
+                $invoiceSettings = \App\Models\PageSetting::where('page_name', 'invoice')->first();
+                $invoiceData = $invoiceSettings ? (is_array($invoiceSettings->settings) ? $invoiceSettings->settings : json_decode($invoiceSettings->settings, true)) : null;
+            }
+            
+            $footerNote = ($invoiceData && isset($invoiceData['footerNote'])) ? $invoiceData['footerNote'] : 'Thank you for your business! If you have any questions about this invoice, please contact our customer support.';
+            $footerDisclaimer = ($invoiceData && isset($invoiceData['footerDisclaimer'])) ? $invoiceData['footerDisclaimer'] : 'This is a computer-generated document and doesn\'t require a signature.';
+            $footerCopyright = ($invoiceData && isset($invoiceData['footerCopyright'])) ? $invoiceData['footerCopyright'] : '&copy; ' . date('Y') . ' Garmenique. All rights reserved.';
+        @endphp
+        
+        <div class="footer-note">
+            <p>{{ $footerNote }}</p>
+            <p>{{ $footerDisclaimer }}</p>
         </div>
         
-        <!-- Footer -->
         <div class="footer">
-            &copy; {{ date('Y') }} Garmenique. All rights reserved.
+            {!! $footerCopyright !!}
         </div>
     </div>
 </body>

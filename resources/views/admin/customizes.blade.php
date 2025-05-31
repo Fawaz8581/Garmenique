@@ -521,6 +521,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ $page == 'footer' ? 'active' : '' }}" href="{{ route('admin.customizes', 'footer') }}">Footer</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $page == 'invoice' ? 'active' : '' }}" href="{{ route('admin.customizes', 'invoice') }}">Invoice</a>
+                </li>
             </ul>
         </div>
         
@@ -1316,6 +1319,64 @@
                     </div>
                 </div>
                 
+                <!-- Invoice Controls -->
+                <div ng-if="currentPage === 'invoice'">
+                    <!-- Company Information Controls -->
+                    <div class="control-card">
+                        <h3>Company Information</h3>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="invoiceToggle" ng-model="site.invoice.enabled">
+                            <label class="form-check-label" for="invoiceToggle">Enable Invoice Customization</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceCompanyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="invoiceCompanyName" ng-model="site.invoice.companyName">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceCompanyAddress" class="form-label">Company Address</label>
+                            <input type="text" class="form-control" id="invoiceCompanyAddress" ng-model="site.invoice.companyAddress">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceCompanyRegion" class="form-label">Company Region</label>
+                            <input type="text" class="form-control" id="invoiceCompanyRegion" ng-model="site.invoice.companyRegion">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceCompanyPhone" class="form-label">Company Phone</label>
+                            <input type="text" class="form-control" id="invoiceCompanyPhone" ng-model="site.invoice.companyPhone">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceCompanyEmail" class="form-label">Company Email</label>
+                            <input type="text" class="form-control" id="invoiceCompanyEmail" ng-model="site.invoice.companyEmail">
+                        </div>
+                    </div>
+                    
+                    <!-- Footer Information Controls -->
+                    <div class="control-card">
+                        <h3>Footer Information</h3>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceFooterNote" class="form-label">Thank You Note</label>
+                            <textarea class="form-control" id="invoiceFooterNote" rows="3" ng-model="site.invoice.footerNote"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceFooterDisclaimer" class="form-label">Disclaimer</label>
+                            <textarea class="form-control" id="invoiceFooterDisclaimer" rows="2" ng-model="site.invoice.footerDisclaimer"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="invoiceFooterCopyright" class="form-label">Copyright</label>
+                            <input type="text" class="form-control" id="invoiceFooterCopyright" ng-model="site.invoice.footerCopyright">
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Footer Controls -->
                 <div ng-if="currentPage === 'footer'">
                     <!-- Footer Section Controls -->
@@ -1826,6 +1887,123 @@
                         </div>
                     </div>
                     
+                    <!-- Invoice Preview -->
+                    <div ng-if="currentPage === 'invoice'" class="invoice-preview preview-container">
+                        <div style="background-color: #fff; padding: 30px; border: 1px solid #ddd; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                            <!-- Invoice Header -->
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">GARMENIQUE</div>
+                                    <div style="font-size: 12px; color: #666;">
+                                        {% site.invoice.companyName %}<br>
+                                        {% site.invoice.companyAddress %}<br>
+                                        {% site.invoice.companyRegion %}<br>
+                                        Phone: {% site.invoice.companyPhone %}<br>
+                                        Email: {% site.invoice.companyEmail %}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="text-align: right; font-size: 28px; font-weight: bold; color: #000; margin-bottom: 10px;">INVOICE</div>
+                                    <div style="text-align: right; font-size: 12px; color: #666;">
+                                        <div style="font-weight: bold; color: #000; font-size: 16px; margin-bottom: 5px;">Invoice #INV-12345</div>
+                                        <div>Date: May 31, 2025</div>
+                                        <div>Status: Confirmed</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Billing Details -->
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                                <div style="width: 48%;">
+                                    <div style="font-weight: bold; margin-bottom: 10px; font-size: 16px; color: #000;">Billed To:</div>
+                                    <div style="font-size: 14px; line-height: 1.5;">
+                                        John Doe<br>
+                                        123 Main Street<br>
+                                        Jakarta<br>
+                                        Indonesia
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 14px;">
+                                        Phone: +62 812 3456 7890<br>
+                                        Email: john.doe@example.com
+                                    </div>
+                                </div>
+                                <div style="width: 48%;">
+                                    <div style="font-weight: bold; margin-bottom: 10px; font-size: 16px; color: #000;">Shipping Details:</div>
+                                    <div style="font-size: 14px; line-height: 1.5;">
+                                        John Doe<br>
+                                        123 Main Street<br>
+                                        Jakarta<br>
+                                        Indonesia
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 14px;">
+                                        Shipping Method: JNE - REG
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment Status -->
+                            <div style="text-align: center; margin: 20px 0; font-size: 18px; font-weight: bold; padding: 10px; border-radius: 5px; color: #fff; background-color: #28a745;">
+                                PAYMENT COMPLETED
+                            </div>
+                            
+                            <!-- Order Items -->
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                                <thead>
+                                    <tr>
+                                        <th style="background: #f8f8f8; text-align: left; padding: 12px; font-weight: 600; color: #333; border-bottom: 2px solid #e0e0e0;">Product</th>
+                                        <th style="background: #f8f8f8; text-align: left; padding: 12px; font-weight: 600; color: #333; border-bottom: 2px solid #e0e0e0;">Size</th>
+                                        <th style="background: #f8f8f8; text-align: left; padding: 12px; font-weight: 600; color: #333; border-bottom: 2px solid #e0e0e0;">Price</th>
+                                        <th style="background: #f8f8f8; text-align: left; padding: 12px; font-weight: 600; color: #333; border-bottom: 2px solid #e0e0e0;">Quantity</th>
+                                        <th style="background: #f8f8f8; text-align: right; padding: 12px; font-weight: 600; color: #333; border-bottom: 2px solid #e0e0e0;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">Cotton T-Shirt</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">M</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">IDR 250.000</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">2</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: right;">IDR 500.000</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">Denim Jeans</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">32</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">IDR 450.000</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top;">1</td>
+                                        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: right;">IDR 450.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <!-- Order Summary -->
+                            <div style="float: right; width: 300px;">
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e0e0;">
+                                    <div>Subtotal:</div>
+                                    <div>IDR 950.000</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e0e0;">
+                                    <div>Shipping:</div>
+                                    <div>IDR 30.000</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 2px solid #000; font-weight: bold; font-size: 16px;">
+                                    <div>Total:</div>
+                                    <div>IDR 980.000</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Note -->
+                            <div style="margin-top: 40px; font-size: 12px; color: #666; text-align: center; clear: both; padding-top: 20px;">
+                                <p>{% site.invoice.footerNote %}</p>
+                                <p>{% site.invoice.footerDisclaimer %}</p>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div style="margin-top: 50px; text-align: center; color: #888; font-size: 12px; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                                {% site.invoice.footerCopyright %}
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Footer Preview -->
                     <div ng-if="currentPage === 'footer'" class="footer-preview preview-container">
                         <div style="background-color: #f8f9fa; padding: 40px 20px 0;">
@@ -2234,6 +2412,18 @@
                         pinterest: '#'
                     },
                     copyright: '© 2025 Garmenique. All Rights Reserved.'
+                },
+                // Invoice customization settings
+                invoice: {
+                    enabled: true,
+                    companyName: 'Garmenique Clothing Co.',
+                    companyAddress: 'Jl. Cihapit No. 12, Bandung',
+                    companyRegion: 'West Java, Indonesia',
+                    companyPhone: '+62 22 1234567',
+                    companyEmail: 'support@garmenique.com',
+                    footerNote: 'Thank you for your business! If you have any questions about this invoice, please contact our customer support.',
+                    footerDisclaimer: 'This is a computer-generated document and doesn\'t require a signature.',
+                    footerCopyright: '© 2025 Garmenique. All rights reserved.'
                 }
             };
 
@@ -2646,6 +2836,40 @@
                                 // Initialize socialMediaItems array from footer.social
                                 $scope.syncFooterToSocialMedia();
                             }
+                            else if ($scope.currentPage === 'invoice') {
+                                console.log("Processing invoice settings");
+                                if (savedSettings.invoice) {
+                                    $scope.site.invoice.enabled = savedSettings.invoice.enabled;
+                                    
+                                    // Apply saved settings
+                                    if (savedSettings.invoice.settings) {
+                                        if (savedSettings.invoice.settings.companyName) {
+                                            $scope.site.invoice.companyName = savedSettings.invoice.settings.companyName;
+                                        }
+                                        if (savedSettings.invoice.settings.companyAddress) {
+                                            $scope.site.invoice.companyAddress = savedSettings.invoice.settings.companyAddress;
+                                        }
+                                        if (savedSettings.invoice.settings.companyRegion) {
+                                            $scope.site.invoice.companyRegion = savedSettings.invoice.settings.companyRegion;
+                                        }
+                                        if (savedSettings.invoice.settings.companyPhone) {
+                                            $scope.site.invoice.companyPhone = savedSettings.invoice.settings.companyPhone;
+                                        }
+                                        if (savedSettings.invoice.settings.companyEmail) {
+                                            $scope.site.invoice.companyEmail = savedSettings.invoice.settings.companyEmail;
+                                        }
+                                        if (savedSettings.invoice.settings.footerNote) {
+                                            $scope.site.invoice.footerNote = savedSettings.invoice.settings.footerNote;
+                                        }
+                                        if (savedSettings.invoice.settings.footerDisclaimer) {
+                                            $scope.site.invoice.footerDisclaimer = savedSettings.invoice.settings.footerDisclaimer;
+                                        }
+                                        if (savedSettings.invoice.settings.footerCopyright) {
+                                            $scope.site.invoice.footerCopyright = savedSettings.invoice.settings.footerCopyright;
+                                        }
+                                    }
+                                }
+                            }
                         }
                         
                         // Make sure socialMediaItems is initialized for footer page
@@ -2986,6 +3210,27 @@
                     
                     console.log("Footer settings to save:", settingsToSave);
                 }
+                else if ($scope.currentPage === 'invoice') {
+                    console.log("Saving invoice settings");
+                    
+                    settingsToSave = {
+                        invoice: {
+                            enabled: $scope.site.invoice.enabled,
+                            settings: {
+                                companyName: $scope.site.invoice.companyName,
+                                companyAddress: $scope.site.invoice.companyAddress,
+                                companyRegion: $scope.site.invoice.companyRegion,
+                                companyPhone: $scope.site.invoice.companyPhone,
+                                companyEmail: $scope.site.invoice.companyEmail,
+                                footerNote: $scope.site.invoice.footerNote,
+                                footerDisclaimer: $scope.site.invoice.footerDisclaimer,
+                                footerCopyright: $scope.site.invoice.footerCopyright
+                            }
+                        }
+                    };
+                    
+                    console.log("Invoice settings to save:", settingsToSave);
+                }
                 
                 // Send to server
                 $http.post('/admin/api/page-settings', {
@@ -3233,12 +3478,11 @@
                             info: {
                                 enabled: $scope.site.contact.info.enabled,
                                 settings: {
-                                    address: {
-                                        line1: $scope.site.contact.info.address.line1,
-                                        line2: $scope.site.contact.info.address.line2
-                                    },
-                                    email: $scope.site.contact.info.email,
+                                    title: $scope.site.contact.info.title,
+                                    subtitle: $scope.site.contact.info.subtitle,
+                                    address: $scope.site.contact.info.address,
                                     phone: $scope.site.contact.info.phone,
+                                    email: $scope.site.contact.info.email,
                                     hours: {
                                         weekdays: $scope.site.contact.info.hours.weekdays,
                                         weekends: $scope.site.contact.info.hours.weekends
@@ -3253,6 +3497,20 @@
                                 settings: {
                                     items: $scope.site.products_detailed.features.items
                                 }
+                            }
+                        }
+                    } : $scope.currentPage === 'invoice' ? {
+                        invoice: {
+                            enabled: $scope.site.invoice.enabled,
+                            settings: {
+                                companyName: $scope.site.invoice.companyName,
+                                companyAddress: $scope.site.invoice.companyAddress,
+                                companyRegion: $scope.site.invoice.companyRegion,
+                                companyPhone: $scope.site.invoice.companyPhone,
+                                companyEmail: $scope.site.invoice.companyEmail,
+                                footerNote: $scope.site.invoice.footerNote,
+                                footerDisclaimer: $scope.site.invoice.footerDisclaimer,
+                                footerCopyright: $scope.site.invoice.footerCopyright
                             }
                         }
                     } : $scope.currentPage === 'footer' ? {
