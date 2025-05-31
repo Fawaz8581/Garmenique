@@ -110,7 +110,7 @@ class ContactController extends Controller
      * Submit the contact form.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function submit(Request $request)
     {
@@ -121,8 +121,36 @@ class ContactController extends Controller
             'message' => 'required|string'
         ]);
         
-        // Process the contact form submission
-        // For now, just return success
-        return response()->json(['success' => true]);
+        // Get admin user
+        $admin = \App\Models\User::where('role', 'admin')->first();
+        
+        if (!$admin) {
+            return redirect()->back()->with('error', 'Could not process your message. Please try again later.');
+        }
+        
+        // Get or create user based on email
+        $user = \App\Models\User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            // Create a temporary user for the message
+            $user = new \App\Models\User();
+            $user->name = $request->firstName . ' ' . $request->lastName;
+            $user->email = $request->email;
+            $user->password = bcrypt(\Illuminate\Support\Str::random(16)); // Random password
+            $user->role = 'guest';
+            $user->save();
+        }
+        
+        // Create message
+        $message = new \App\Models\Message();
+        $message->from_user_id = $user->id;
+        $message->to_user_id = $admin->id;
+        $message->message = $request->message;
+        $message->is_read = false;
+        $message->is_admin = false;
+        $message->save();
+        
+        // Redirect to messages page with success message
+        return redirect()->route('user.messages')->with('status', 'Your message has been sent successfully!');
     }
 }

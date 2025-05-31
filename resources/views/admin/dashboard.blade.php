@@ -207,9 +207,7 @@
                                                 data-bs-toggle="modal" data-bs-target="#editOrderModal" 
                                                 data-order-number="{{ $order['order_number'] }}"
                                                 data-order-status="{{ $order['status'] }}">Edit</button>
-                                        @if(in_array(strtolower($order['status']), ['success', 'confirmed', 'packing', 'shipped', 'delivered', 'completed']))
-                                            <a href="{{ route('admin.invoice.download', ['order_id' => $order['id']]) }}" class="action-btn invoice-btn" target="_blank" style="text-decoration: none;">Invoice</a>
-                                        @endif
+                                        <!-- Invoice button removed from here and only shown in modal -->
                                     </td>
                                 </tr>
                                 @empty
@@ -373,10 +371,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <span id="invoiceButtonContainer">
-                        <!-- Tombol invoice akan ditampilkan disini melalui JavaScript -->
-                    </span>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="invoiceButton" data-bs-toggle="modal" data-bs-target="#invoiceModal" style="display: none;">
+                        <i class="fas fa-file-invoice me-2"></i> View Invoice
+                    </button>
                 </div>
             </div>
         </div>
@@ -1249,21 +1247,77 @@
             document.getElementById('detailShipping').textContent = `IDR ${formatNumber(order.shipping_cost)}`;
             document.getElementById('detailTotal').textContent = `IDR ${formatNumber(order.total)}`;
             
-            // Set invoice download link - hanya tampilkan jika status pembayaran sudah berhasil
-            const invoiceButtonContainer = document.getElementById('invoiceButtonContainer');
-            invoiceButtonContainer.innerHTML = '';
-            
-            // Status yang dianggap sudah melakukan pembayaran
+            // Tampilkan tombol invoice hanya jika status pembayaran sudah berhasil
+            const invoiceButton = document.getElementById('invoiceButton');
             const paidStatuses = ['success', 'confirmed', 'packing', 'shipped', 'delivered', 'completed'];
             
             if (paidStatuses.includes(order.status.toLowerCase())) {
-                const invoiceButton = document.createElement('a');
-                invoiceButton.href = `/admin/invoice/download/${order.id}`;
-                invoiceButton.className = 'btn btn-primary';
-                invoiceButton.target = '_blank';
-                invoiceButton.style.textDecoration = 'none';
-                invoiceButton.textContent = 'Download Invoice';
-                invoiceButtonContainer.appendChild(invoiceButton);
+                // Tampilkan tombol invoice
+                invoiceButton.style.display = 'inline-block';
+                
+                // Simpan data order untuk digunakan di modal invoice
+                invoiceButton.setAttribute('data-order-id', order.id);
+                invoiceButton.setAttribute('data-order-number', order.order_number);
+                invoiceButton.setAttribute('data-order-date', new Date(order.created_at).toLocaleDateString());
+                invoiceButton.setAttribute('data-order-status', order.status);
+                
+                // Set event listener untuk tombol invoice
+                invoiceButton.onclick = function() {
+                    // Isi data invoice di modal
+                    document.getElementById('invoiceOrderNumber').textContent = order.order_number;
+                    document.getElementById('invoiceOrderDate').textContent = new Date(order.created_at).toLocaleDateString();
+                    
+                    // Set status dengan badge yang sesuai
+                    const statusBadge = document.createElement('span');
+                    statusBadge.className = `status-badge status-${order.status.toLowerCase()}`;
+                    statusBadge.textContent = capitalizeFirstLetter(order.status);
+                    document.getElementById('invoiceOrderStatus').innerHTML = '';
+                    document.getElementById('invoiceOrderStatus').appendChild(statusBadge);
+                    
+                    // Informasi pelanggan
+                    document.getElementById('invoiceCustomerName').textContent = 
+                        `${order.shipping_info.firstName} ${order.shipping_info.lastName}`;
+                    document.getElementById('invoiceCustomerAddress').textContent = order.shipping_info.address;
+                    document.getElementById('invoiceCustomerCity').textContent = 
+                        `${order.shipping_info.city}, ${order.shipping_info.postalCode}`;
+                    document.getElementById('invoiceCustomerEmail').textContent = order.shipping_info.email;
+                    document.getElementById('invoiceCustomerPhone').textContent = order.shipping_info.phoneNumber;
+                    
+                    // Metode pembayaran
+                    if (order.payment_info && order.payment_info.method) {
+                        document.getElementById('invoicePaymentMethod').textContent = 
+                            capitalizeFirstLetter(order.payment_info.method);
+                    } else {
+                        document.getElementById('invoicePaymentMethod').textContent = 'Midtrans';
+                    }
+                    
+                    // Daftar produk
+                    const productsList = document.getElementById('invoiceProductsList');
+                    productsList.innerHTML = '';
+                    
+                    order.cart_items.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.name}</td>
+                            <td>${item.size || '-'}</td>
+                            <td>${item.quantity}</td>
+                            <td class="text-end">IDR ${formatNumber(item.price)}</td>
+                            <td class="text-end">IDR ${formatNumber(item.price * item.quantity)}</td>
+                        `;
+                        productsList.appendChild(row);
+                    });
+                    
+                    // Ringkasan order
+                    document.getElementById('invoiceSubtotal').textContent = `IDR ${formatNumber(order.subtotal)}`;
+                    document.getElementById('invoiceShipping').textContent = `IDR ${formatNumber(order.shipping_cost)}`;
+                    document.getElementById('invoiceTotal').textContent = `IDR ${formatNumber(order.total)}`;
+                    
+                    // Set link download invoice
+                    document.getElementById('downloadInvoiceLink').href = `/admin/invoice/download/${order.id}`;
+                };
+            } else {
+                // Sembunyikan tombol invoice
+                invoiceButton.style.display = 'none';
             }
             
             // Products list
@@ -1627,5 +1681,84 @@
         color: white;
     }
     </style>
+    <!-- Invoice Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceModalLabel">Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between mb-4">
+                        <div>
+                            <h4>INVOICE</h4>
+                            <p class="mb-1"><strong>Order #:</strong> <span id="invoiceOrderNumber"></span></p>
+                            <p class="mb-1"><strong>Date:</strong> <span id="invoiceOrderDate"></span></p>
+                            <p class="mb-1"><strong>Status:</strong> <span id="invoiceOrderStatus"></span></p>
+                        </div>
+                        <div>
+                            <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Garmenique Logo" style="max-height: 60px;">
+                            <p class="mb-1">Garmenique Fashion</p>
+                            <p class="mb-1">Jakarta, Indonesia</p>
+                            <p class="mb-1">support@garmenique.com</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Bill To:</h5>
+                            <p class="mb-1" id="invoiceCustomerName"></p>
+                            <p class="mb-1" id="invoiceCustomerAddress"></p>
+                            <p class="mb-1" id="invoiceCustomerCity"></p>
+                            <p class="mb-1" id="invoiceCustomerEmail"></p>
+                            <p class="mb-1" id="invoiceCustomerPhone"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Payment Method:</h5>
+                            <p id="invoicePaymentMethod">Midtrans</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Size</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceProductsList">
+                                <!-- Products will be inserted here dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                                    <td class="text-end" id="invoiceSubtotal"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
+                                    <td class="text-end" id="invoiceShipping"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-end"><strong id="invoiceTotal"></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="#" id="downloadInvoiceLink" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-download me-2"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

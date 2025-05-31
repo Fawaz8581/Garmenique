@@ -266,6 +266,13 @@
 
         <!-- Main Content -->
         <main class="messages-container">
+            @if (session('status'))
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                {{ session('status') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
+            
             <div class="chat-container">
                 <!-- Chat Header -->
                 <div class="chat-header">
