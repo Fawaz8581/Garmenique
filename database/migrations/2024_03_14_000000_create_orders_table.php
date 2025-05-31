@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('total', 12, 2);
             $table->string('status');
             $table->string('snap_token')->nullable();
+            $table->timestamps();
         });
     }
 

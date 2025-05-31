@@ -1070,6 +1070,13 @@
 
         // Fetch order details from the server
         function fetchOrderDetails(orderId) {
+            // Ensure we're using a numeric ID for the API request
+            if (!orderId) {
+                console.error('No order ID provided');
+                return;
+            }
+            
+            // Make the API request with the ID
             fetch(`/admin/api/orders/${orderId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -1302,6 +1309,13 @@
             const orderId = document.getElementById('editOrderId').value;
             const status = document.getElementById('orderStatus').value;
             const note = document.getElementById('orderNote').value;
+            
+            // Ensure we have a valid ID
+            if (!orderId) {
+                console.error('No order ID provided');
+                alert('Error: No order ID provided');
+                return;
+            }
             
             // Call API to update order status
             fetch(`/admin/api/orders/${orderId}/status`, {

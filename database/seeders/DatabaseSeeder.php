@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@garmenique.us',
-            'password' => bcrypt('Garmenique2025d'),
+            'password' => bcrypt('Garmenique2025'),
+            'role' => 'admin',
         ]);
 
         // Seed categories

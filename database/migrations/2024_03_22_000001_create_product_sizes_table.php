@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->string('size'); // XS, S, M, L, XL, XXL
             $table->integer('stock')->default(0);
+            $table->string('snap_token')->nullable();
             $table->timestamps();
             
             // Add unique constraint to prevent duplicate sizes for the same product

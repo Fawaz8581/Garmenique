@@ -11,17 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Create the table first
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->string('snap_token')->nullable();
             $table->timestamps();
-            
-            $table->foreign('parent_id')->references('id')->on('categories')
-                ->onDelete('set null');
         });
+
+        // Try to add the foreign key, but don't fail if it doesn't work
+        try {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->foreign('parent_id')
+                      ->references('id')
+                      ->on('categories')
+                      ->onDelete('set null');
+            });
+        } catch (\Exception $e) {
+            \Log::error('Could not add foreign key to categories table: ' . $e->getMessage());
+        }
     }
 
     /**

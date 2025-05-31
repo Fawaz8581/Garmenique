@@ -12,7 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('snap_token')->nullable()->after('status');
+            // Add timestamps columns if they don't exist
+            if (!Schema::hasColumn('orders', 'created_at')) {
+                $table->timestamp('created_at')->nullable();
+            }
+            
+            if (!Schema::hasColumn('orders', 'updated_at')) {
+                $table->timestamp('updated_at')->nullable();
+            }
         });
     }
 
@@ -22,7 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('snap_token');
+            //
         });
     }
-}; 
+};

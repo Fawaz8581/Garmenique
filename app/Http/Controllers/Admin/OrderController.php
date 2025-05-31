@@ -32,7 +32,14 @@ class OrderController extends Controller
         }
 
         try {
-            $order = Order::findOrFail($id);
+            // Check if $id is numeric (regular ID) or a string (possibly order_number)
+            if (is_numeric($id)) {
+                $order = Order::findOrFail($id);
+            } else {
+                // If it's not numeric, try to find by order_number
+                $order = Order::where('order_number', $id)->firstOrFail();
+            }
+            
             $oldStatus = $order->status;
             $newStatus = $request->status;
             
@@ -164,7 +171,13 @@ class OrderController extends Controller
     public function getOrderDetails($id)
     {
         try {
-            $order = Order::findOrFail($id);
+            // Check if $id is numeric (regular ID) or a string (possibly order_number)
+            if (is_numeric($id)) {
+                $order = Order::findOrFail($id);
+            } else {
+                // If it's not numeric, try to find by order_number
+                $order = Order::where('order_number', $id)->firstOrFail();
+            }
             
             // Ensure shipping expedition information is properly formatted
             $orderData = $order->toArray();
