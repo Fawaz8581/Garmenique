@@ -125,6 +125,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/order-success', [App\Http\Controllers\OrderController::class, 'success'])->name('order.success');
     
+    // Invoice routes
+    Route::get('/invoice/{orderId}', [App\Http\Controllers\InvoiceController::class, 'download'])->name('invoice.download');
+    
     Route::post('/api/orders', [\App\Http\Controllers\OrderController::class, 'store']);
 });
 

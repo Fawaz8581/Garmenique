@@ -222,15 +222,13 @@
         
         .refresh-status {
             display: inline-block;
-            margin-top: 15px;
-            padding: 8px 15px;
+            padding: 10px 15px;
             background-color: #E8F5E9;
             color: #4CAF50;
-            border: 1px solid #4CAF50;
             border-radius: 5px;
             text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            margin-top: 15px;
         }
         
         .refresh-status:hover {
@@ -253,6 +251,24 @@
         
         .btn-pay-now:hover {
             background-color: #0069d9;
+            color: #fff;
+        }
+        
+        .btn-download-invoice {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-download-invoice:hover {
+            background-color: #218838;
             color: #fff;
             text-decoration: none;
         }
@@ -428,6 +444,12 @@
                 <a href="/account/orders" class="btn-back btn-primary">
                     View My Orders <i class="fas fa-arrow-right ms-2"></i>
                 </a>
+                
+                @if(in_array($order->status, ['success', 'confirmed', 'shipped', 'delivered', 'completed']))
+                    <a href="{{ route('invoice.download', $order->id) }}" class="btn-download-invoice">
+                        <i class="fas fa-file-invoice me-2"></i> Download Invoice
+                    </a>
+                @endif
             </div>
         @else
             <div class="alert alert-info">

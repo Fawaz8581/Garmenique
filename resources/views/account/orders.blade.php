@@ -280,8 +280,18 @@
                                                             }
                                                         @endphp
                                                         
-                                                        <a href="{{ $trackingUrl }}" target="_blank" class="btn-track-order">
-                                                            <i class="fas fa-map-marker-alt me-2"></i> Track Your Order
+                                                        <div class="d-flex gap-2">
+                                                            <a href="{{ $trackingUrl }}" target="_blank" class="btn-track-order">
+                                                                <i class="fas fa-map-marker-alt me-2"></i> Track Order
+                                                            </a>
+                                                            
+                                                            <a href="{{ route('invoice.download', $order->id) }}" class="btn-download-invoice">
+                                                                <i class="fas fa-file-invoice me-2"></i> Invoice
+                                                            </a>
+                                                        </div>
+                                                    @elseif(in_array($order->status, ['success', 'confirmed', 'completed']))
+                                                        <a href="{{ route('invoice.download', $order->id) }}" class="btn-download-invoice">
+                                                            <i class="fas fa-file-invoice me-2"></i> Download Invoice
                                                         </a>
                                                     @endif
                                                 </div>
@@ -997,6 +1007,27 @@
         
         .btn-pay-now:hover {
             background-color: #0069d9;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Download Invoice Button */
+        .btn-download-invoice {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-download-invoice:hover {
+            background-color: #218838;
             color: white;
             text-decoration: none;
         }
