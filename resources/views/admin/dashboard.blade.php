@@ -1265,31 +1265,70 @@
                 invoiceButton.onclick = function() {
                     // Isi data invoice di modal
                     document.getElementById('invoiceOrderNumber').textContent = order.order_number;
-                    document.getElementById('invoiceOrderDate').textContent = new Date(order.created_at).toLocaleDateString();
+                    document.getElementById('invoiceOrderDate').textContent = new Date(order.created_at).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
                     
                     // Set status dengan badge yang sesuai
-                    const statusBadge = document.createElement('span');
-                    statusBadge.className = `status-badge status-${order.status.toLowerCase()}`;
-                    statusBadge.textContent = capitalizeFirstLetter(order.status);
-                    document.getElementById('invoiceOrderStatus').innerHTML = '';
-                    document.getElementById('invoiceOrderStatus').appendChild(statusBadge);
+                    document.getElementById('invoiceOrderStatus').textContent = capitalizeFirstLetter(order.status);
                     
-                    // Informasi pelanggan
-                    document.getElementById('invoiceCustomerName').textContent = 
-                        `${order.shipping_info.firstName} ${order.shipping_info.lastName}`;
-                    document.getElementById('invoiceCustomerAddress').textContent = order.shipping_info.address;
-                    document.getElementById('invoiceCustomerCity').textContent = 
-                        `${order.shipping_info.city}, ${order.shipping_info.postalCode}`;
+                    // Set payment status box
+                    const paymentStatusBox = document.getElementById('invoicePaymentStatus');
+                    if (paidStatuses.includes(order.status.toLowerCase())) {
+                        paymentStatusBox.className = 'alert alert-success text-center mb-4';
+                        paymentStatusBox.textContent = 'PAYMENT COMPLETED';
+                    } else {
+                        paymentStatusBox.className = 'alert alert-warning text-center mb-4';
+                        paymentStatusBox.textContent = 'PAYMENT PENDING';
+                    }
+                    
+                    // Billing information
+                    const customerName = `${order.shipping_info.firstName} ${order.shipping_info.lastName}`;
+                    const customerAddress = order.shipping_info.address;
+                    const customerCity = `${order.shipping_info.city}, ${order.shipping_info.postalCode}`;
+                    
+                    document.getElementById('invoiceCustomerName').textContent = customerName;
+                    document.getElementById('invoiceCustomerAddress').textContent = customerAddress;
+                    document.getElementById('invoiceCustomerCity').textContent = customerCity;
                     document.getElementById('invoiceCustomerEmail').textContent = order.shipping_info.email;
                     document.getElementById('invoiceCustomerPhone').textContent = order.shipping_info.phoneNumber;
                     
-                    // Metode pembayaran
-                    if (order.payment_info && order.payment_info.method) {
-                        document.getElementById('invoicePaymentMethod').textContent = 
-                            capitalizeFirstLetter(order.payment_info.method);
-                    } else {
-                        document.getElementById('invoicePaymentMethod').textContent = 'Midtrans';
+                    // Shipping information (same as billing in this case)
+                    document.getElementById('invoiceShippingName').textContent = customerName;
+                    document.getElementById('invoiceShippingAddress').textContent = customerAddress;
+                    document.getElementById('invoiceShippingCity').textContent = customerCity;
+                    
+                    // Shipping method
+                    let expeditionName = 'N/A';
+                    if (order.shipping_info.expedition) {
+                        switch(order.shipping_info.expedition) {
+                            case 'jne':
+                                expeditionName = 'JNE';
+                                break;
+                            case 'jnt':
+                                expeditionName = 'J&T Express';
+                                break;
+                            case 'sicepat':
+                                expeditionName = 'SiCepat';
+                                break;
+                            case 'pos':
+                                expeditionName = 'POS Indonesia';
+                                break;
+                            case 'tiki':
+                                expeditionName = 'TIKI';
+                                break;
+                            default:
+                                expeditionName = order.shipping_info.expedition.toUpperCase();
+                        }
+                        
+                        // Add service if available
+                        if (order.shipping_info.service) {
+                            expeditionName += ` - ${order.shipping_info.service}`;
+                        }
                     }
+                    document.getElementById('invoiceShippingMethod').textContent = expeditionName;
                     
                     // Daftar produk
                     const productsList = document.getElementById('invoiceProductsList');
@@ -1300,8 +1339,8 @@
                         row.innerHTML = `
                             <td>${item.name}</td>
                             <td>${item.size || '-'}</td>
+                            <td>IDR ${formatNumber(item.price)}</td>
                             <td>${item.quantity}</td>
-                            <td class="text-end">IDR ${formatNumber(item.price)}</td>
                             <td class="text-end">IDR ${formatNumber(item.price * item.quantity)}</td>
                         `;
                         productsList.appendChild(row);
@@ -1312,8 +1351,10 @@
                     document.getElementById('invoiceShipping').textContent = `IDR ${formatNumber(order.shipping_cost)}`;
                     document.getElementById('invoiceTotal').textContent = `IDR ${formatNumber(order.total)}`;
                     
-                    // Set link download invoice
-                    document.getElementById('downloadInvoiceLink').href = `/admin/invoice/download/${order.id}`;
+                    // Set link download invoice using the correct route name
+                    document.getElementById('downloadInvoiceLink').href = `/admin/api/invoice/download/${order.id}`;
+                    // Remove any download attribute to prevent double downloads
+                    document.getElementById('downloadInvoiceLink').removeAttribute('download');
                 };
             } else {
                 // Sembunyikan tombol invoice
@@ -1689,66 +1730,93 @@
                     <h5 class="modal-title" id="invoiceModalLabel">Invoice</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="d-flex justify-content-between mb-4">
-                        <div>
-                            <h4>INVOICE</h4>
-                            <p class="mb-1"><strong>Order #:</strong> <span id="invoiceOrderNumber"></span></p>
-                            <p class="mb-1"><strong>Date:</strong> <span id="invoiceOrderDate"></span></p>
-                            <p class="mb-1"><strong>Status:</strong> <span id="invoiceOrderStatus"></span></p>
+                <div class="modal-body" style="font-family: 'Helvetica', 'Arial', sans-serif; color: #333;">
+                    <!-- Header Section -->
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <h4 style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">GARMENIQUE</h4>
+                            <p class="mb-1">Garmenique Clothing Co.</p>
+                            <p class="mb-1">Jl. Cihapit No. 12, Bandung</p>
+                            <p class="mb-1">West Java, Indonesia</p>
+                            <p class="mb-1">Phone: +62 22 1234567</p>
+                            <p class="mb-1">Email: support@garmenique.com</p>
                         </div>
-                        <div>
-                            <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Garmenique Logo" style="max-height: 60px;">
-                            <p class="mb-1">Garmenique Fashion</p>
-                            <p class="mb-1">Jakarta, Indonesia</p>
-                            <p class="mb-1">support@garmenique.com</p>
+                        <div class="col-6 text-end">
+                            <h4 style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">INVOICE</h4>
+                            <p class="mb-1">Invoice #<span id="invoiceOrderNumber"></span></p>
+                            <p class="mb-1">Date: <span id="invoiceOrderDate"></span></p>
+                            <p class="mb-1">Status: <span id="invoiceOrderStatus"></span></p>
                         </div>
                     </div>
 
+                    <!-- Billing and Shipping Details -->
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <h5>Bill To:</h5>
+                            <h5 style="font-weight: bold; margin-bottom: 10px;">Billed To:</h5>
                             <p class="mb-1" id="invoiceCustomerName"></p>
                             <p class="mb-1" id="invoiceCustomerAddress"></p>
                             <p class="mb-1" id="invoiceCustomerCity"></p>
-                            <p class="mb-1" id="invoiceCustomerEmail"></p>
-                            <p class="mb-1" id="invoiceCustomerPhone"></p>
+                            <p class="mb-1">Phone: <span id="invoiceCustomerPhone"></span></p>
+                            <p class="mb-1">Email: <span id="invoiceCustomerEmail"></span></p>
                         </div>
                         <div class="col-md-6">
-                            <h5>Payment Method:</h5>
-                            <p id="invoicePaymentMethod">Midtrans</p>
+                            <h5 style="font-weight: bold; margin-bottom: 10px;">Shipping Details:</h5>
+                            <p class="mb-1" id="invoiceShippingName"></p>
+                            <p class="mb-1" id="invoiceShippingAddress"></p>
+                            <p class="mb-1" id="invoiceShippingCity"></p>
+                            <p class="mb-1">Shipping Method: <span id="invoiceShippingMethod"></span></p>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
+                    <!-- Payment Status -->
+                    <div id="invoicePaymentStatus" class="alert alert-success text-center mb-4" style="font-weight: bold; font-size: 16px;">
+                        PAYMENT COMPLETED
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="table-responsive mb-4">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Item</th>
+                                    <th>Product</th>
                                     <th>Size</th>
+                                    <th>Price</th>
                                     <th>Quantity</th>
-                                    <th class="text-end">Price</th>
                                     <th class="text-end">Total</th>
                                 </tr>
                             </thead>
                             <tbody id="invoiceProductsList">
                                 <!-- Products will be inserted here dynamically -->
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                                    <td class="text-end" id="invoiceSubtotal"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
-                                    <td class="text-end" id="invoiceShipping"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
-                                    <td class="text-end"><strong id="invoiceTotal"></strong></td>
-                                </tr>
-                            </tfoot>
                         </table>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="row">
+                        <div class="col-md-6 offset-md-6">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="invoiceSubtotal"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span id="invoiceShipping"></span>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 border-top mt-2" style="font-weight: bold;">
+                                <span>Total:</span>
+                                <span id="invoiceTotal"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Notes -->
+                    <div class="text-center mt-5" style="color: #666; font-size: 14px;">
+                        <p>Thank you for your business! If you have any questions about this invoice, please contact our customer support.</p>
+                        <p>This is a computer-generated document and doesn't require a signature.</p>
+                    </div>
+                    
+                    <div class="text-center mt-4 pt-2 border-top" style="color: #666; font-size: 12px;">
+                        © 2025 Garmenique. All rights reserved.
                     </div>
                 </div>
                 <div class="modal-footer">
