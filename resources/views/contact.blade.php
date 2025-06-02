@@ -386,13 +386,7 @@
                     </ul>
                 </nav>
                 
-                <div class="nav-icons">
-                    <a href="{{ route('user.messages') }}" class="nav-icon"><i class="fas fa-envelope"></i></a>
-                    @include('partials.account-dropdown')
-                    <a href="javascript:void(0)" class="nav-icon" ng-click="openCartPanel()">
-                        <i class="fas fa-shopping-cart"></i>
-                    </a>
-                </div>
+                @include('partials.nav-icons')
                 
                 <div class="mobile-menu-btn">
                     <button type="button" class="mobile-toggle" ng-click="toggleNav()">

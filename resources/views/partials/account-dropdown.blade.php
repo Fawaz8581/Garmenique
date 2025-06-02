@@ -1,39 +1,56 @@
 <!-- Account Dropdown -->
 <div class="account-dropdown-wrapper">
-    <a href="@auth @if(Auth::user()->role === 'admin') /admin @else javascript:void(0) @endif @else javascript:void(0) @endauth" class="nav-icon account-toggle" id="accountDropdownToggle">
-        @auth
-            @if(Auth::user()->role === 'admin')
-                <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Admin" class="admin-nav-icon">
-            @else
-                <i class="fas fa-user"></i>
-            @endif
-        @else
-            <i class="fas fa-user"></i>
-        @endauth
-    </a>
-    <div class="account-dropdown" id="accountDropdownMenu">
-        @auth
-            <div class="dropdown-header">
-                <p>Hello, {{ Auth::user()->name }}</p>
+    @auth
+        @if(Auth::user()->role === 'admin')
+            <!-- Admin: Only show logo with dropdown toggle -->
+            <a href="javascript:void(0)" class="nav-icon account-toggle" id="accountDropdownToggle">
+                <img src="{{ asset('images/icons/GarmeniqueLogo.png') }}" alt="Admin" class="admin-nav-icon" style="width: 48px; height: auto; margin: 0 5px; display: block;">
+            </a>
+            <!-- Admin dropdown with limited options -->
+            <div class="account-dropdown" id="accountDropdownMenu">
+                <div class="dropdown-header">
+                    <p>Admin: {{ Auth::user()->name }}</p>
+                </div>
+                <a href="/admin" class="dropdown-item">Dashboard</a>
+                <div class="dropdown-divider"></div>
+                <form action="{{ route('logout') }}" method="POST" class="dropdown-item-form">
+                    @csrf
+                    <button type="submit" class="dropdown-item">Logout</button>
+                </form>
             </div>
-            @if(Auth::user()->role === 'admin')
-                <a href="/admin" class="dropdown-item">Admin Dashboard</a>
-            @endif
-            <a href="/account/settings" class="dropdown-item">My Account</a>
-            <a href="/account/orders" class="dropdown-item">My Orders</a>
-            <div class="dropdown-divider"></div>
-            <form action="{{ route('logout') }}" method="POST" class="dropdown-item-form">
-                @csrf
-                <button type="submit" class="dropdown-item">Logout</button>
-            </form>
         @else
+            <!-- Regular user: Show user icon with dropdown toggle -->
+            <a href="javascript:void(0)" class="nav-icon account-toggle" id="accountDropdownToggle">
+                <i class="fas fa-user"></i>
+            </a>
+            <!-- Regular user dropdown with all options -->
+            <div class="account-dropdown" id="accountDropdownMenu">
+                <div class="dropdown-header">
+                    <p>Hello, {{ Auth::user()->name }}</p>
+                </div>
+                <a href="/account/settings" class="dropdown-item">My Account</a>
+                <a href="/account/orders" class="dropdown-item">My Orders</a>
+                <div class="dropdown-divider"></div>
+                <form action="{{ route('logout') }}" method="POST" class="dropdown-item-form">
+                    @csrf
+                    <button type="submit" class="dropdown-item">Logout</button>
+                </form>
+            </div>
+        @endif
+    @else
+        <!-- Guest user: Show user icon with dropdown toggle -->
+        <a href="javascript:void(0)" class="nav-icon account-toggle" id="accountDropdownToggle">
+            <i class="fas fa-user"></i>
+        </a>
+        <!-- Guest dropdown with login/register options -->
+        <div class="account-dropdown" id="accountDropdownMenu">
             <div class="dropdown-header">
                 <p>Your Account</p>
             </div>
             <a href="{{ route('login') }}" class="dropdown-item">Login</a>
             <a href="{{ route('register') }}" class="dropdown-item">Register</a>
-        @endauth
-    </div>
+        </div>
+    @endauth
 </div>
 
 <style>
@@ -128,31 +145,68 @@
 <script>
     // Wait for document to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
-        const accountToggle = document.getElementById('accountDropdownToggle');
-        const accountMenu = document.getElementById('accountDropdownMenu');
-        
-        // Toggle dropdown when clicking the account icon
-        if (accountToggle && accountMenu) {
-            @auth
-                @if(Auth::user()->role !== 'admin')
+        @auth
+            @if(Auth::user()->role === 'admin')
+                // For admin users, use the same click behavior as regular users
+                const accountToggle = document.getElementById('accountDropdownToggle');
+                const accountMenu = document.getElementById('accountDropdownMenu');
+                
+                if (accountToggle && accountMenu) {
                     accountToggle.addEventListener('click', function(e) {
                         e.stopPropagation();
                         accountMenu.classList.toggle('show');
                     });
-                @endif
+                    
+                    // Close dropdown when clicking elsewhere
+                    document.addEventListener('click', function(e) {
+                        if (accountMenu.classList.contains('show') && 
+                            !accountMenu.contains(e.target) && 
+                            e.target !== accountToggle) {
+                            accountMenu.classList.remove('show');
+                        }
+                    });
+                }
             @else
+                // For regular users, use the standard toggle behavior
+                const accountToggle = document.getElementById('accountDropdownToggle');
+                const accountMenu = document.getElementById('accountDropdownMenu');
+                
+                if (accountToggle && accountMenu) {
+                    accountToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        accountMenu.classList.toggle('show');
+                    });
+                    
+                    // Close dropdown when clicking elsewhere
+                    document.addEventListener('click', function(e) {
+                        if (accountMenu.classList.contains('show') && 
+                            !accountMenu.contains(e.target) && 
+                            e.target !== accountToggle) {
+                            accountMenu.classList.remove('show');
+                        }
+                    });
+                }
+            @endif
+        @else
+            // For guests, use the standard toggle behavior
+            const accountToggle = document.getElementById('accountDropdownToggle');
+            const accountMenu = document.getElementById('accountDropdownMenu');
+            
+            if (accountToggle && accountMenu) {
                 accountToggle.addEventListener('click', function(e) {
                     e.stopPropagation();
                     accountMenu.classList.toggle('show');
                 });
-            @endauth
-            
-            // Close dropdown when clicking elsewhere on the page
-            document.addEventListener('click', function(e) {
-                if (accountMenu.classList.contains('show') && !accountMenu.contains(e.target) && e.target !== accountToggle) {
-                    accountMenu.classList.remove('show');
-                }
-            });
-        }
+                
+                // Close dropdown when clicking elsewhere
+                document.addEventListener('click', function(e) {
+                    if (accountMenu.classList.contains('show') && 
+                        !accountMenu.contains(e.target) && 
+                        e.target !== accountToggle) {
+                        accountMenu.classList.remove('show');
+                    }
+                });
+            }
+        @endauth
     });
 </script> 
