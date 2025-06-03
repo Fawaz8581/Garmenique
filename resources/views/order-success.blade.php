@@ -318,17 +318,7 @@
             @endif
         </div>
         
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-        
-        @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
+        {{-- Removed success/error messages to improve UX --}}
         
         @if(isset($order))
             <h1 class="order-title">
@@ -343,6 +333,14 @@
             <p class="order-number">Order #{{ $order->order_number }}</p>
             
             @if($order->status === 'pending' || $order->status === 'payment_pending')
+                <div class="payment-actions mt-4">
+                    <button class="btn btn-primary btn-pay-now">
+                        <i class="fas fa-credit-card me-2"></i> Pay Now
+                    </button>
+                    <button class="btn btn-secondary btn-check-status ms-2">
+                        <i class="fas fa-sync-alt me-2"></i> Check Status
+                    </button>
+                </div>
                 <div class="pending-instructions">
                     <h4><i class="fas fa-credit-card me-2"></i> Payment Required</h4>
                     <p>Your payment is still pending. Please complete your payment to process your order.</p>
@@ -498,26 +496,29 @@
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-61XuGAwQ8Bj8LxSS"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Only set up the button click handler, don't automatically open payment popup
+            // Set up the button click handler
             const payNowBtn = document.querySelector('.btn-pay-now');
             if (payNowBtn) {
                 payNowBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     
-                    // Open Midtrans payment popup only when button is clicked
+                    // Open Midtrans payment popup when button is clicked
                     window.snap.pay('{{ $order->snap_token }}', {
                         onSuccess: function(result) {
-                            // Update the order status directly without page refresh
+                            // Update the order status directly without page refresh and redirect
                             updateOrderStatus('success', result);
                         },
                         onPending: function(result) {
-                            console.log('Payment is still pending');
+                            // Redirect to order success page with pending status
+                            updateOrderStatus('pending', result);
                         },
                         onError: function(result) {
-                            alert('Payment failed. Please try again.');
+                            // Redirect to order success page with error status
+                            updateOrderStatus('failed', result);
                         },
                         onClose: function() {
-                            console.log('Payment popup closed without completing payment');
+                            // When user clicks X, redirect to order success page with pending status
+                            window.location.href = '{{ route("order.success", ["order_id" => $order->id, "status" => "pending"]) }}';
                         }
                     });
                 });
@@ -554,6 +555,134 @@
                 // Append form to body and submit
                 document.body.appendChild(form);
                 form.submit();
+            }
+            
+            // Set up the check status button click handler with cooldown
+            const checkStatusBtn = document.querySelector('.btn-check-status');
+            if (checkStatusBtn) {
+                // Track last check time to prevent spam
+                let lastCheckTime = 0;
+                const COOLDOWN_MS = 15000; // 15 seconds cooldown
+                let checkCount = 0;
+                const MAX_CHECKS = 3; // Maximum number of checks allowed
+                let isCheckingStatus = false; // Flag to prevent multiple simultaneous requests
+                
+                checkStatusBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Prevent multiple simultaneous requests
+                    if (isCheckingStatus) {
+                        alert('Status check already in progress. Please wait...');
+                        return;
+                    }
+                    
+                    const now = Date.now();
+                    
+                    // Prevent spam clicks with longer cooldown
+                    if (now - lastCheckTime < COOLDOWN_MS) {
+                        alert('Please wait before checking again. The payment gateway needs time to process your payment.');
+                        return;
+                    }
+                    
+                    // Limit number of checks to prevent abuse
+                    checkCount++;
+                    if (checkCount > MAX_CHECKS) {
+                        alert('You have reached the maximum number of status checks. Please wait a few minutes before trying again.');
+                        checkStatusBtn.disabled = true;
+                        setTimeout(() => {
+                            checkCount = 0;
+                            checkStatusBtn.disabled = false;
+                        }, 120000); // Reset after 2 minutes
+                        return;
+                    }
+                    
+                    lastCheckTime = now;
+                    isCheckingStatus = true;
+                    
+                    // Show loading indicator
+                    checkStatusBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Checking...';
+                    checkStatusBtn.disabled = true;
+                    
+                    // Make AJAX request to check status from Midtrans
+                    fetch('/api/midtrans/check-status/{{ $order->order_number }}', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        // Add cache control to prevent browser caching
+                        cache: 'no-store'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Status check response:', data);
+                        isCheckingStatus = false;
+                        
+                        if (data.success) {
+                            // Handle expired payments
+                            if (data.order_status === 'expired' || data.transaction_status === 'expire') {
+                                alert('This payment has expired. The order will be removed from your orders list.');
+                                window.location.reload();
+                                return;
+                            }
+                            
+                            // If order status is already updated to success, refresh the page
+                            if (data.order_status === 'success' || data.order_status === 'completed') {
+                                window.location.reload();
+                                return;
+                            }
+                            
+                            // If payment is successful with valid transaction_id, update status
+                            if ((data.transaction_status === 'settlement' || 
+                                data.transaction_status === 'capture') && 
+                                data.transaction_id) {
+                                
+                                alert('Payment confirmed! The page will refresh to show your updated order status.');
+                                window.location.reload();
+                            } 
+                            // If payment is still pending, show message
+                            else if (data.transaction_status === 'pending') {
+                                alert('Payment is still pending. Please complete your payment.');
+                                checkStatusBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Check Status';
+                                checkStatusBtn.disabled = false;
+                            }
+                            // If payment failed, show message
+                            else {
+                                alert('Payment status: ' + data.transaction_status + '. Please try again or contact support.');
+                                checkStatusBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Check Status';
+                                checkStatusBtn.disabled = false;
+                            }
+                        } else {
+                            // Show error message
+                            alert('Error checking payment status: ' + (data.message || 'Unknown error'));
+                            checkStatusBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Check Status';
+                            checkStatusBtn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking status:', error);
+                        alert('Error checking payment status. Please try again.');
+                        checkStatusBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Check Status';
+                        checkStatusBtn.disabled = false;
+                        isCheckingStatus = false;
+                    })
+                    .finally(() => {
+                        // Re-enable button after COOLDOWN_MS regardless of result
+                        setTimeout(() => {
+                            if (checkStatusBtn.disabled) {
+                                checkStatusBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Check Status';
+                                checkStatusBtn.disabled = false;
+                            }
+                            // Make sure the flag is reset
+                            isCheckingStatus = false;
+                        }, COOLDOWN_MS);
+                    });
+                });
             }
         });
     </script>

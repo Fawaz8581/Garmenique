@@ -73,25 +73,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.snap.pay(snapTokenField.value, {
                     onSuccess: function(result) {
                         console.log('Payment success:', result);
-                        alert('Payment successful! You will be redirected to the order success page.');
                         const orderId = document.getElementById('order-id') ? document.getElementById('order-id').value : '';
                         handleSuccessfulPayment(orderId);
                     },
                     onPending: function(result) {
                         console.log('Payment pending:', result);
-                        alert('Payment is pending. Please complete your payment according to the instructions.');
                         const orderId = document.getElementById('order-id') ? document.getElementById('order-id').value : '';
                         handlePendingPayment(orderId);
                     },
                     onError: function(result) {
                         console.error('Payment error:', result);
-                        alert('Payment failed. Please try again.');
                         if (paymentLoading) paymentLoading.style.display = 'none';
+                        const orderId = document.getElementById('order-id') ? document.getElementById('order-id').value : '';
+                        window.location.href = '/order-success?order_id=' + orderId + '&status=error';
                     },
                     onClose: function() {
                         console.log('Customer closed the payment window');
-                        alert('Payment window closed. You can try again later.');
                         if (paymentLoading) paymentLoading.style.display = 'none';
+                        const orderId = document.getElementById('order-id') ? document.getElementById('order-id').value : '';
+                        handlePendingPayment(orderId);
                     }
                 });
             } catch (e) {
@@ -151,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.snap.pay(data.snap_token, {
                                 onSuccess: function(result) {
                                     console.log('Payment success:', result);
-                                    alert('Payment successful! You will be redirected to the order success page.');
                                     // Try to get order_number from the result if available
                                     let orderReference = data.order_number || data.order_id;
                                     if (result && result.order_id) {
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 },
                                 onPending: function(result) {
                                     console.log('Payment pending:', result);
-                                    alert('Payment is pending. Please complete your payment according to the instructions.');
                                     // Try to get order_number from the result if available
                                     let orderReference = data.order_number || data.order_id;
                                     if (result && result.order_id) {
@@ -171,17 +169,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                 },
                                 onError: function(result) {
                                     console.error('Payment error:', result);
-                                    alert('Payment failed. Please try again.');
                                     if (paymentLoading) paymentLoading.style.display = 'none';
                                     console.log('Payment error details:', JSON.stringify(result));
+                                    // Try to get order_number from the result if available
+                                    let orderReference = data.order_number || data.order_id;
+                                    if (result && result.order_id) {
+                                        orderReference = result.order_id;
+                                    }
+                                    window.location.href = '/order-success?order_id=' + orderReference + '&status=error';
                                 },
                                 onClose: function() {
                                     console.log('Customer closed the payment window');
                                     if (paymentLoading) paymentLoading.style.display = 'none';
-                                    if (shippingSection) shippingSection.style.display = 'block';
-                                    if (paymentSection) paymentSection.style.display = 'none';
-                                    if (step2) step2.classList.remove('active');
-                                    if (step1) step1.classList.add('active');
+                                    // Try to get order_number from the result if available
+                                    let orderReference = data.order_number || data.order_id;
+                                    handlePendingPayment(orderReference);
                                 }
                             });
                         } catch (e) {

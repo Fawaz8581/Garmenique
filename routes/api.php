@@ -33,3 +33,4 @@ Route::post('/midtrans/notification', [MidtransController::class, 'notificationH
 Route::get('/midtrans/finish', [MidtransController::class, 'finishRedirect']);
 Route::get('/midtrans/unfinish', [MidtransController::class, 'unfinishRedirect']);
 Route::get('/midtrans/error', [MidtransController::class, 'errorRedirect']);
+Route::get('/midtrans/check-status/{orderNumber}', [MidtransController::class, 'checkStatus']);

@@ -329,6 +329,18 @@ class MidtransController extends Controller
                 $order->status = 'failed';
             } else if ($transaction == 'expire') {
                 $order->status = 'expired';
+                
+                // For expired transactions, make sure we don't reduce stock
+                // and mark it clearly in the payment info
+                $paymentInfo = $order->payment_info ?: [];
+                $paymentInfo['expired_at'] = now()->toDateTimeString();
+                $paymentInfo['stock_updated'] = false; // Ensure stock won't be updated
+                $order->payment_info = $paymentInfo;
+                
+                Log::info('Order marked as expired from notification', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number
+                ]);
             } else if ($transaction == 'cancel') {
                 $order->status = 'failed';
             }
@@ -638,37 +650,170 @@ class MidtransController extends Controller
         }
         
         return redirect()->route('order.success', ['order_id' => $order->id])
-            ->with('warning', 'Payment is not completed');
+            ->with('error', 'Payment failed. Please try again.');
     }
     
     /**
-     * Handle error redirect from Midtrans
+     * Check payment status directly from Midtrans API
      * 
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @param string $orderNumber
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function errorRedirect(Request $request)
+    public function checkStatus($orderNumber)
     {
-        Log::info('Midtrans error redirect received', [
-            'payload' => $request->all()
+        // Set your Merchant Server Key
+        \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
+        \Midtrans\Config::$isProduction = false;
+        
+        Log::info('Checking payment status for order', [
+            'order_number' => $orderNumber,
+            'user_id' => Auth::id() ?? 'unauthenticated'
         ]);
         
-        $orderId = $request->input('order_id');
-        
-        if (!$orderId) {
-            return redirect()->route('home')
-                ->with('error', 'Invalid order information');
+        try {
+            // Find the order first
+            $order = Order::where('order_number', $orderNumber)->first();
+            
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found'
+                ], 404);
+            }
+            
+            // Verify user has permission to check this order
+            if (!Auth::check() || (Auth::id() !== $order->user_id && !Auth::user()->is_admin)) {
+                Log::warning('Unauthorized status check attempt', [
+                    'order_id' => $order->id,
+                    'order_number' => $orderNumber,
+                    'user_id' => Auth::id() ?? 'unauthenticated'
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to check this order'
+                ], 403);
+            }
+            
+            // Check if order is already expired
+            if ($order->status === 'expired') {
+                return response()->json([
+                    'success' => true,
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'transaction_status' => 'expire',
+                    'order_status' => 'expired'
+                ]);
+            }
+            
+            // Get transaction status from Midtrans API
+            $status = \Midtrans\Transaction::status($orderNumber);
+            
+            Log::info('Midtrans status check response', [
+                'order_number' => $orderNumber,
+                'status' => $status
+            ]);
+            
+            // Always update payment_info to record the latest status from Midtrans
+            // but don't change the order status unless it's truly settled or captured
+            $order->payment_info = array_merge(
+                $order->payment_info ?: [], 
+                [
+                    'transaction_status' => $status->transaction_status,
+                    'payment_type' => $status->payment_type ?? null,
+                    'transaction_id' => $status->transaction_id ?? null,
+                    'updated_at' => now()->toDateTimeString(),
+                    'status_check' => true,
+                    'last_check_time' => now()->toDateTimeString()
+                ]
+            );
+            $order->save();
+            
+            Log::info('Payment info updated from status check', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'transaction_status' => $status->transaction_status
+            ]);
+            
+            // Handle expired transactions
+            if ($status->transaction_status == 'expire') {
+                $order->status = 'expired';
+                $order->save();
+                
+                Log::info('Order marked as expired', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'transaction_status' => $status->transaction_status
+                ]);
+            }
+            // Only update order status if it's truly settled or captured
+            // and ensure the status is from the Midtrans API, not from manual input
+            else if (($status->transaction_status == 'capture' || $status->transaction_status == 'settlement') && 
+                ($order->status == 'pending' || $order->status == 'payment_pending')) {
+                
+                // Further verification by checking transaction_id and payment_type
+                if (isset($status->transaction_id) && !empty($status->transaction_id)) {
+                    // Update order status
+                    $order->status = 'success';
+                    $order->save();
+                    
+                    // Check if stock already updated
+                    $stockAlreadyUpdated = isset($order->payment_info['stock_updated']) && $order->payment_info['stock_updated'] === true;
+                    
+                    // Update stock if not already updated
+                    if (!$stockAlreadyUpdated) {
+                        $this->updateProductStock($order);
+                        
+                        // Mark stock as updated
+                        $paymentInfo = $order->payment_info;
+                        $paymentInfo['stock_updated'] = true;
+                        $order->payment_info = $paymentInfo;
+                        $order->save();
+                        
+                        Log::info('Stock updated after status check', [
+                            'order_id' => $order->id,
+                            'order_number' => $order->order_number
+                        ]);
+                    }
+                    
+                    Log::info('Order status updated after status check', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'previous_status' => 'pending/payment_pending',
+                        'new_status' => 'success',
+                        'transaction_id' => $status->transaction_id
+                    ]);
+                } else {
+                    Log::warning('Transaction marked as settled but missing transaction_id', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'transaction_status' => $status->transaction_status
+                    ]);
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'transaction_status' => $status->transaction_status,
+                'payment_type' => $status->payment_type ?? null,
+                'transaction_time' => $status->transaction_time ?? null,
+                'order_status' => $order->status
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking payment status', [
+                'order_number' => $orderNumber,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking payment status: ' . $e->getMessage()
+            ], 500);
         }
-        
-        $order = Order::where('order_number', $orderId)->first();
-        
-        if (!$order) {
-            return redirect()->route('home')
-                ->with('error', 'Order not found');
-        }
-        
-        return redirect()->route('order.success', ['order_id' => $order->id])
-            ->with('error', 'Payment failed. Please try again.');
     }
     
     /**

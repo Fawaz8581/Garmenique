@@ -288,12 +288,20 @@ class OrderController extends Controller
             return redirect('/')->with('error', 'Order not found or unauthorized');
         }
         
-        // If status is pending, update order status
+        // Update order status based on the status parameter
         if ($status === 'pending') {
             $order->status = 'payment_pending';
             $order->save();
             
             Log::info('Order status updated to payment_pending', [
+                'order_id' => $orderId,
+                'user_id' => Auth::id()
+            ]);
+        } else if ($status === 'error') {
+            $order->status = 'payment_failed';
+            $order->save();
+            
+            Log::info('Order status updated to payment_failed', [
                 'order_id' => $orderId,
                 'user_id' => Auth::id()
             ]);
