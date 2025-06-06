@@ -154,9 +154,9 @@ class MidtransController extends Controller
             
             // IMPORTANT: Gunakan server key dan client key yang benar
             // Pastikan Anda menggantinya dengan server key dan client key dari akun Midtrans Anda
-            \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
-            \Midtrans\Config::$clientKey = 'SB-Mid-client-61XuGAwQ8Bj8LxSS'; 
-            \Midtrans\Config::$isProduction = false;
+            \Midtrans\Config::$serverKey = config('midtrans.serverKey', env('MIDTRANS_SERVER_KEY'));
+            \Midtrans\Config::$clientKey = config('midtrans.clientKey', env('MIDTRANS_CLIENT_KEY')); 
+            \Midtrans\Config::$isProduction = config('midtrans.isProduction', env('MIDTRANS_IS_PRODUCTION', false));
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
             // Set up transaction parameters
@@ -251,8 +251,8 @@ class MidtransController extends Controller
     public function notificationHandler(Request $request)
     {
         // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
-        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey', env('MIDTRANS_SERVER_KEY'));
+        \Midtrans\Config::$isProduction = config('midtrans.isProduction', env('MIDTRANS_IS_PRODUCTION', false));
         
         Log::info('Midtrans notification received', [
             'payload' => $request->all()
@@ -500,9 +500,9 @@ class MidtransController extends Controller
             }
             
             // Set Midtrans configuration
-            \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
-            \Midtrans\Config::$clientKey = 'SB-Mid-client-61XuGAwQ8Bj8LxSS'; 
-            \Midtrans\Config::$isProduction = false;
+            \Midtrans\Config::$serverKey = config('midtrans.serverKey', env('MIDTRANS_SERVER_KEY'));
+            \Midtrans\Config::$clientKey = config('midtrans.clientKey', env('MIDTRANS_CLIENT_KEY')); 
+            \Midtrans\Config::$isProduction = config('midtrans.isProduction', env('MIDTRANS_IS_PRODUCTION', false));
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
             
@@ -662,8 +662,8 @@ class MidtransController extends Controller
     public function checkStatus($orderNumber)
     {
         // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA';
-        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey', env('MIDTRANS_SERVER_KEY'));
+        \Midtrans\Config::$isProduction = config('midtrans.isProduction', env('MIDTRANS_IS_PRODUCTION', false));
         
         Log::info('Checking payment status for order', [
             'order_number' => $orderNumber,
