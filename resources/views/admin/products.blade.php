@@ -1294,16 +1294,19 @@
             const sizeGrid = document.getElementById('detailSizeGrid');
             sizeGrid.innerHTML = '';
             
-            if (product.sizes) {
-                Object.values(product.sizes).forEach(sizeData => {
+            if (product.sizes && product.sizes.length > 0) {
+                product.sizes.forEach(sizeData => {
                     const sizeBox = document.createElement('div');
                     sizeBox.className = 'size-stock';
+                    const stockValue = (sizeData.pivot && typeof sizeData.pivot.stock !== 'undefined') ? sizeData.pivot.stock : 'N/A';
                     sizeBox.innerHTML = `
-                        <span class="size-label">${sizeData.name}</span>
-                        <span class="size-quantity">${sizeData.stock}</span>
+                        <h5>${sizeData.name}</h5>
+                        <p>${stockValue}</p>
                     `;
                     sizeGrid.appendChild(sizeBox);
                 });
+            } else {
+                sizeGrid.innerHTML = '<p>No size information available.</p>';
             }
 
             // Show modal
