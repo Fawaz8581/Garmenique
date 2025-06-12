@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Size;
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,9 @@ class DashboardController extends Controller
         $lowStockCount = Product::whereHas('sizes', function($query) {
             $query->where('stock', '<', 10);
         })->count();
+
+        // Get total users with the 'user' role
+        $totalUsers = User::where('role', 'user')->count();
 
         // Get the selected date or default to today
         $showAllDates = $request->has('all_dates');
@@ -137,6 +141,7 @@ class DashboardController extends Controller
             'categoryCount',
             'sizeCount',
             'lowStockCount',
+            'totalUsers',
             'totalSales',
             'totalOrders',
             'salesPercentage',

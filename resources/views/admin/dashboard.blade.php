@@ -85,7 +85,7 @@
         <!-- Dashboard Cards -->
         <div class="dashboard-cards">
             <div class="row">
-                <div class="col-md-6 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4">
                     <div class="dashboard-card">
                         <div class="d-flex align-items-start">
                             <div>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 
-                <div class="col-md-6 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4">
                     <div class="dashboard-card">
                         <div class="d-flex align-items-start">
                             <div>
@@ -126,6 +126,21 @@
                                             stroke-dasharray="220" stroke-dashoffset="{{ 220 - ($ordersPercentage * 2.2) }}" transform="rotate(-90 40 40)"></circle>
                                 </svg>
                                 <div class="progress-percentage">{{ $ordersPercentage }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <div class="d-flex align-items-start">
+                            <div>
+                                <div class="card-icon icon-users" style="background-color: #ffc107;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h3 class="card-title">Total Users</h3>
+                                <h2 class="card-value">{{ $totalUsers }}</h2>
+                                <p class="card-period">All Time</p>
                             </div>
                         </div>
                     </div>
