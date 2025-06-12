@@ -109,25 +109,27 @@
                 </div>
                 
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="dashboard-card">
-                        <div class="d-flex align-items-start">
-                            <div>
-                                <div class="card-icon icon-orders">
-                                    <i class="fas fa-shopping-bag"></i>
-                                </div>
-                                <h3 class="card-title">Total Orders</h3>
-                                <h2 class="card-value">{{ $totalOrders }}</h2>
-                                <p class="card-period">Last 24 Hours</p>
-                            </div>
-                            <div class="progress-container">
-                                <svg class="progress-circle">
-                                    <circle cx="40" cy="40" r="35" fill="none" stroke="#eee" stroke-width="5"></circle>
-                                    <circle cx="40" cy="40" r="35" fill="none" stroke="#2a5298" stroke-width="5" 
-                                            stroke-dasharray="220" stroke-dashoffset="{{ 220 - ($ordersPercentage * 2.2) }}" transform="rotate(-90 40 40)"></circle>
-                                </svg>
-                                <div class="progress-percentage">{{ $ordersPercentage }}%</div>
-                            </div>
+                    <div class="dashboard-card" style="max-height: 300px; overflow-y: auto;">
+                        <div class="card-icon icon-products" style="background-color: #ff9800;">
+                            <i class="fas fa-trophy"></i>
                         </div>
+                        <h3 class="card-title">Most Products Sold</h3>
+                        
+                        @if(!empty($mostSoldProducts))
+                            <ul class="list-unstyled mt-3 product-list">
+                                @foreach($mostSoldProducts as $item)
+                                    <li class="d-flex align-items-center mb-2">
+                                        <img src="{{ route('product.image', ['id' => $item['product']->id]) }}" alt="{{ $item['product']->name }}" class="me-3" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid #eee;">
+                                        <div class="flex-grow-1">
+                                            <div style="font-weight: 500; font-size: 14px; color: #333;">{{ $item['product']->name }}</div>
+                                            <small class="text-muted" style="font-size: 12px;">Sold: <strong>{{ $item['quantity_sold'] }}</strong> units</small>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-muted mt-3">No product sales data available for the selected period.</p>
+                        @endif
                     </div>
                 </div>
 

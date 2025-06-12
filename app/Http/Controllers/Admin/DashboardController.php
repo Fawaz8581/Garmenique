@@ -50,10 +50,7 @@ class DashboardController extends Controller
         }
         
         // Calculate total sales
-        $totalSales = $ordersQuery->sum('total');
-        
-        // Get total orders count
-        $totalOrders = $ordersQuery->count();
+        $totalSales = (clone $ordersQuery)->sum('total');
         
         // Calculate sales percentage (compared to previous period)
         if (!$showAllDates) {
@@ -75,32 +72,21 @@ class DashboardController extends Controller
                                   ->where('status', '!=', 'rejected');
         
         $previousSales = $previousOrdersQuery->sum('total');
-        $previousOrders = $previousOrdersQuery->count();
         
         // Calculate percentages (avoid division by zero)
         $salesPercentage = $previousSales > 0 
             ? min(100, round(($totalSales / $previousSales) * 100)) 
             : ($totalSales > 0 ? 100 : 0);
         
-        $ordersPercentage = $previousOrders > 0 
-            ? min(100, round(($totalOrders / $previousOrders) * 100)) 
-            : ($totalOrders > 0 ? 100 : 0);
-        
         // Get recent orders with product details and pagination
-        $recentOrdersQuery = Order::orderBy('created_at', 'desc')
-                                 ->where('status', '!=', 'rejected');
-        
-        // Apply date filter if not showing all dates
-        if (!$showAllDates) {
-            $recentOrdersQuery->whereBetween('created_at', [$startDate, $endDate]);
-        }
+        $recentOrdersQuery = (clone $ordersQuery)->orderBy('created_at', 'desc');
         
         // Apply search filter if provided
         $search = $request->input('search');
         if ($search) {
             $recentOrdersQuery->where(function($query) use ($search) {
                 $query->where('order_number', 'like', "%{$search}%")
-                      ->orWhere('cart_items', 'like', "%{$search}%"); // This is a rough approximation since cart_items is JSON
+                      ->orWhere('cart_items', 'like', "%{$search}%");
             });
         }
         
@@ -114,14 +100,9 @@ class DashboardController extends Controller
         $recentOrdersPaginated = $recentOrdersQuery->paginate(5)->appends($request->except('page'));
         
         $recentOrders = $recentOrdersPaginated->map(function ($order) {
-            // Extract the first product from each order
             $firstItem = !empty($order->cart_items) ? $order->cart_items[0] : null;
-            
-            // Extract order number for product number
             $orderNumberParts = explode('-', $order->order_number);
             $productNumber = isset($orderNumberParts[1]) ? $orderNumberParts[1] : '';
-            
-            // Get shipping expedition information
             $shippingInfo = $order->shipping_info ?? [];
             
             return [
@@ -136,6 +117,37 @@ class DashboardController extends Controller
             ];
         });
 
+        // --- Most Sold Products Logic ---
+        $allOrdersForProducts = (clone $ordersQuery)->get();
+
+        $productSales = [];
+        foreach ($allOrdersForProducts as $order) {
+            if (is_array($order->cart_items)) {
+                foreach ($order->cart_items as $item) {
+                    if (isset($item['id']) && isset($item['quantity'])) {
+                        $productId = $item['id'];
+                        $productSales[$productId] = ($productSales[$productId] ?? 0) + $item['quantity'];
+                    }
+                }
+            }
+        }
+
+        arsort($productSales);
+        $topProductIds = array_slice(array_keys($productSales), 0, 5);
+        $topProducts = Product::with('sizes')->whereIn('id', $topProductIds)->get()->keyBy('id');
+
+        $mostSoldProducts = [];
+        foreach ($topProductIds as $productId) {
+            if (isset($topProducts[$productId])) {
+                $product = $topProducts[$productId];
+                $mostSoldProducts[] = [
+                    'product' => $product,
+                    'quantity_sold' => $productSales[$productId]
+                ];
+            }
+        }
+        // --- End Most Sold Products Logic ---
+
         return view('admin.dashboard', compact(
             'productCount',
             'categoryCount',
@@ -143,13 +155,12 @@ class DashboardController extends Controller
             'lowStockCount',
             'totalUsers',
             'totalSales',
-            'totalOrders',
             'salesPercentage',
-            'ordersPercentage',
             'recentOrders',
             'recentOrdersPaginated',
             'selectedDate',
-            'showAllDates'
+            'showAllDates',
+            'mostSoldProducts'
         ));
     }
     
