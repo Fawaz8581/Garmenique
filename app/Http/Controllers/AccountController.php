@@ -48,6 +48,65 @@ class AccountController extends Controller
 
         return view('account.orders', ['orders' => $orders]);
     }
+
+    /**
+     * Mark an order as delivered.
+     */
+    public function completeOrder(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        // Check if the order belongs to the authenticated user
+        if ($order->user_id !== Auth::id()) {
+            return redirect()->route('account.orders')->with('error', 'You are not authorized to update this order.');
+        }
+
+        // Check if the order status is 'shipped'
+        if ($order->status !== 'shipped') {
+            return redirect()->route('account.orders')->with('error', 'This order cannot be marked as delivered.');
+        }
+
+        // Find the latest 'shipped' note message
+        $notes = $order->notes ?? [];
+        $shippedNoteMessage = '';
+        if (is_array($notes)) {
+            $shippedNotes = collect($notes)->filter(function ($note) {
+                return isset($note['status']) && $note['status'] === 'shipped';
+            })->sortByDesc('date');
+
+            if ($shippedNotes->isNotEmpty()) {
+                $latestShippedNote = $shippedNotes->first();
+                if (isset($latestShippedNote['message'])) {
+                    $shippedNoteMessage = $latestShippedNote['message'];
+                }
+            }
+        }
+
+        // Update the order status to 'delivered'
+        $order->status = 'delivered';
+
+        // Add a new note for 'delivered' status, preserving the last message
+        if (!empty($shippedNoteMessage)) {
+            $currentNotes = $order->notes ?? [];
+            if (!is_array($currentNotes)) {
+                $currentNotes = [];
+            }
+            
+            $newNote = [
+                'status' => 'delivered',
+                'message' => $shippedNoteMessage,
+                'date' => now()->toDateTimeString(),
+                'admin' => true // To ensure it's displayed by the current view logic
+            ];
+            
+            $currentNotes[] = $newNote;
+            $order->notes = $currentNotes;
+        }
+        
+        $order->save();
+
+        return redirect()->route('account.orders')->with('status', 'Order has been marked as delivered.');
+    }
     
     /**
      * Update the user's profile information.

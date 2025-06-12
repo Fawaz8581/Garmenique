@@ -276,7 +276,7 @@
                                                             }
                                                         @endphp
                                                         
-                                                        <div class="d-flex gap-2">
+                                                        <div class="d-flex flex-column gap-2">
                                                             <a href="{{ $trackingUrl }}" target="_blank" class="btn-track-order">
                                                                 <i class="fas fa-map-marker-alt me-2"></i> Track Order
                                                             </a>
@@ -284,6 +284,13 @@
                                                             <a href="{{ route('invoice.download', $order->id) }}" class="btn-download-invoice">
                                                                 <i class="fas fa-file-invoice me-2"></i> Invoice
                                                             </a>
+
+                                                            @if ($order->status == 'shipped')
+                                                                <form action="{{ route('account.orders.complete', $order->id) }}" method="POST" class="d-inline">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn-track-order" style="background-color: #007bff; color: white; border-color: #007bff;">Complete Order</button>
+                                                                </form>
+                                                            @endif
                                                         </div>
                                                     @elseif(in_array($order->status, ['success', 'confirmed', 'completed']))
                                                         <a href="{{ route('invoice.download', $order->id) }}" class="btn-download-invoice">

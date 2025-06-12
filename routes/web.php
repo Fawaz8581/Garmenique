@@ -107,6 +107,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Orders routes
     Route::get('/account/orders', [AccountController::class, 'showOrders'])->name('account.orders');
+    Route::post('/account/orders/{id}/complete', [AccountController::class, 'completeOrder'])->name('account.orders.complete');
     
     // Dashboard routes
     Route::get('/account/dashboard', [AccountController::class, 'showDashboard'])->name('account.dashboard');
